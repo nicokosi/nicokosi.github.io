@@ -101,10 +101,10 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-              <td>benzod</td>
-              <td>havlane</td>
-              <td>loprazolam</td>
+            <tr class="2013">
+              <td>inca</td>
+              <td>Amlor</td>
+              <td>amlodipine</td>
               <td>Sanofi Aventis</td>
               <td></td>
               <td class="changed"><div class="down" data-toggle="modal" data-target="#price1"></div></td>
@@ -113,34 +113,34 @@
               <td class="changed">lactose</td>
             </tr>
             <tr>
-              <td></td>
+              <td>benzodiazepine</td>
               <td>lormetazepam</td>
               <td>lormetazepam</td>
-              <td>Générique</td>
+              <td>Teva</td>
               <td></td>
               <td></td>
               <td></td>
               <td class="changed">faible > important</td>
               <td></td>
             </tr>
-            <tr>
-              <td></td>
-              <td>noctamide</td>
-              <td>lormetazepam</td>
-              <td>Bayer</td>
-              <td></td>
-              <td class="changed"><div class="down"></div></td>
-              <td></td>
-              <td class="changed">faible > important</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td></td>
+            <tr class="2014">
+              <td>benzodiazepine</td>
               <td>rohypnol</td>
               <td>flunitrazepam</td>
-              <td>Roche</td>
+              <td>Bayer</td>
               <td class="changed"><div class="delete"></div></td>
-              <td class="changed"><div class="down"></div></td>
+              <td class="changed"><div class="down" data-toggle="modal" data-target="#price3"></div></td>
+              <td></td>
+              <td class="changed">faible > important</td>
+              <td></td>
+            </tr>
+            <tr class="2014">
+              <td>antidepresseur</td>
+              <td>zoloft</td>
+              <td>sertraline</td>
+              <td>Roche</td>
+              <td></td>
+              <td class="changed"><div class="down" data-toggle="modal" data-target="#price4"></div></td>
               <td class="changed"><div class="up"></div></td>
               <td></td>
               <td></td>
@@ -155,7 +155,29 @@
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-body">
-              <div class="logo-vidal"></div>
+              <div class="amlor"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="price3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div class="roro"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="price4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div class="serta"></div>
             </div>
           </div>
         </div>
@@ -169,6 +191,23 @@
   <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
   <script src="js/datepicker/jQDateRangeSlider-min.js"></script>
   <script>
-                $("#dateSlider").dateRangeSlider();
+    $("#dateSlider").dateRangeSlider();
+    $("#dateSlider").bind("valuesChanging", function(e, data){
+
+    if(data.values.min.getFullYear() <= 2013 && data.values.max.getFullYear() >= 2013){
+        $(".2013").show();
+      }else{
+        $(".2013").hide();
+      }
+      if(data.values.min.getFullYear() <= 2014 && data.values.max.getFullYear() >= 2014){
+        $(".2014").show();
+      }else{
+        $(".2014").hide();
+      }
+
+
+    });
+
+
   </script>
 </html>

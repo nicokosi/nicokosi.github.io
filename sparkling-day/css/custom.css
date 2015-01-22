@@ -48,3 +48,43 @@
     height: 30px;
     width: 30px;
 }
+
+.amlor {
+    background-image: url("./img/Amlor.jpg");
+    height: 400px;
+    width: 500px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.clamoxyl {
+    background-image: url("./img/Clamoxyl.jpg");
+    height: 400px;
+    width: 500px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.roro {
+    background-image: url("./img/RORO.jpg");
+    height: 400px;
+    width: 500px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.serta {
+    background-image: url("./img/Serta.jpg");
+    height: 400px;
+    width: 500px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    margin-left: auto;
+    margin-right: auto;
+}
