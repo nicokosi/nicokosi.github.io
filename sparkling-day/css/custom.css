@@ -1,0 +1,50 @@
+.logo-vidal {
+    background-image: url("./img/quoi-de-neuf.jpg");
+    height: 200px;
+    width: 500px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.logo-vidal-2 {
+    background-image: url("./img/VIDAL-Group.png");
+    height: 100px;
+    width: 200px;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    position: fixed;
+    bottom: 0;
+    right: 80px;
+}
+
+.up {
+    background-image: url("./img/up.png");
+    background-repeat: no-repeat;
+    margin-left: auto;
+    margin-right: auto;
+    background-size: 100%;
+    height: 30px;
+    width: 30px;
+}
+
+.down {
+    background-image: url("./img/down.png");
+    background-repeat: no-repeat;
+    margin-left: auto;
+    margin-right: auto;
+    background-size: 100%;
+    height: 30px;
+    width: 30px;
+}
+
+.delete {
+    background-image: url("./img/delete.png");
+    background-repeat: no-repeat;
+    margin-left: auto;
+    margin-right: auto;
+    background-size: 100%;
+    height: 30px;
+    width: 30px;
+}

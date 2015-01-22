@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Liste de médicaments</title>
+
+    <link rel="stylesheet" href="css/custom.css"/>
+    <link rel="stylesheet" href="css/table.css"/>
+
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="css/bootstrap.css">
+
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/table/table.js"></script>
+
+
+
+    <link rel="stylesheet" href="css/iThing.css" type="text/css" />
+
+  </head>
+  <body>
+
+    <nav class="navbar navbar-fixed-top" style="background-color: #FFF;">
+      <div class="logo-vidal"></div>
+      <div class="container">
+
+
+        <div class="navbar-header">
+
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true" style="margin-top: 10%;">
+              Country
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">FRANCE</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">UK</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Spain</a></li>
+              <li role="presentation"><a role="menuitem" tabindex="-1" href="#">US</a></li>
+            </ul>
+          </div>
+        </div>
+        <div id="navbar1" class="collapse navbar-collapse navbar1">
+          <ul class="nav navbar-nav">
+            <li><a href="index.html">Industrie</a></li>
+            <li><a href="medecin.html">Medecin</a></li>
+            <li><a href="#about">Hopitaux</a></li>
+            <li><a href="#about">Editeur</a></li>
+            <li><a href="#about">Pharmacien</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container" style="margin-top: 10%;">
+
+      <div class="starter-template">
+        <br><br>
+        <h1>Vue concurrentielle</h1>
+        <br><br><br><br>
+        <p class="lead">Periode visée<div id="dateSlider"></div></p>
+
+      </div>
+
+      <div class="row" style="margin-top: 5%">
+        <div class="panel panel-primary filterable">
+          <div class="panel-heading">
+            <h3 class="panel-title">Spécialités</h3>
+            <div class="pull-right">
+              <button class="btn btn-default btn-xs btn-filter"><span class="glyphicon glyphicon-filter"></span> Filtrer</button>
+            </div>
+          </div>
+          <table class="table table-custom">
+            <thead>
+            <tr class="filters">
+              <th><input type="text" class="form-control" placeholder="Classe Therap" disabled></th>
+              <th><input type="text" class="form-control" placeholder="Produit" disabled></th>
+              <th><input type="text" class="form-control" placeholder="Subst active" disabled></th>
+              <th><input type="text" class="form-control" placeholder="Labo" disabled></th>
+              <th><input type="text" class="form-control" placeholder="Commercialisé" disabled></th>
+              <th><input type="text" class="form-control" placeholder="Prix" disabled></th>
+              <th><input type="text" class="form-control" placeholder="ASMR" disabled></th>
+              <th><input type="text" class="form-control" placeholder="SMR" disabled></th>
+              <th><input type="text" class="form-control" placeholder="Composition" disabled></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>benzod</td>
+              <td>havlane</td>
+              <td>loprazolam</td>
+              <td>Sanofi Aventis</td>
+              <td></td>
+              <td class="changed"><div class="down" data-toggle="modal" data-target="#price1"></div></td>
+              <td></td>
+              <td class="changed">faible</td>
+              <td class="changed">lactose</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>lormetazepam</td>
+              <td>lormetazepam</td>
+              <td>Générique</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="changed">faible > important</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>noctamide</td>
+              <td>lormetazepam</td>
+              <td>Bayer</td>
+              <td></td>
+              <td class="changed"><div class="down"></div></td>
+              <td></td>
+              <td class="changed">faible > important</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>rohypnol</td>
+              <td>flunitrazepam</td>
+              <td>Roche</td>
+              <td class="changed"><div class="delete"></div></td>
+              <td class="changed"><div class="down"></div></td>
+              <td class="changed"><div class="up"></div></td>
+              <td></td>
+              <td></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="price1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              <div class="logo-vidal"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div><!-- /.container -->
+  </body>
+  <div class="logo-vidal-2"></div>
+
+  <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+  <script src="js/datepicker/jQDateRangeSlider-min.js"></script>
+  <script>
+                $("#dateSlider").dateRangeSlider();
+  </script>
+</html>
