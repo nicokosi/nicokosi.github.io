@@ -117,8 +117,8 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
     <!-- Post Content -->
     <article>
-        <p>Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d'illuster par l'exemple le pattern matching en Scala.</p>
-<p>Supposons que nous voulions créer une fonction retournant la couleur (noir / rouge) d'une enseigne d'une carte à jouer (les quatre enseignes du jeu français étant : trêfle, coeur, carreau et pique).</p>
+        <p>Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d’illustrer par l'exemple le pattern matching en Scala.</p>
+<p>Supposons que nous voulions créer une fonction retournant la couleur (noir / rouge) d'une enseigne d'une carte à jouer (les quatre enseignes du jeu français étant : trèfle, cœur, carreau et pique).</p>
 <p>Notes : dans le code ci-dessous, les commentaires se trouvant à la fin de chaque ligne correspondent à la sortie standard de la console ; j'ai utilisé un <a href="https://confluence.jetbrains.com/display/IntelliJIDEA/Working+with+Scala+Worksheet">worksheet IntelliJ IDEA</a> pour coder interactivement cet exemple, mais on peut bien sûr utiliser la console Scala.</p>
 <p><br/></p>
 <h2>1ère étape : création d'une simple classe</h2>
@@ -133,7 +133,7 @@
 </pre></div>
 
 
-<p>Notons que cette classe permet de comparer des objets par l'identité (référence) et non par valeur car on ne surcharge pas la méthode <code>equals</code> :</p>
+<p>Notons que cette classe permet de comparer des objets par identité (référence) et non par valeur car on ne surcharge pas la méthode <code>equals</code> :</p>
 <div class="highlight"><pre><span></span><span class="n">trèfle</span><span class="o">.</span><span class="n">equals</span><span class="o">(</span><span class="n">trèfle</span><span class="o">)</span> <span class="c1">// true</span>
 <span class="n">trèfle</span> <span class="o">==</span> <span class="k">new</span> <span class="nc">Trèfle</span> <span class="c1">// false</span>
 <span class="n">trèfle</span><span class="o">.</span><span class="n">eq</span><span class="o">(</span><span class="k">new</span> <span class="nc">Trèfle</span><span class="o">)</span> <span class="c1">// false</span>
@@ -150,11 +150,11 @@
 
 <p><br/></p>
 <h2>2ème étape : création d'une case class</h2>
-<p>La création d'une <code>case class</code> permet :
- 1. d'auto-implémenter les méthodes <code>equals</code>, <code>hashCode</code> et <code>toString</code>.
- 2. de bénéficier de deux méthodes utiles au pattern matching :
-  - un "constructeur", la méthode <code>apply</code>
-  - un "déconstructeur", la méthode <code>unapply</code></p>
+<p>La création d'une <code>case class</code> permet :</p>
+<ol>
+<li>d'auto-implémenter les méthodes <code>equals</code>, <code>hashCode</code> et <code>toString</code> ;</li>
+<li>de bénéficier de deux méthodes utiles au pattern matching : un "constructeur", la méthode <code>apply</code>, et un "dé-constructeur", la méthode <code>unapply</code>.</li>
+</ol>
 <div class="highlight"><pre><span></span><span class="k">case</span> <span class="k">class</span> <span class="nc">Enseigne</span><span class="o">(</span><span class="n">symbole</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">libellé</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
 </pre></div>
 
@@ -191,6 +191,7 @@
 
 <p><br/></p>
 <h2>Dernière étape : pattern matchons !</h2>
+<h3>Premier exemple</h3>
 <p>Un premier exemple de pattern matching, utilisé dans une fonction qui retourne la couleur de l'enseigne :</p>
 <div class="highlight"><pre><span></span><span class="k">def</span> <span class="n">indiquerJusteLaCouleur</span><span class="o">(</span><span class="n">cardSuite</span><span class="k">:</span> <span class="kt">Enseigne</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="n">cardSuite</span> <span class="k">match</span> <span class="o">{</span>
   <span class="k">case</span> <span class="nc">Enseignes</span><span class="o">.</span><span class="nc">TREFLE</span> <span class="o">|</span> <span class="nc">Enseignes</span><span class="o">.</span><span class="nc">PIQUE</span> <span class="k">=&gt;</span> <span class="s">&quot;noir&quot;</span>
@@ -202,10 +203,13 @@
 </pre></div>
 
 
-<p>Ce premier exemple met en avant :
- - la notation <code>|</code> (<em>disjunction</em>) permettant de regrouper plusieurs cas ;
- - la notation <code>_</code> (<em>wildcard</em>) pour gérer les autres cas.</p>
-<p>Voici un deuxième exemple montrant comment récupérer sélectivement certains champs (ici, le libellé de l'enseigne) en "destructurant" notre instance de <code>case class</code>, via la méthode <code>unapply</code>.</p>
+<p>Ce premier exemple met en avant :</p>
+<ul>
+<li>la notation <code>|</code> (<em>disjunction</em>) permettant de regrouper plusieurs cas ;</li>
+<li>la notation <code>_</code> (<em>wildcard</em>) pour gérer les autres cas.</li>
+</ul>
+<h3>Deuxième exemple</h3>
+<p>Voici un deuxième exemple montrant comment récupérer sélectivement certains champs (ici, le libellé de l'enseigne) en "dé-structurant" notre instance de <code>case class</code>, via la méthode <code>unapply</code>.</p>
 <div class="highlight"><pre><span></span><span class="k">def</span> <span class="n">décrireLaCouleur</span><span class="o">(</span><span class="n">enseigne</span><span class="k">:</span> <span class="kt">Enseigne</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="n">enseigne</span> <span class="k">match</span> <span class="o">{</span>
   <span class="k">case</span> <span class="nc">Enseigne</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">libellé</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="s">s&quot;</span><span class="si">$libellé</span><span class="s"> is </span><span class="si">${</span><span class="n">indiquerJusteLaCouleur</span><span class="o">(</span><span class="n">enseigne</span><span class="o">)</span><span class="si">}</span><span class="s">&quot;</span>
 <span class="o">}</span>
