@@ -123,13 +123,29 @@ et codons de façon interactive un exemple similaire en Haskell.</p>
 </pre></div>
 
 
-<p>Nous venons de créer notre propre type (<em>data type</em>), nommé "Enseigne" qui :
-<em> a quatre constructeurs (<em>value constructors</em>)
-</em> hérite des classes de base :
-  * <code>Eq</code> pour implémenter l'égalité entre deux valeurs
-  * <code>Ord</code> pour pouvoir comparer deux valeurs
-  * <code>Enum</code> pour que les valeurs sont finies et ordonnées (<em>sequentially ordered types</em>)
-  * <code>Show</code> pour avoir une représentation sous forme de chaîne de caractères, ce qui peut être utile pour débugguer ou pour évaluer interactivement du code via le REPL.</p>
+<p>Nous venons de créer notre propre type (<em>data type</em>), nommé "Enseigne" qui :</p>
+<ul>
+<li>
+<p>a quatre constructeurs (<em>value constructors</em>)</p>
+</li>
+<li>
+<p>hérite des classes de base :</p>
+<ul>
+<li>
+<p><code>Eq</code> pour implémenter l'égalité entre deux valeurs</p>
+</li>
+<li>
+<p><code>Ord</code> pour pouvoir comparer deux valeurs</p>
+</li>
+<li>
+<p><code>Enum</code> pour que les valeurs sont finies et ordonnées (<em>sequentially ordered types</em>)</p>
+</li>
+<li>
+<p><code>Show</code> pour avoir une représentation sous forme de chaîne de caractères, ce qui peut être utile pour débugguer ou pour évaluer interactivement du code via le REPL.</p>
+</li>
+</ul>
+</li>
+</ul>
 <p>Utilisons maintenant le REPL, <code>ghci</code> (<em>Glascow Haskell Compiler Interactive environment</em>), pour interagir avec cette énumération :</p>
 <div class="highlight"><pre><span></span>ghci
 GHCi, version 8.0.1: http://www.haskell.org/ghc/  :? <span class="k">for</span> <span class="nb">help</span>
@@ -212,7 +228,7 @@ True
 <p>Nous avons ici utilisé le mot-clé <code>where</code> qui nous permet de partager des expressions.
 <br/></p>
 <h3>Troisième exemple, "dé-structuration" via des 'wild-cards'</h3>
-<p>Définissons notre propre type <code>Carte</code> combinant un rang (1, 2, 3, ..., valet, dame, roi) et une une enseigne :</p>
+<p>Définissons notre propre type <code>Carte</code> combinant un rang (1, 2, 3, ..., valet, dame, roi) et une enseigne :</p>
 <div class="highlight"><pre><span></span><span class="kr">data</span> <span class="kt">Rang</span> <span class="ow">=</span> <span class="kt">R1</span> <span class="o">|</span> <span class="kt">R2</span> <span class="o">|</span> <span class="kt">R3</span> <span class="o">|</span> <span class="kt">R4</span> <span class="o">|</span> <span class="kt">R5</span> <span class="o">|</span> <span class="kt">R6</span> <span class="o">|</span> <span class="kt">R7</span> <span class="o">|</span> <span class="kt">R8</span> <span class="o">|</span> <span class="kt">R9</span> <span class="o">|</span> <span class="kt">R10</span> <span class="o">|</span> <span class="kt">Valet</span> <span class="o">|</span> <span class="kt">Dame</span> <span class="o">|</span> <span class="kt">Roi</span> <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Ord</span><span class="p">,</span> <span class="kt">Enum</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
 <span class="kr">data</span> <span class="kt">Carte</span> <span class="ow">=</span> <span class="kt">Carte</span> <span class="p">{</span>
   <span class="n">rang</span> <span class="ow">::</span> <span class="kt">Rang</span><span class="p">,</span>
