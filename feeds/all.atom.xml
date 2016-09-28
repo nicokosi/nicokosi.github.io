@@ -1,5 +1,288 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2016-09-14T00:00:00+02:00</updated><entry><title>Jouons avec le pattern matching en Scala</title><link href="https://nicokosi.github.io/scala-pattern-matching.html" rel="alternate"></link><published>2016-09-14T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-14:scala-pattern-matching.html</id><summary type="html">&lt;p&gt;Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d’illustrer par l'exemple le pattern matching en Scala.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2016-09-27T00:00:00+02:00</updated><entry><title>Jouons avec le pattern matching en Haskell</title><link href="https://nicokosi.github.io/haskell-pattern-matching.html" rel="alternate"></link><published>2016-09-27T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-27:haskell-pattern-matching.html</id><summary type="html">&lt;p&gt;Découvrons le pattern matching en Haskell en reprenant l'exemple des cartes à jouer utilisé dans l'article &lt;a href="https://nicokosi.github.io/scala-pattern-matching.html"&gt;"Jouons avec le pattern matching en Scala"&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Préambule : création d'une énumération&lt;/h2&gt;
+&lt;p&gt;Codons notre énumération correspondant à nos quatre enseignes (carreau, cœur, pique et trèfle) :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kr"&gt;data&lt;/span&gt; &lt;span class="kt"&gt;Enseigne&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;Carreau&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Coeur&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Pique&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Trèfle&lt;/span&gt;
+  &lt;span class="kr"&gt;deriving&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Eq&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Enum&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Show&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Nous venons de créer notre propre type (&lt;em&gt;data type&lt;/em&gt;) qui :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;a quatre constructeurs (&lt;em&gt;value constructors&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;hérite des classes de base :&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Eq&lt;/code&gt; pour implémenter l'égalité entre deux valeurs&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Enum&lt;/code&gt; pour que les valeurs sont finies et ordonnées (&lt;em&gt;sequentially ordered types&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Show&lt;/code&gt; pour avoir une représentation sous forme de chaîne de caractères, ce qui peut être utile pour débugguer ou pour évaluer interactivement du code via le REPL.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Utilisons maintenant &lt;code&gt;ghci&lt;/code&gt; (&lt;em&gt;Glascow Haskell Compiler Interactive environment&lt;/em&gt;), le REPL d'Haskell, pour interagir avec cette énumération :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="kt"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;Coeur&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="kt"&gt;Coeur&lt;/span&gt;
+&lt;span class="kt"&gt;True&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="kt"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;succ&lt;/span&gt; &lt;span class="kt"&gt;Coeur&lt;/span&gt;
+&lt;span class="kt"&gt;Pique&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Exemples de pattern matching&lt;/h2&gt;
+&lt;h3&gt;Premier exemple basique&lt;/h3&gt;
+&lt;p&gt;La fonction suivante retourne le symbole d'une enseigne :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;symbole&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;Enseigne&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
+&lt;span class="nf"&gt;symbole&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt;
+  &lt;span class="kr"&gt;case&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="kr"&gt;of&lt;/span&gt;
+    &lt;span class="kt"&gt;Carreau&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♦&amp;quot;&lt;/span&gt;
+    &lt;span class="kt"&gt;Coeur&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;♥&amp;quot;&lt;/span&gt;
+    &lt;span class="kt"&gt;Pique&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;♠&amp;quot;&lt;/span&gt;
+    &lt;span class="kt"&gt;Trèfle&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;    
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Exemple d'appel :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="kt"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;putStrLn&lt;/span&gt; &lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="n"&gt;symbole&lt;/span&gt; &lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="kt"&gt;Coeur&lt;/span&gt;
+&lt;span class="err"&gt;♥&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Notons que :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;L'opérateur &lt;code&gt;$&lt;/code&gt; nous permet de chaîner nos fonctions, plutôt que de les imbriquer dans des parenthèses (&lt;code&gt;putStrLn(symbole(Coeur))&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;la fonction &lt;code&gt;putStrLn&lt;/code&gt; permet d'afficher des caractères Unicode, à l'inverse de la fonction standard &lt;code&gt;show&lt;/code&gt; qui ne retourne que des chaînes ASCII. 😎&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br/&gt;
+Remarque : le compilateur sait détecter un pattern matching non exhaustif. Par exemple, le code suivant :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;symbole&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;Enseigne&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
+&lt;span class="nf"&gt;symbole&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="kr"&gt;case&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="kr"&gt;of&lt;/span&gt;
+    &lt;span class="kt"&gt;Carreau&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♦&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;génère un avertissement de compilation :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;warning&lt;/span&gt;&lt;span class="kt"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kt"&gt;Wincomplete&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;patterns&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="kt"&gt;Pattern&lt;/span&gt; &lt;span class="n"&gt;match&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;es&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;are&lt;/span&gt; &lt;span class="n"&gt;non&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;exhaustive&lt;/span&gt;
+    &lt;span class="kt"&gt;In&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="kr"&gt;case&lt;/span&gt; &lt;span class="n"&gt;alternative&lt;/span&gt;&lt;span class="kt"&gt;:&lt;/span&gt;
+        &lt;span class="kt"&gt;Patterns&lt;/span&gt; &lt;span class="n"&gt;not&lt;/span&gt; &lt;span class="n"&gt;matched&lt;/span&gt;&lt;span class="kt"&gt;:&lt;/span&gt;
+            &lt;span class="kt"&gt;Coeur&lt;/span&gt;
+            &lt;span class="kt"&gt;Pique&lt;/span&gt;
+            &lt;span class="kt"&gt;Trèfle&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Et l'appel de cette fonction génére une exception :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="kt"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;symbole&lt;/span&gt; &lt;span class="kt"&gt;Coeur&lt;/span&gt;
+&lt;span class="s"&gt;&amp;quot;*** Exception: test.hs:(5,20)-(6,17): Non-exhaustive patterns in case&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Deuxième exemple, partage d'expression via un bloc 'where'&lt;/h3&gt;
+&lt;p&gt;Autre exemple, implémentons une fonction &lt;code&gt;couleur&lt;/code&gt; qui retourne la couleur d'une enseigne (chaîne de caractères "rouge" ou "noir") :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;couleur&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;Enseigne&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
+&lt;span class="nf"&gt;couleur&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="kr"&gt;case&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="kr"&gt;of&lt;/span&gt;
+    &lt;span class="kt"&gt;Carreau&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;rouge&lt;/span&gt;
+    &lt;span class="kt"&gt;Coeur&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;rouge&lt;/span&gt;
+    &lt;span class="kt"&gt;Pique&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;noir&lt;/span&gt;
+    &lt;span class="kt"&gt;Trèfle&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;noir&lt;/span&gt;
+    &lt;span class="kr"&gt;where&lt;/span&gt;
+      &lt;span class="n"&gt;rouge&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;rouge&amp;quot;&lt;/span&gt;
+      &lt;span class="n"&gt;noir&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;noir&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Exemple d'appel :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;*Main&amp;gt; couleur(Coeur)
+&amp;quot;rouge&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Nous avons ici utilisé le mot-clé &lt;code&gt;where&lt;/code&gt; qui nous permet de partager des expressions.
+&lt;br/&gt;
+&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Troisième exemple, déstructuration&lt;/h3&gt;
+&lt;p&gt;Définissons notre propre type &lt;code&gt;Carte&lt;/code&gt; combinant un rang (1, 2, 3, ..., valet, dame, roi) et une enseigne :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kr"&gt;data&lt;/span&gt; &lt;span class="kt"&gt;Rang&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt;
+  &lt;span class="kt"&gt;R1&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R2&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R3&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R4&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R5&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R6&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R7&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R8&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R9&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R10&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Valet&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Dame&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Roi&lt;/span&gt;
+  &lt;span class="kr"&gt;deriving&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Eq&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Ord&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Enum&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Show&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="kr"&gt;data&lt;/span&gt; &lt;span class="kt"&gt;Carte&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;Carte&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;rang&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;Rang&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;Enseigne&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="kr"&gt;deriving&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Eq&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Show&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Le type &lt;code&gt;Carte&lt;/code&gt; utilise la syntaxe &lt;em&gt;record&lt;/em&gt; permettant de nommer les champs.&lt;/p&gt;
+&lt;p&gt;Nous pouvons ainsi utiliser le pattern matching pour "déstructurer" une carte en filtrant les champs. Par exemple, la fonction suivante permet de déterminer si deux cartes, associées par un &lt;em&gt;tuple&lt;/em&gt;, sont de même enseigne :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;mêmeEnseigne&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Carte&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Carte&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;Bool&lt;/span&gt;
+&lt;span class="nf"&gt;mêmeEnseigne&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="kt"&gt;Carte&lt;/span&gt; &lt;span class="kr"&gt;_&lt;/span&gt; &lt;span class="n"&gt;enseigne1&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Carte&lt;/span&gt; &lt;span class="kr"&gt;_&lt;/span&gt; &lt;span class="n"&gt;enseigne2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt;
+  &lt;span class="n"&gt;enseigne1&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;enseigne2&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Exemples d'appel :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;*Main&amp;gt; :{
+*Main| mêmeEnseigne (
+*Main|     Carte {rang=R1, enseigne=Carreau},
+*Main|     Carte {rang=R1, enseigne=Coeur} )
+*Main| :}
+False
+*Main&amp;gt; :{
+*Main| mêmeEnseigne (
+*Main|     Carte {rang=Valet, enseigne=Coeur},
+*Main|     Carte {rang=R1, enseigne=Coeur} )
+*Main| :}
+True
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Les rangs, que l'on n'utilise pas dans la fonction, ont été filtrés via le caractère &lt;em&gt;wild-card&lt;/em&gt; (&lt;code&gt;_&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;Et voilà ! 🤓&lt;/p&gt;</summary><category term="haskell"></category><category term="pattern-matching"></category></entry><entry><title>Let's play with pattern matching in Haskell</title><link href="https://nicokosi.github.io/haskell-pattern-matching-en.html" rel="alternate"></link><published>2016-09-27T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-27:haskell-pattern-matching-en.html</id><summary type="html">&lt;p&gt;Let's discover Haskell and pattern matching via basic examples similar to &lt;a href="https://nicokosi.github.io/scala-pattern-matching-en.html"&gt;"Let's play with pattern matching in Scala"&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Step #1: create an enumeration&lt;/h2&gt;
+&lt;p&gt;We can create an enumeration that represent the four suites in French playing cards:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kr"&gt;data&lt;/span&gt; &lt;span class="kt"&gt;CardSuite&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;Club&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Diamond&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Heart&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Spade&lt;/span&gt;
+  &lt;span class="kr"&gt;deriving&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Eq&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Enum&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Show&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;We have just created our own &lt;em&gt;data type&lt;/em&gt; which:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;has four constructors (&lt;em&gt;value constructors&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;inherits from Haskell's base types:&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Eq&lt;/code&gt; in order to know if two values are equal or not&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Enum&lt;/code&gt; so that all values are known and ordered (&lt;em&gt;sequentially ordered types&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Show&lt;/code&gt; so that we can have a string representation for debugging/troubleshooting&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We can then use &lt;code&gt;ghci&lt;/code&gt; (&lt;em&gt;Glascow Haskell Compiler Interactive environment&lt;/em&gt;), the Haskell REPL, to illustrate how we can use this enumeration:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="kt"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;Heart&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="kt"&gt;Heart&lt;/span&gt;
+&lt;span class="kt"&gt;True&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="kt"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;Heart&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="kt"&gt;Spade&lt;/span&gt;
+&lt;span class="kt"&gt;True&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="kt"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;succ&lt;/span&gt; &lt;span class="kt"&gt;Heart&lt;/span&gt;
+&lt;span class="kt"&gt;Spade&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Pattern matching examples&lt;/h2&gt;
+&lt;h3&gt;Basic example&lt;/h3&gt;
+&lt;p&gt;The following function returns the Unicode symbol for a given card suite:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;symbol&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;CardSuite&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
+&lt;span class="nf"&gt;symbol&lt;/span&gt; &lt;span class="n"&gt;cardSuite&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt;
+  &lt;span class="kr"&gt;case&lt;/span&gt; &lt;span class="n"&gt;cardSuite&lt;/span&gt; &lt;span class="kr"&gt;of&lt;/span&gt;
+    &lt;span class="kt"&gt;Club&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;
+    &lt;span class="kt"&gt;Diamond&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♦&amp;quot;&lt;/span&gt;
+    &lt;span class="kt"&gt;Heart&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;♥&amp;quot;&lt;/span&gt;
+    &lt;span class="kt"&gt;Spade&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;♠&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Let's evaluate it :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="kt"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;putStrLn&lt;/span&gt; &lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="n"&gt;symbol&lt;/span&gt; &lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="kt"&gt;Heart&lt;/span&gt;
+&lt;span class="err"&gt;♥&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Notice that:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The &lt;code&gt;$&lt;/code&gt; operator allows is a way chain function calls, omitting to use nested parenthesis (&lt;code&gt;putStrLn(symbol(Heart))&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;the &lt;code&gt;putStrLn&lt;/code&gt; standard function can display Unicode characters, whereas the standard function &lt;code&gt;show&lt;/code&gt; only displays ASCII characters. 😎&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br/&gt;
+Morevover, the Haskell compiler can detect a non-exhaustive pattern matching. For instance, the following code :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;symbol&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;CardSuite&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
+&lt;span class="nf"&gt;symbol&lt;/span&gt; &lt;span class="n"&gt;cardSuite&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt;
+  &lt;span class="kr"&gt;case&lt;/span&gt; &lt;span class="n"&gt;cardSuite&lt;/span&gt; &lt;span class="kr"&gt;of&lt;/span&gt;
+    &lt;span class="kt"&gt;Club&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;generates a compile-time warning :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;warning&lt;/span&gt;&lt;span class="kt"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kt"&gt;Wincomplete&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;patterns&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="kt"&gt;Pattern&lt;/span&gt; &lt;span class="n"&gt;match&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;es&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;are&lt;/span&gt; &lt;span class="n"&gt;non&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;exhaustive&lt;/span&gt;
+    &lt;span class="kt"&gt;In&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="kr"&gt;case&lt;/span&gt; &lt;span class="n"&gt;alternative&lt;/span&gt;&lt;span class="kt"&gt;:&lt;/span&gt;
+        &lt;span class="kt"&gt;Patterns&lt;/span&gt; &lt;span class="n"&gt;not&lt;/span&gt; &lt;span class="n"&gt;matched&lt;/span&gt;&lt;span class="kt"&gt;:&lt;/span&gt;
+            &lt;span class="kt"&gt;Diamond&lt;/span&gt;
+            &lt;span class="kt"&gt;Heart&lt;/span&gt;
+            &lt;span class="kt"&gt;Spade&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;and the following evaluation triggers an error :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="kt"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;symbol&lt;/span&gt; &lt;span class="kt"&gt;Diamond&lt;/span&gt;
+&lt;span class="s"&gt;&amp;quot;*** Exception: test-en.hs:(13,3)-(14,15): Non-exhaustive patterns in case&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Exemple #2, share expression with a 'where' block&lt;/h3&gt;
+&lt;p&gt;Let's implement a &lt;code&gt;color&lt;/code&gt; function that returns "red" or "black" depending on the input card suite:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;color&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;CardSuite&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
+&lt;span class="nf"&gt;color&lt;/span&gt; &lt;span class="n"&gt;cardSuite&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt;
+  &lt;span class="kr"&gt;case&lt;/span&gt; &lt;span class="n"&gt;cardSuite&lt;/span&gt; &lt;span class="kr"&gt;of&lt;/span&gt;
+    &lt;span class="kt"&gt;Club&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;black&lt;/span&gt;
+    &lt;span class="kt"&gt;Diamond&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;red&lt;/span&gt;
+    &lt;span class="kt"&gt;Heart&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;red&lt;/span&gt;
+    &lt;span class="kt"&gt;Spade&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;black&lt;/span&gt;
+    &lt;span class="kr"&gt;where&lt;/span&gt;
+      &lt;span class="n"&gt;red&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;red&amp;quot;&lt;/span&gt;
+      &lt;span class="n"&gt;black&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;black&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Let's evaluate it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;*Main&amp;gt; color Heart
+&amp;quot;red&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;where&lt;/code&gt; keyword is used there to share some expressions.
+&lt;br/&gt;
+&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Example #3: destructuring&lt;/h3&gt;
+&lt;p&gt;Let's say we want to define our custom type &lt;code&gt;Card&lt;/code&gt; that combines a rank (1, 2, 3, ..., Jack, Queen, King) and a suite:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kr"&gt;data&lt;/span&gt; &lt;span class="kt"&gt;Rank&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt;
+  &lt;span class="kt"&gt;R1&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R2&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R3&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R4&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R5&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R6&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R7&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R8&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R9&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R10&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Jack&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Queen&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;King&lt;/span&gt;
+  &lt;span class="kr"&gt;deriving&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Eq&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Ord&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Enum&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Show&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="kr"&gt;data&lt;/span&gt; &lt;span class="kt"&gt;Card&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;Card&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;rank&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;Rank&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;suite&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;CardSuite&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="kr"&gt;deriving&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Eq&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Show&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;Card&lt;/code&gt; type uses the &lt;em&gt;record&lt;/em&gt; syntax that allows to name fields.&lt;/p&gt;
+&lt;p&gt;We can then use pattern matching in order to de-structure a card, filtering some fields.
+For instance, the following function determines if two cards have the same suite:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;sameSuite&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Card&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Card&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;Bool&lt;/span&gt;
+&lt;span class="nf"&gt;sameSuite&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="kt"&gt;Card&lt;/span&gt; &lt;span class="kr"&gt;_&lt;/span&gt; &lt;span class="n"&gt;suite1&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Card&lt;/span&gt; &lt;span class="kr"&gt;_&lt;/span&gt; &lt;span class="n"&gt;suite2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt;
+  &lt;span class="n"&gt;suite1&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;suite2&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Call examples:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;*Main&amp;gt; :{
+*Main| sameSuite (
+*Main|        Card {rank=R1, suite=Diamond},
+*Main|        Card {rank=R1, suite=Heart} )
+*Main| :}
+False
+*Main&amp;gt; :{
+*Main| sameSuite (
+*Main|      Card {rank=Jack, suite=Heart},
+*Main|      Card {rank=R1, suite=Diamond} )
+*Main| :}
+False
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Card ranks, that are not needed by our function, have been filtered using the &lt;em&gt;wild-card&lt;/em&gt; symbol (&lt;code&gt;_&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;That's all, folks! 🤓&lt;/p&gt;</summary><category term="haskell"></category><category term="pattern-matching"></category></entry><entry><title>Jouons avec le pattern matching en Scala</title><link href="https://nicokosi.github.io/scala-pattern-matching.html" rel="alternate"></link><published>2016-09-14T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-14:scala-pattern-matching.html</id><summary type="html">&lt;p&gt;Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d’illustrer par l'exemple le pattern matching en Scala.&lt;/p&gt;
 &lt;p&gt;Supposons que nous voulions créer une fonction retournant la couleur (noir / rouge) d'une enseigne d'une carte à jouer (les quatre enseignes du jeu français étant : trèfle, cœur, carreau et pique).&lt;/p&gt;
 &lt;p&gt;Notes : dans le code ci-dessous, les commentaires se trouvant à la fin de chaque ligne correspondent à la sortie standard de la console ; j'ai utilisé un &lt;a href="https://confluence.jetbrains.com/display/IntelliJIDEA/Working+with+Scala+Worksheet"&gt;worksheet IntelliJ IDEA&lt;/a&gt; pour coder interactivement cet exemple, mais on peut bien sûr utiliser la console Scala.&lt;/p&gt;
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;

@@ -48,7 +48,7 @@
 
 	<meta property="og:type" content="article">
             <meta property="article:author" content="https://nicokosi.github.io/author/nicolas-kosinski.html">
-	<meta property="og:url" content="https://nicokosi.github.io/drafts/haskell-pattern-matching.html">
+	<meta property="og:url" content="https://nicokosi.github.io/haskell-pattern-matching.html">
 	<meta property="og:title" content="Jouons avec le pattern matching en Haskell">
 	<meta property="article:published_time" content="2016-09-27 00:00:00+02:00">
             <meta property="og:description" content="Découvrons par l'exemple le pattern matching en Haskell">
@@ -101,7 +101,9 @@
                                 <a href="https://nicokosi.github.io/author/nicolas-kosinski.html">Nicolas Kosinski</a>
                              on 2016-09-27
                         </span>
-                        
+                        Translations: 
+<a href="https://nicokosi.github.io/haskell-pattern-matching-en.html">en</a>
+
                     </div>
                 </div>
             </div>
@@ -114,31 +116,27 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
     <!-- Post Content -->
     <article>
-        <p>Reprenons l'exemple des cartes à jouer utilisé dans l'article <a href="https://nicokosi.github.io/scala-pattern-matching.html">"Jouons avec le pattern matching en Scala"</a>,
-et codons de façon interactive un exemple similaire en Haskell.</p>
+        <p>Découvrons le pattern matching en Haskell en reprenant l'exemple des cartes à jouer utilisé dans l'article <a href="https://nicokosi.github.io/scala-pattern-matching.html">"Jouons avec le pattern matching en Scala"</a>.</p>
 <p><br/></p>
 <h2>Préambule : création d'une énumération</h2>
 <p>Codons notre énumération correspondant à nos quatre enseignes (carreau, cœur, pique et trèfle) :</p>
 <div class="highlight"><pre><span></span><span class="kr">data</span> <span class="kt">Enseigne</span> <span class="ow">=</span> <span class="kt">Carreau</span> <span class="o">|</span> <span class="kt">Coeur</span> <span class="o">|</span> <span class="kt">Pique</span> <span class="o">|</span> <span class="kt">Trèfle</span>
-  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Ord</span><span class="p">,</span> <span class="kt">Enum</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Enum</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
 </pre></div>
 
 
-<p>Nous venons de créer notre propre type (<em>data type</em>), nommé "Enseigne" qui :</p>
+<p>Nous venons de créer notre propre type (<em>data type</em>) qui :</p>
 <ul>
 <li>a quatre constructeurs (<em>value constructors</em>)</li>
 <li>hérite des classes de base :<ul>
 <li><code>Eq</code> pour implémenter l'égalité entre deux valeurs</li>
-<li><code>Ord</code> pour pouvoir comparer deux valeurs</li>
 <li><code>Enum</code> pour que les valeurs sont finies et ordonnées (<em>sequentially ordered types</em>)</li>
 <li><code>Show</code> pour avoir une représentation sous forme de chaîne de caractères, ce qui peut être utile pour débugguer ou pour évaluer interactivement du code via le REPL.</li>
 </ul>
 </li>
 </ul>
-<p>Utilisons maintenant le REPL, <code>ghci</code> (<em>Glascow Haskell Compiler Interactive environment</em>), pour interagir avec cette énumération :</p>
+<p>Utilisons maintenant <code>ghci</code> (<em>Glascow Haskell Compiler Interactive environment</em>), le REPL d'Haskell, pour interagir avec cette énumération :</p>
 <div class="highlight"><pre><span></span><span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span> <span class="kt">Coeur</span> <span class="o">==</span> <span class="kt">Coeur</span>
-<span class="kt">True</span>
-<span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span> <span class="kt">Coeur</span> <span class="o">&lt;</span> <span class="kt">Pique</span>
 <span class="kt">True</span>
 <span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span> <span class="n">succ</span> <span class="kt">Coeur</span>
 <span class="kt">Pique</span>
@@ -168,7 +166,7 @@ et codons de façon interactive un exemple similaire en Haskell.</p>
 <p>Notons que :</p>
 <ul>
 <li>L'opérateur <code>$</code> nous permet de chaîner nos fonctions, plutôt que de les imbriquer dans des parenthèses (<code>putStrLn(symbole(Coeur))</code>).</li>
-<li>la méthode <code>putStrLn</code> permet d'afficher des caractères Unicode, à l'inverse de la méthode standard <code>show</code> qui ne retourne que des chaînes ASCII. 😎</li>
+<li>la fonction <code>putStrLn</code> permet d'afficher des caractères Unicode, à l'inverse de la fonction standard <code>show</code> qui ne retourne que des chaînes ASCII. 😎</li>
 </ul>
 <p><br/>
 Remarque : le compilateur sait détecter un pattern matching non exhaustif. Par exemple, le code suivant :</p>
@@ -197,7 +195,7 @@ Remarque : le compilateur sait détecter un pattern matching non exhaustif. Par 
 
 <p><br/></p>
 <h3>Deuxième exemple, partage d'expression via un bloc 'where'</h3>
-<p>Autre exemple, implémentons une fonction <code>couleur</code> qui retourne la chaîne de caractères "rouge" ou "noir" pour une enseigne :</p>
+<p>Autre exemple, implémentons une fonction <code>couleur</code> qui retourne la couleur d'une enseigne (chaîne de caractères "rouge" ou "noir") :</p>
 <div class="highlight"><pre><span></span><span class="nf">couleur</span> <span class="ow">::</span> <span class="kt">Enseigne</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
 <span class="nf">couleur</span> <span class="n">enseigne</span> <span class="ow">=</span> <span class="kr">case</span> <span class="n">enseigne</span> <span class="kr">of</span>
     <span class="kt">Carreau</span> <span class="ow">-&gt;</span> <span class="n">rouge</span>
@@ -217,8 +215,9 @@ Remarque : le compilateur sait détecter un pattern matching non exhaustif. Par 
 
 
 <p>Nous avons ici utilisé le mot-clé <code>where</code> qui nous permet de partager des expressions.
+<br/>
 <br/></p>
-<h3>Troisième exemple, pattern matching déstructurant</h3>
+<h3>Troisième exemple, déstructuration</h3>
 <p>Définissons notre propre type <code>Carte</code> combinant un rang (1, 2, 3, ..., valet, dame, roi) et une enseigne :</p>
 <div class="highlight"><pre><span></span><span class="kr">data</span> <span class="kt">Rang</span> <span class="ow">=</span>
   <span class="kt">R1</span> <span class="o">|</span> <span class="kt">R2</span> <span class="o">|</span> <span class="kt">R3</span> <span class="o">|</span> <span class="kt">R4</span> <span class="o">|</span> <span class="kt">R5</span> <span class="o">|</span> <span class="kt">R6</span> <span class="o">|</span> <span class="kt">R7</span> <span class="o">|</span> <span class="kt">R8</span> <span class="o">|</span> <span class="kt">R9</span> <span class="o">|</span> <span class="kt">R10</span> <span class="o">|</span> <span class="kt">Valet</span> <span class="o">|</span> <span class="kt">Dame</span> <span class="o">|</span> <span class="kt">Roi</span>
@@ -231,7 +230,7 @@ Remarque : le compilateur sait détecter un pattern matching non exhaustif. Par 
 </pre></div>
 
 
-<p>Le type <code>Carte</code> utilise la syntax <em>record</em> permettant de nommer les champs.</p>
+<p>Le type <code>Carte</code> utilise la syntaxe <em>record</em> permettant de nommer les champs.</p>
 <p>Nous pouvons ainsi utiliser le pattern matching pour "déstructurer" une carte en filtrant les champs. Par exemple, la fonction suivante permet de déterminer si deux cartes, associées par un <em>tuple</em>, sont de même enseigne :</p>
 <div class="highlight"><pre><span></span><span class="nf">mêmeEnseigne</span> <span class="ow">::</span> <span class="p">(</span><span class="kt">Carte</span><span class="p">,</span> <span class="kt">Carte</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span>
 <span class="nf">mêmeEnseigne</span> <span class="p">((</span><span class="kt">Carte</span> <span class="kr">_</span> <span class="n">enseigne1</span><span class="p">),</span> <span class="p">(</span><span class="kt">Carte</span> <span class="kr">_</span> <span class="n">enseigne2</span><span class="p">))</span> <span class="ow">=</span>
@@ -265,6 +264,21 @@ True
 
     <hr>
 
+        <div class="comments">
+            <h2>Comments !</h2>
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'nicokosi-blog';
+                var disqus_identifier = 'haskell-pattern-matching.html';
+                var disqus_url = 'https://nicokosi.github.io/haskell-pattern-matching.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//nicokosi-blog.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
             </div>
         </div>
     </div>
