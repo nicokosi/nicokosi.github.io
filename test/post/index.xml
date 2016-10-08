@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Post-rsses on Le blog de Nicokosi</title>
+    <link>https://nicokosi.github.io/test/post/index.xml</link>
+    <description>Recent content in Post-rsses on Le blog de Nicokosi</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Tue, 27 Sep 2016 00:00:00 +0100</lastBuildDate>
+    <atom:link href="https://nicokosi.github.io/test/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Jouons avec le pattern matching en Haskell</title>
+      <link>https://nicokosi.github.io/test/post/haskell-pattern-matching/</link>
+      <pubDate>Tue, 27 Sep 2016 00:00:00 +0100</pubDate>
+      
+      <guid>https://nicokosi.github.io/test/post/haskell-pattern-matching/</guid>
+      <description>
+
+&lt;p&gt;Découvrons le pattern matching en Haskell en reprenant l&amp;rsquo;exemple des cartes à jouer utilisé dans l&amp;rsquo;article &lt;a href=&#34;https://nicokosi.github.io/scala-pattern-matching.html&#34;&gt;&amp;ldquo;Jouons avec le pattern matching en Scala&amp;rdquo;&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;préambule-création-d-une-énumération&#34;&gt;Préambule : création d&amp;rsquo;une énumération&lt;/h2&gt;
+
+&lt;p&gt;Codons notre énumération correspondant à nos quatre enseignes (carreau, cœur, pique et trèfle) :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;data Enseigne = Carreau | Coeur | Pique | Trèfle
+  deriving (Eq, Enum, Show)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Nous venons de créer notre propre type (&lt;em&gt;data type&lt;/em&gt;) qui :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;a quatre constructeurs (&lt;em&gt;value constructors&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;hérite des classes de base :
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Eq&lt;/code&gt; pour implémenter l&amp;rsquo;égalité entre deux valeurs&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Enum&lt;/code&gt; pour que les valeurs sont finies et ordonnées (&lt;em&gt;sequentially ordered types&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Show&lt;/code&gt; pour avoir une représentation sous forme de chaîne de caractères, ce qui peut être utile pour débugguer ou pour évaluer interactivement du code via le REPL.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Utilisons maintenant &lt;code&gt;ghci&lt;/code&gt; (&lt;em&gt;Glascow Haskell Compiler Interactive environment&lt;/em&gt;), le REPL d&amp;rsquo;Haskell, pour interagir avec cette énumération :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;*Main&amp;gt; Coeur == Coeur
+True
+*Main&amp;gt; succ Coeur
+Pique
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;exemples-de-pattern-matching&#34;&gt;Exemples de pattern matching&lt;/h2&gt;
+
+&lt;h3 id=&#34;premier-exemple-basique&#34;&gt;Premier exemple basique&lt;/h3&gt;
+
+&lt;p&gt;La fonction suivante retourne le symbole d&amp;rsquo;une enseigne :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;symbole :: Enseigne -&amp;gt; String
+symbole enseigne =
+  case enseigne of
+    Carreau -&amp;gt;&amp;quot;♦&amp;quot;
+    Coeur -&amp;gt; &amp;quot;♥&amp;quot;
+    Pique -&amp;gt; &amp;quot;♠&amp;quot;
+    Trèfle -&amp;gt; &amp;quot;♣&amp;quot;    
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Exemple d&amp;rsquo;appel :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;*Main&amp;gt; putStrLn $ symbole $ Coeur
+♥
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Notons que :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;L&amp;rsquo;opérateur &lt;code&gt;$&lt;/code&gt; nous permet de chaîner nos fonctions, plutôt que de les imbriquer dans des parenthèses (&lt;code&gt;putStrLn(symbole(Coeur))&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;la fonction &lt;code&gt;putStrLn&lt;/code&gt; permet d&amp;rsquo;afficher des caractères Unicode, à l&amp;rsquo;inverse de la fonction standard &lt;code&gt;show&lt;/code&gt; qui ne retourne que des chaînes ASCII. 😎&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;br/&gt;
+Remarque : le compilateur sait détecter un pattern matching non exhaustif. Par exemple, le code suivant :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;symbole :: Enseigne -&amp;gt; String
+symbole enseigne = case enseigne of
+    Carreau -&amp;gt;&amp;quot;♦&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;génère un avertissement de compilation :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;warning: [-Wincomplete-patterns]
+    Pattern match(es) are non-exhaustive
+    In a case alternative:
+        Patterns not matched:
+            Coeur
+            Pique
+            Trèfle
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Et l&amp;rsquo;appel de cette fonction génére une exception :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;*Main&amp;gt; symbole Coeur
+&amp;quot;*** Exception: test.hs:(5,20)-(6,17): Non-exhaustive patterns in case
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;deuxième-exemple-partage-d-expression-via-un-bloc-where&#34;&gt;Deuxième exemple, partage d&amp;rsquo;expression via un bloc &amp;lsquo;where&amp;rsquo;&lt;/h3&gt;
+
+&lt;p&gt;Autre exemple, implémentons une fonction &lt;code&gt;couleur&lt;/code&gt; qui retourne la couleur d&amp;rsquo;une enseigne (chaîne de caractères &amp;ldquo;rouge&amp;rdquo; ou &amp;ldquo;noir&amp;rdquo;) :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;couleur :: Enseigne -&amp;gt; String
+couleur enseigne = case enseigne of
+    Carreau -&amp;gt; rouge
+    Coeur -&amp;gt; rouge
+    Pique -&amp;gt; noir
+    Trèfle -&amp;gt; noir
+    where
+      rouge = &amp;quot;rouge&amp;quot;
+      noir = &amp;quot;noir&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Exemple d&amp;rsquo;appel :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;*Main&amp;gt; couleur(Coeur)
+&amp;quot;rouge&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Nous avons ici utilisé le mot-clé &lt;code&gt;where&lt;/code&gt; qui nous permet de partager des expressions.
+&lt;br/&gt;
+&lt;br/&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;troisième-exemple-déstructuration&#34;&gt;Troisième exemple, déstructuration&lt;/h3&gt;
+
+&lt;p&gt;Définissons notre propre type &lt;code&gt;Carte&lt;/code&gt; combinant un rang (1, 2, 3, &amp;hellip;, valet, dame, roi) et une enseigne :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;data Rang =
+  R1 | R2 | R3 | R4 | R5 | R6 | R7 | R8 | R9 | R10 | Valet | Dame | Roi
+  deriving (Eq, Ord, Enum, Show)
+
+data Carte = Carte {
+  rang :: Rang,
+  enseigne :: Enseigne
+} deriving (Eq, Show)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Le type &lt;code&gt;Carte&lt;/code&gt; utilise la syntaxe &lt;em&gt;record&lt;/em&gt; permettant de nommer les champs.&lt;/p&gt;
+
+&lt;p&gt;Nous pouvons ainsi utiliser le pattern matching pour &amp;ldquo;déstructurer&amp;rdquo; une carte en filtrant les champs. Par exemple, la fonction suivante permet de déterminer si deux cartes, associées par un &lt;em&gt;tuple&lt;/em&gt;, sont de même enseigne :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-haskell&#34;&gt;mêmeEnseigne :: (Carte, Carte) -&amp;gt; Bool
+mêmeEnseigne ((Carte _ enseigne1), (Carte _ enseigne2)) =
+  enseigne1 == enseigne2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Exemples d&amp;rsquo;appel :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;*Main&amp;gt; :{
+*Main| mêmeEnseigne (
+*Main|     Carte {rang=R1, enseigne=Carreau},
+*Main|     Carte {rang=R1, enseigne=Coeur} )
+*Main| :}
+False
+*Main&amp;gt; :{
+*Main| mêmeEnseigne (
+*Main|     Carte {rang=Valet, enseigne=Coeur},
+*Main|     Carte {rang=R1, enseigne=Coeur} )
+*Main| :}
+True
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Les rangs, que l&amp;rsquo;on n&amp;rsquo;utilise pas dans la fonction, ont été filtrés via le caractère &lt;em&gt;wild-card&lt;/em&gt; (&lt;code&gt;_&lt;/code&gt;).&lt;/p&gt;
+
+&lt;p&gt;Et voilà ! 🤓&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Jouons avec le pattern matching en Scala</title>
+      <link>https://nicokosi.github.io/test/post/scala-pattern-matching/</link>
+      <pubDate>Wed, 14 Sep 2016 00:00:00 +0100</pubDate>
+      
+      <guid>https://nicokosi.github.io/test/post/scala-pattern-matching/</guid>
+      <description>
+
+&lt;p&gt;Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d’illustrer par l&amp;rsquo;exemple le pattern matching en Scala.&lt;/p&gt;
+
+&lt;p&gt;Supposons que nous voulions créer une fonction retournant la couleur (noir / rouge) d&amp;rsquo;une enseigne d&amp;rsquo;une carte à jouer (les quatre enseignes du jeu français étant : trèfle, cœur, carreau et pique).&lt;/p&gt;
+
+&lt;p&gt;Notes : dans le code ci-dessous, les commentaires se trouvant à la fin de chaque ligne correspondent à la sortie standard de la console ; j&amp;rsquo;ai utilisé un &lt;a href=&#34;https://confluence.jetbrains.com/display/IntelliJIDEA/Working+with+Scala+Worksheet&#34;&gt;worksheet IntelliJ IDEA&lt;/a&gt; pour coder interactivement cet exemple, mais on peut bien sûr utiliser la console Scala.&lt;/p&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;1ère-étape-création-d-une-simple-classe&#34;&gt;1ère étape : création d&amp;rsquo;une simple classe&lt;/h2&gt;
+
+&lt;p&gt;Commençons par créer une classe immuable représentant l&amp;rsquo;enseigne &amp;ldquo;trèfle&amp;rdquo; :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;class Trèfle {
+   val symbole = &amp;quot;♣&amp;quot;
+   val libellé = &amp;quot;trèfle&amp;quot;
+}
+
+val trèfle: Trèfle = new Trèfle()
+trèfle.symbole // ♣
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Notons que cette classe permet de comparer des objets par identité (référence) et non par valeur car on ne surcharge pas la méthode &lt;code&gt;equals&lt;/code&gt; :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trèfle.equals(trèfle) // true
+trèfle == new Trèfle // false
+trèfle.eq(new Trèfle) // false
+trèfle.equals(new Trèfle) // false
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;De même, les méthodes &lt;code&gt;hashCode&lt;/code&gt;, &lt;code&gt;toString&lt;/code&gt; sont celles par défaut :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trèfle // Trèfle@1ac88f64
+trèfle.hashCode() // 123717365
+new Trèfle().hashCode() // 1323753063
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;2ème-étape-création-d-une-case-class&#34;&gt;2ème étape : création d&amp;rsquo;une case class&lt;/h2&gt;
+
+&lt;p&gt;La création d&amp;rsquo;une &lt;code&gt;case class&lt;/code&gt; permet :&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;d&amp;rsquo;auto-implémenter les méthodes &lt;code&gt;equals&lt;/code&gt;, &lt;code&gt;hashCode&lt;/code&gt; et &lt;code&gt;toString&lt;/code&gt; ;&lt;/li&gt;
+&lt;li&gt;de bénéficier de deux méthodes utiles au pattern matching : un &amp;ldquo;constructeur&amp;rdquo;, la méthode &lt;code&gt;apply&lt;/code&gt;, et un &amp;ldquo;dé-constructeur&amp;rdquo;, la méthode &lt;code&gt;unapply&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;case class Enseigne(symbole: String, libellé: String)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Nous avons un constructeur &amp;ldquo;gratuit&amp;rdquo;, la méthode &lt;code&gt;apply&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;) // Enseigne(♣,trèfle)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Nous avons également une implémentation &amp;ldquo;gratuite&amp;rdquo;, basée sur les champs, des méthodes &lt;code&gt;equals&lt;/code&gt;, &lt;code&gt;hashCode&lt;/code&gt; et &lt;code&gt;toString&lt;/code&gt; :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;).symbole // ♣
+Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;) == Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;) // true
+Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;).equals(Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;)) // true
+Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;).eq(Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;)) // false
+Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;).hashCode() // 841520215
+Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;).hashCode() // 841520215
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;etape-bonus-création-d-une-énumération&#34;&gt;Etape &amp;ldquo;bonus&amp;rdquo; : création d&amp;rsquo;une énumération&lt;/h2&gt;
+
+&lt;p&gt;Puisque nous avons quatre enseignes, nous pouvons créer une énumération. Ca ne servira pas directement à implémenter notre exemple final mais l&amp;rsquo;exemple s&amp;rsquo;y prête bien.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;object Enseignes {
+  val TREFLE = Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;)
+  val CARREAU = Enseigne(&amp;quot;♦&amp;quot;, &amp;quot;carreau&amp;quot;)
+  val COEUR = Enseigne(&amp;quot;♥&amp;quot;, &amp;quot;coeur&amp;quot;)
+  val PIQUE = Enseigne(&amp;quot;♠&amp;quot;, &amp;quot;pique&amp;quot;)
+  def values() = List(CARREAU, COEUR, PIQUE, TREFLE)
+}
+Enseignes.TREFLE != Enseignes.CARREAU // true
+Enseignes.values // List[Enseigne] = List(Enseigne(♦,carreau), Enseigne(♥,coeur), Enseigne(♠,pique), Enseigne(♣,trèfle))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;dernière-étape-pattern-matchons&#34;&gt;Dernière étape : pattern matchons !&lt;/h2&gt;
+
+&lt;h3 id=&#34;premier-exemple&#34;&gt;Premier exemple&lt;/h3&gt;
+
+&lt;p&gt;Un premier exemple de pattern matching, utilisé dans une fonction qui retourne la couleur de l&amp;rsquo;enseigne :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def indiquerJusteLaCouleur(cardSuite: Enseigne): String = cardSuite match {
+  case Enseignes.TREFLE | Enseignes.PIQUE =&amp;gt; &amp;quot;noir&amp;quot;
+  case Enseignes.CARREAU | Enseignes.COEUR =&amp;gt; &amp;quot;rouge&amp;quot;
+  case _ =&amp;gt; &amp;quot;aucune&amp;quot;
+}
+
+indiquerJusteLaCouleur(Enseignes.PIQUE) // noir
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Ce premier exemple met en avant :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;la notation &lt;code&gt;|&lt;/code&gt; (&lt;em&gt;disjunction&lt;/em&gt;) permettant de regrouper plusieurs cas ;&lt;/li&gt;
+&lt;li&gt;la notation &lt;code&gt;_&lt;/code&gt; (&lt;em&gt;wildcard&lt;/em&gt;) pour gérer les autres cas.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;deuxième-exemple&#34;&gt;Deuxième exemple&lt;/h3&gt;
+
+&lt;p&gt;Voici un deuxième exemple montrant comment récupérer sélectivement certains champs (ici, le libellé de l&amp;rsquo;enseigne) en &amp;ldquo;dé-structurant&amp;rdquo; notre instance de &lt;code&gt;case class&lt;/code&gt;, via la méthode &lt;code&gt;unapply&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def décrireLaCouleur(enseigne: Enseigne): String = enseigne match {
+  case Enseigne(_, libellé) =&amp;gt; s&amp;quot;$libellé is ${indiquerJusteLaCouleur(enseigne)}&amp;quot;
+}
+
+décrireLaCouleur(Enseignes.PIQUE) // pique est noir
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Et voilà ! 🤓&lt;/p&gt;
+
+&lt;p&gt;PS : merci à Jérôme Prudent pour ses tuyaux en Scala et ses avis éclairés.
+Jérôme est contributeur au &lt;a href=&#34;http://www.arolla.fr/blog&#34;&gt;blog d&amp;rsquo;Arolla&lt;/a&gt; (&lt;a href=&#34;http://www.arolla.fr/blog/author/jerome-prudent/&#34;&gt;lien direct vers ses articles&lt;/a&gt;).&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Versionner sa configuration système via des &#39;dotfiles&#39;</title>
+      <link>https://nicokosi.github.io/test/post/dotfiles/</link>
+      <pubDate>Thu, 18 Aug 2016 08:18:20 +0200</pubDate>
+      
+      <guid>https://nicokosi.github.io/test/post/dotfiles/</guid>
+      <description>
+
+&lt;h2 id=&#34;introduction-la-puissance-du-shell-avec-ou-sans-maîtrise&#34;&gt;Introduction : la puissance du shell, avec ou sans maîtrise ?&lt;/h2&gt;
+
+&lt;p&gt;Cela fait environ deux ans que je développe sur un poste &amp;ldquo;*nix&amp;rdquo; (Linux et Mac) après avoir développé de nombreuses années sur un poste Windows. La puissance du shell est indéniable : combiner des lignes de commandes simples, bénéficier de l&amp;rsquo;historique des commandes lancées, etc. Pourquoi ne pas en profiter pour maîtriser davantage son système en &lt;strong&gt;versionnant sa configuration&lt;/strong&gt; ?&lt;/p&gt;
+
+&lt;h2 id=&#34;présentation-dotfiles-quezako&#34;&gt;Présentation : Dotfiles, quezako ?&lt;/h2&gt;
+
+&lt;p&gt;Pour un système *nix (Linux, Mac, etc.), la configuration du shell et des applications est généralement centralisée dans les &amp;ldquo;dotfiles&amp;rdquo;, des fichiers / répertoires dont le nom commence par un point (&amp;ldquo;dot&amp;rdquo; en anglais) et qui sont chargés en début de session interactive ou au lancement d&amp;rsquo;applications. En utilisant un gestionnaire de sources et des liens symboliques, on peut facilement &lt;strong&gt;historiser&lt;/strong&gt; et &lt;strong&gt;synchroniser&lt;/strong&gt; l&amp;rsquo;évolution de ces dotfiles afin de :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;personnaliser le système d&amp;rsquo;exploitation&lt;/strong&gt;  : options d&amp;rsquo;affichage (exemple : choisir de masquer automatiquement la barre des applications), audio, etc.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;personnaliser son shell&lt;/strong&gt; :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;positionnement de variables d&amp;rsquo;environnement (exemples : &lt;code&gt;PATH&lt;/code&gt;, &lt;code&gt;JAVA_HOME&lt;/code&gt;, &lt;code&gt;MVN_OPTIONS&lt;/code&gt; etc.)&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;création d&amp;rsquo;alias pour les commandes fréquemment utilisées et/ou dures à mémoriser (exemple : &lt;code&gt;alias mcist=&amp;quot;mvn clean install -DskipTests&amp;quot;&lt;/code&gt;)&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;utilisation d&amp;rsquo;un shell &amp;ldquo;sur-vitaminé&amp;rdquo; du type &lt;a href=&#34;https://github.com/robbyrussell/oh-my-zsh&#34;&gt;Oh My Zsh&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;gérér les applications installées&lt;/strong&gt;, à condition d&amp;rsquo;utiliser un gestionnaire de paquets du type &lt;code&gt;homebrew&lt;/code&gt; (ou &lt;code&gt;apt&lt;/code&gt;, &lt;code&gt;OneGet&lt;/code&gt; etc.).&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;comment-un-exemple-d-utilisation-du-mini-framework-holman-dotfiles&#34;&gt;Comment ? Un exemple d&amp;rsquo;utilisation du mini-framework &amp;ldquo;holman/dotfiles&amp;rdquo;&lt;/h2&gt;
+
+&lt;p&gt;On peut créer son propre environnement ou bien utiliser un framework &amp;ldquo;dotfiles&amp;rdquo; prêt à l&amp;rsquo;emploi car il existe de nombreux frameworks &amp;ldquo;dotfiles&amp;rdquo;, en voici une liste non-exhaustive : &lt;a href=&#34;https://dotfiles.github.io/&#34;&gt;https://dotfiles.github.io/&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;J&amp;rsquo;ai pour ma part utilisé &lt;a href=&#34;https://github.com/holman/dotfiles&#34;&gt;https://github.com/holman/dotfiles&lt;/a&gt; qui permet de gérer sa configuration &lt;code&gt;ZSH&lt;/code&gt; en proposant les fonctionnalités suivantes :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;chargement automatique des fichiers nommés &lt;code&gt;*.zsh&lt;/code&gt;, quel que soit leur répertoire, favorisant ainsi une structure thématique. Par exemple, on peut distinguer la configuration du compilateur Java, dans le script &lt;code&gt;java/env.zsh&lt;/code&gt;, de la configuration du compilateur Go, dans le script &lt;code&gt;golang/env.zsh&lt;/code&gt;. Cette approche thématique remplace avantageusement l&amp;rsquo;utilisation d&amp;rsquo;un script monolithique.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;création de liens symboliques (&amp;ldquo;symlinks&amp;rdquo;) pointant vers les scripts de démarrage du shell (exemple : le fichier &lt;code&gt;$HOME/.zshrc&lt;/code&gt; pour le shell &lt;code&gt;ZSH&lt;/code&gt;).&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Après avoir &amp;ldquo;forké&amp;rdquo; &lt;a href=&#34;https://github.com/holman/dotfile&#34;&gt;https://github.com/holman/dotfiles&lt;/a&gt;, j&amp;rsquo;ai créé deux branches :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;une pour mon ordinateur personnel sous Mac : &lt;a href=&#34;https://github.com/nicokosi/dotfiles&#34;&gt;https://github.com/nicokosi/dotfiles&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;une autre pour mon ordinateur professionnel sous Linux : &lt;a href=&#34;https://github.com/nicokosi/dotfiles/tree/vidal&#34;&gt;https://github.com/nicokosi/dotfiles/tree/vidal&lt;/a&gt;
+Ces branches me permettent d&amp;rsquo;avoir deux configurations bien distinctes même si elles partagent certaines similitudes.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;conclusion-dotfiles-all-the-things&#34;&gt;Conclusion : &lt;em&gt;Dotfiles all the things&lt;/em&gt;!&lt;/h2&gt;
+
+&lt;p&gt;Même si la mise en place et la maintenance de ses dotfiles prend du temps, l&amp;rsquo;investissement vaut le coup pour notamment :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;la résolution de problèmes&lt;/strong&gt; (exemples : identifier ce qui a été récemment modifié, revenir à une configuration précédente, etc.) ;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;synchroniser&lt;/strong&gt; des changements entre plusieurs machines (exemple : PC sous Linux au travail et Mac perso), chacune ayant  une configuration distincte ;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;partager&lt;/strong&gt; sa configuration avec d&amp;rsquo;autres développeurs (&amp;ldquo;Voici le dernier réglage que j&amp;rsquo;ai utilisé pour &amp;hellip;&amp;rdquo;).
+:&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;PS : merci à Jean-Christophe Gay pour l&amp;rsquo;inspiration et les &amp;ldquo;bons tuyaux&amp;rdquo;. Voici son blog : &lt;a href=&#34;https://jeanchristophegay.com/&#34;&gt;https://jeanchristophegay.com/&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

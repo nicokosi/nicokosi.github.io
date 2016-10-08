@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Le blog de Nicokosi</title>
+    <link>https://nicokosi.github.io/test/tags/scala/index.xml</link>
+    <description>Recent content on Le blog de Nicokosi</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <atom:link href="https://nicokosi.github.io/test/tags/scala/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Jouons avec le pattern matching en Scala</title>
+      <link>https://nicokosi.github.io/test/post/scala-pattern-matching/</link>
+      <pubDate>Wed, 14 Sep 2016 00:00:00 +0100</pubDate>
+      
+      <guid>https://nicokosi.github.io/test/post/scala-pattern-matching/</guid>
+      <description>
+
+&lt;p&gt;Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d’illustrer par l&amp;rsquo;exemple le pattern matching en Scala.&lt;/p&gt;
+
+&lt;p&gt;Supposons que nous voulions créer une fonction retournant la couleur (noir / rouge) d&amp;rsquo;une enseigne d&amp;rsquo;une carte à jouer (les quatre enseignes du jeu français étant : trèfle, cœur, carreau et pique).&lt;/p&gt;
+
+&lt;p&gt;Notes : dans le code ci-dessous, les commentaires se trouvant à la fin de chaque ligne correspondent à la sortie standard de la console ; j&amp;rsquo;ai utilisé un &lt;a href=&#34;https://confluence.jetbrains.com/display/IntelliJIDEA/Working+with+Scala+Worksheet&#34;&gt;worksheet IntelliJ IDEA&lt;/a&gt; pour coder interactivement cet exemple, mais on peut bien sûr utiliser la console Scala.&lt;/p&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;1ère-étape-création-d-une-simple-classe&#34;&gt;1ère étape : création d&amp;rsquo;une simple classe&lt;/h2&gt;
+
+&lt;p&gt;Commençons par créer une classe immuable représentant l&amp;rsquo;enseigne &amp;ldquo;trèfle&amp;rdquo; :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;class Trèfle {
+   val symbole = &amp;quot;♣&amp;quot;
+   val libellé = &amp;quot;trèfle&amp;quot;
+}
+
+val trèfle: Trèfle = new Trèfle()
+trèfle.symbole // ♣
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Notons que cette classe permet de comparer des objets par identité (référence) et non par valeur car on ne surcharge pas la méthode &lt;code&gt;equals&lt;/code&gt; :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trèfle.equals(trèfle) // true
+trèfle == new Trèfle // false
+trèfle.eq(new Trèfle) // false
+trèfle.equals(new Trèfle) // false
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;De même, les méthodes &lt;code&gt;hashCode&lt;/code&gt;, &lt;code&gt;toString&lt;/code&gt; sont celles par défaut :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;trèfle // Trèfle@1ac88f64
+trèfle.hashCode() // 123717365
+new Trèfle().hashCode() // 1323753063
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;2ème-étape-création-d-une-case-class&#34;&gt;2ème étape : création d&amp;rsquo;une case class&lt;/h2&gt;
+
+&lt;p&gt;La création d&amp;rsquo;une &lt;code&gt;case class&lt;/code&gt; permet :&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;d&amp;rsquo;auto-implémenter les méthodes &lt;code&gt;equals&lt;/code&gt;, &lt;code&gt;hashCode&lt;/code&gt; et &lt;code&gt;toString&lt;/code&gt; ;&lt;/li&gt;
+&lt;li&gt;de bénéficier de deux méthodes utiles au pattern matching : un &amp;ldquo;constructeur&amp;rdquo;, la méthode &lt;code&gt;apply&lt;/code&gt;, et un &amp;ldquo;dé-constructeur&amp;rdquo;, la méthode &lt;code&gt;unapply&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;case class Enseigne(symbole: String, libellé: String)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Nous avons un constructeur &amp;ldquo;gratuit&amp;rdquo;, la méthode &lt;code&gt;apply&lt;/code&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;) // Enseigne(♣,trèfle)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Nous avons également une implémentation &amp;ldquo;gratuite&amp;rdquo;, basée sur les champs, des méthodes &lt;code&gt;equals&lt;/code&gt;, &lt;code&gt;hashCode&lt;/code&gt; et &lt;code&gt;toString&lt;/code&gt; :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;).symbole // ♣
+Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;) == Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;) // true
+Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;).equals(Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;)) // true
+Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;).eq(Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;)) // false
+Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;).hashCode() // 841520215
+Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;).hashCode() // 841520215
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;etape-bonus-création-d-une-énumération&#34;&gt;Etape &amp;ldquo;bonus&amp;rdquo; : création d&amp;rsquo;une énumération&lt;/h2&gt;
+
+&lt;p&gt;Puisque nous avons quatre enseignes, nous pouvons créer une énumération. Ca ne servira pas directement à implémenter notre exemple final mais l&amp;rsquo;exemple s&amp;rsquo;y prête bien.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;object Enseignes {
+  val TREFLE = Enseigne(&amp;quot;♣&amp;quot;, &amp;quot;trèfle&amp;quot;)
+  val CARREAU = Enseigne(&amp;quot;♦&amp;quot;, &amp;quot;carreau&amp;quot;)
+  val COEUR = Enseigne(&amp;quot;♥&amp;quot;, &amp;quot;coeur&amp;quot;)
+  val PIQUE = Enseigne(&amp;quot;♠&amp;quot;, &amp;quot;pique&amp;quot;)
+  def values() = List(CARREAU, COEUR, PIQUE, TREFLE)
+}
+Enseignes.TREFLE != Enseignes.CARREAU // true
+Enseignes.values // List[Enseigne] = List(Enseigne(♦,carreau), Enseigne(♥,coeur), Enseigne(♠,pique), Enseigne(♣,trèfle))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;dernière-étape-pattern-matchons&#34;&gt;Dernière étape : pattern matchons !&lt;/h2&gt;
+
+&lt;h3 id=&#34;premier-exemple&#34;&gt;Premier exemple&lt;/h3&gt;
+
+&lt;p&gt;Un premier exemple de pattern matching, utilisé dans une fonction qui retourne la couleur de l&amp;rsquo;enseigne :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def indiquerJusteLaCouleur(cardSuite: Enseigne): String = cardSuite match {
+  case Enseignes.TREFLE | Enseignes.PIQUE =&amp;gt; &amp;quot;noir&amp;quot;
+  case Enseignes.CARREAU | Enseignes.COEUR =&amp;gt; &amp;quot;rouge&amp;quot;
+  case _ =&amp;gt; &amp;quot;aucune&amp;quot;
+}
+
+indiquerJusteLaCouleur(Enseignes.PIQUE) // noir
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Ce premier exemple met en avant :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;la notation &lt;code&gt;|&lt;/code&gt; (&lt;em&gt;disjunction&lt;/em&gt;) permettant de regrouper plusieurs cas ;&lt;/li&gt;
+&lt;li&gt;la notation &lt;code&gt;_&lt;/code&gt; (&lt;em&gt;wildcard&lt;/em&gt;) pour gérer les autres cas.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;deuxième-exemple&#34;&gt;Deuxième exemple&lt;/h3&gt;
+
+&lt;p&gt;Voici un deuxième exemple montrant comment récupérer sélectivement certains champs (ici, le libellé de l&amp;rsquo;enseigne) en &amp;ldquo;dé-structurant&amp;rdquo; notre instance de &lt;code&gt;case class&lt;/code&gt;, via la méthode &lt;code&gt;unapply&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def décrireLaCouleur(enseigne: Enseigne): String = enseigne match {
+  case Enseigne(_, libellé) =&amp;gt; s&amp;quot;$libellé is ${indiquerJusteLaCouleur(enseigne)}&amp;quot;
+}
+
+décrireLaCouleur(Enseignes.PIQUE) // pique est noir
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Et voilà ! 🤓&lt;/p&gt;
+
+&lt;p&gt;PS : merci à Jérôme Prudent pour ses tuyaux en Scala et ses avis éclairés.
+Jérôme est contributeur au &lt;a href=&#34;http://www.arolla.fr/blog&#34;&gt;blog d&amp;rsquo;Arolla&lt;/a&gt; (&lt;a href=&#34;http://www.arolla.fr/blog/author/jerome-prudent/&#34;&gt;lien direct vers ses articles&lt;/a&gt;).&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

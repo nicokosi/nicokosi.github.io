@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://nicokosi.github.io/test/en/</loc>
+    <lastmod>2016-09-27T00:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://nicokosi.github.io/test/en/post/haskell-pattern-matching/</loc>
+    <lastmod>2016-09-27T00:00:00+01:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://nicokosi.github.io/test/en/post/scala-pattern-matching/</loc>
+    <lastmod>2016-09-14T00:00:00+01:00</lastmod>
+  </url>
+  
+</urlset>
