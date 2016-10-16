@@ -2,7 +2,7 @@
 <html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Le blog de Nicokosi</title>
+<title>Nicokosi&#39;s blog</title>
 <link rel="stylesheet" href="https://nicokosi.github.io//css/style.css">
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
 
@@ -13,15 +13,15 @@
   <div class="container">
     <nav class="nav">
       <div class="nav-left">
-        <img src="/images/nicokosi.jpg" width="90" height="90" alt="Le blog de Nicokosi" title="Le blog de Nicokosi"/>
-        <a class="nav-item" href="https://nicokosi.github.io/"><h1 class="title is-4">Le blog de Nicokosi</h1></a>
+        <img src="/images/nicokosi.jpg" width="90" height="90" alt="Nicokosi&#39;s blog" title="Nicokosi&#39;s blog"/>
+        <a class="nav-item" href="https://nicokosi.github.io/"><h1 class="title is-4">Nicokosi&#39;s blog</h1></a>
       </div>
       <div>
         
             
               
+<a href="https://nicokosi.github.io/">🇫🇷 version française</a>
               
-              <a href="https://nicokosi.github.io/en/">🇬🇧 english version</a>
               
             
         
@@ -64,14 +64,15 @@
     
     <article>
       <h2 class="subtitle is-6">September 27, 2016</h2>
-      <h1 class="title"><a href="https://nicokosi.github.io/post/haskell-pattern-matching/">Jouons avec le pattern matching en Haskell</a></h1>
+      <h1 class="title"><a href="https://nicokosi.github.io/en/post/haskell-pattern-matching/">Let&#39;s play with pattern matching in Haskell</a></h1>
       <div class="content">
-        Découvrons le pattern matching en Haskell en reprenant l&rsquo;exemple des cartes à jouer utilisé dans l&rsquo;article &ldquo;Jouons avec le pattern matching en Scala&rdquo;.
+        Let&rsquo;s discover Haskell and pattern matching via basic examples similar to &ldquo;Let&rsquo;s play with pattern matching in Scala&rdquo;.
 
-Préambule : création d&rsquo;une énumération Codons notre énumération correspondant à nos quatre enseignes (carreau, cœur, pique et trèfle) :
-data Enseigne = Carreau | Coeur | Pique | Trèfle deriving (Eq, Enum, Show)  Nous venons de créer notre propre type (data type) qui :
+Step #1: create an enumeration We can create an enumeration that represent the four suites in French playing cards:
+data CardSuite = Club | Diamond | Heart | Spade deriving (Eq, Enum, Show)  We have just created our own data type which:
+ has four constructors (value constructors) inherits from Haskell&rsquo;s base types:  Eq in order to know if two values are equal or not Enum so that all values are known and ordered (sequentially ordered types) Show so that we can have a string representation for debugging/troubleshooting   We can then use ghci (Glascow Haskell Compiler Interactive environment), the Haskell REPL, to illustrate how we can use this enumeration:
         
-        ...<a class="button is-link" href="https://nicokosi.github.io/post/haskell-pattern-matching/" style="height:28px">
+        ...<a class="button is-link" href="https://nicokosi.github.io/en/post/haskell-pattern-matching/" style="height:28px">
           Read more
           <span class="icon is-small">
             <i class="fa fa-angle-double-right"></i>
@@ -83,29 +84,12 @@ data Enseigne = Carreau | Coeur | Pique | Trèfle deriving (Eq, Enum, Show)  Nou
     
     <article>
       <h2 class="subtitle is-6">September 14, 2016</h2>
-      <h1 class="title"><a href="https://nicokosi.github.io/post/scala-pattern-matching/">Jouons avec le pattern matching en Scala</a></h1>
+      <h1 class="title"><a href="https://nicokosi.github.io/en/post/scala-pattern-matching/">Let&#39;s play with pattern matching in Scala</a></h1>
       <div class="content">
-        Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d’illustrer par l&rsquo;exemple le pattern matching en Scala.
-Supposons que nous voulions créer une fonction retournant la couleur (noir / rouge) d&rsquo;une enseigne d&rsquo;une carte à jouer (les quatre enseignes du jeu français étant : trèfle, cœur, carreau et pique).
-Notes : dans le code ci-dessous, les commentaires se trouvant à la fin de chaque ligne correspondent à la sortie standard de la console ; j&rsquo;ai utilisé un worksheet IntelliJ IDEA pour coder interactivement cet exemple, mais on peut bien sûr utiliser la console Scala.
+        Pattern matching is a powerful technique for filtering and testing variables. This article aims at illustrating pattern matching in Scala using a simple example. Let&rsquo;s say we want to return the color (red or black) of a playing card.
+Notes: The code below &ldquo;shows&rdquo; the console output using comments (ex: &quot;foo&quot; // foo). I have used a IntelliJ IDEA worksheet but the standard Scala console can also be used (REPL FTW!
         
-        ...<a class="button is-link" href="https://nicokosi.github.io/post/scala-pattern-matching/" style="height:28px">
-          Read more
-          <span class="icon is-small">
-            <i class="fa fa-angle-double-right"></i>
-          </span>
-        </a>
-        
-      </div>
-    </article>
-    
-    <article>
-      <h2 class="subtitle is-6">August 18, 2016</h2>
-      <h1 class="title"><a href="https://nicokosi.github.io/post/dotfiles/">Versionner sa configuration système via des &#39;dotfiles&#39;</a></h1>
-      <div class="content">
-        Introduction : la puissance du shell, avec ou sans maîtrise ? Cela fait environ deux ans que je développe sur un poste &ldquo;*nix&rdquo; (Linux et Mac) après avoir développé de nombreuses années sur un poste Windows. La puissance du shell est indéniable : combiner des lignes de commandes simples, bénéficier de l&rsquo;historique des commandes lancées, etc. Pourquoi ne pas en profiter pour maîtriser davantage son système en versionnant sa configuration ?
-        
-        ...<a class="button is-link" href="https://nicokosi.github.io/post/dotfiles/" style="height:28px">
+        ...<a class="button is-link" href="https://nicokosi.github.io/en/post/scala-pattern-matching/" style="height:28px">
           Read more
           <span class="icon is-small">
             <i class="fa fa-angle-double-right"></i>

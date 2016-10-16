@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Let&#39;s play with pattern matching in Haskell | Nicokosi&#39;s blog</title>
+<link rel="stylesheet" href="https://nicokosi.github.io//css/style.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/github.min.css">
+
+
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <img src="/images/nicokosi.jpg" width="90" height="90" alt="Nicokosi&#39;s blog" title="Nicokosi&#39;s blog"/>
+        <a class="nav-item" href="https://nicokosi.github.io/"><h1 class="title is-4">Nicokosi&#39;s blog</h1></a>
+      </div>
+      <div>
+        
+            
+              
+<a href="https://nicokosi.github.io/post/haskell-pattern-matching/">🇫🇷 version française</a>
+              
+              
+            
+        
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile">
+          
+          <a class="level-item" href="https://github.com/nicokosi">
+            <span class="icon">
+              <i class="fa fa-github"></i>
+            </span>
+          </a>
+          
+          <a class="level-item" href="https://twitter.com/nicokosi">
+            <span class="icon">
+              <i class="fa fa-twitter"></i>
+            </span>
+          </a>
+          
+          <a class="level-item" href="https://www.linkedin.com/in/nicolas-kosinski-95184811">
+            <span class="icon">
+              <i class="fa fa-linkedin"></i>
+            </span>
+          </a>
+          
+          <a class="level-item" href="/index.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+          </a>
+          
+        </nav>
+      </div>
+    </nav>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="subtitle is-6">September 27, 2016</h2>
+    <h1 class="title">Let&#39;s play with pattern matching in Haskell</h1>
+    <div class="content">
+      
+
+<p>Let&rsquo;s discover Haskell and pattern matching via basic examples similar to <a href="https://nicokosi.github.io/scala-pattern-matching-en.html">&ldquo;Let&rsquo;s play with pattern matching in Scala&rdquo;</a>.</p>
+
+<p><br/></p>
+
+<h2 id="step-1-create-an-enumeration">Step #1: create an enumeration</h2>
+
+<p>We can create an enumeration that represent the four suites in French playing cards:</p>
+
+<pre><code class="language-haskell">data CardSuite = Club | Diamond | Heart | Spade
+  deriving (Eq, Enum, Show)
+</code></pre>
+
+<p>We have just created our own <em>data type</em> which:</p>
+
+<ul>
+<li>has four constructors (<em>value constructors</em>)</li>
+<li>inherits from Haskell&rsquo;s base types:
+
+<ul>
+<li><code>Eq</code> in order to know if two values are equal or not</li>
+<li><code>Enum</code> so that all values are known and ordered (<em>sequentially ordered types</em>)</li>
+<li><code>Show</code> so that we can have a string representation for debugging/troubleshooting</li>
+</ul></li>
+</ul>
+
+<p>We can then use <code>ghci</code> (<em>Glascow Haskell Compiler Interactive environment</em>), the Haskell REPL, to illustrate how we can use this enumeration:</p>
+
+<pre><code class="language-haskell">*Main&gt; Heart == Heart
+True
+*Main&gt; Heart &lt; Spade
+True
+*Main&gt; succ Heart
+Spade
+</code></pre>
+
+<p><br/></p>
+
+<h2 id="pattern-matching-examples">Pattern matching examples</h2>
+
+<h3 id="example-1">Example #1</h3>
+
+<p>The following function returns the Unicode symbol for a given card suite:</p>
+
+<pre><code class="language-haskell">symbol :: CardSuite -&gt; String
+symbol cardSuite =
+  case cardSuite of
+    Club -&gt; &quot;♣&quot;
+    Diamond -&gt;&quot;♦&quot;
+    Heart -&gt; &quot;♥&quot;
+    Spade -&gt; &quot;♠&quot;
+</code></pre>
+
+<p>Let&rsquo;s evaluate it :</p>
+
+<pre><code class="language-haskell">*Main&gt; putStrLn $ symbol $ Heart
+♥
+</code></pre>
+
+<p>Notice that:</p>
+
+<ul>
+<li>The <code>$</code> operator allows is a way chain function calls, omitting to use nested parenthesis (<code>putStrLn(symbol(Heart))</code>).</li>
+<li>the <code>putStrLn</code> standard function can display Unicode characters, whereas the standard function <code>show</code> only displays ASCII characters. 😎</li>
+</ul>
+
+<p><br/>
+Morevover, the Haskell compiler can detect a non-exhaustive pattern matching. For instance, the following code :</p>
+
+<pre><code class="language-haskell">symbol :: CardSuite -&gt; String
+symbol cardSuite =
+  case cardSuite of
+    Club -&gt; &quot;♣&quot;
+</code></pre>
+
+<p>generates a compile-time warning :</p>
+
+<pre><code class="language-haskell">warning: [-Wincomplete-patterns]
+    Pattern match(es) are non-exhaustive
+    In a case alternative:
+        Patterns not matched:
+            Diamond
+            Heart
+            Spade
+</code></pre>
+
+<p>and the following evaluation triggers an error :</p>
+
+<pre><code class="language-haskell">*Main&gt; symbol Diamond
+&quot;*** Exception: test-en.hs:(13,3)-(14,15): Non-exhaustive patterns in case
+</code></pre>
+
+<p><br/></p>
+
+<h3 id="example-2-share-expression-with-a-where-block">Example #2, share expression with a &lsquo;where&rsquo; block</h3>
+
+<p>Let&rsquo;s implement a <code>color</code> function that returns &ldquo;red&rdquo; or &ldquo;black&rdquo; depending on the input card suite:</p>
+
+<pre><code class="language-haskell">color :: CardSuite -&gt; String
+color cardSuite =
+  case cardSuite of
+    Club -&gt; black
+    Diamond -&gt; red
+    Heart -&gt; red
+    Spade -&gt; black
+    where
+      red = &quot;red&quot;
+      black = &quot;black&quot;
+</code></pre>
+
+<p>Let&rsquo;s evaluate it:</p>
+
+<pre><code>*Main&gt; color Heart
+&quot;red&quot;
+</code></pre>
+
+<p>The <code>where</code> keyword is used there to share some expressions.
+<br/>
+<br/></p>
+
+<h3 id="example-3-destructuring">Example #3: destructuring</h3>
+
+<p>Let&rsquo;s say we want to define our custom type <code>Card</code> that combines a rank (1, 2, 3, &hellip;, Jack, Queen, King) and a suite:</p>
+
+<pre><code class="language-haskell">data Rank =
+  R1 | R2 | R3 | R4 | R5 | R6 | R7 | R8 | R9 | R10 | Jack | Queen | King
+  deriving (Eq, Ord, Enum, Show)
+
+data Card = Card {
+  rank :: Rank,
+  suite :: CardSuite
+} deriving (Eq, Show)
+</code></pre>
+
+<p>The <code>Card</code> type uses the <em>record</em> syntax that allows to name fields.</p>
+
+<p>We can then use pattern matching in order to de-structure a card, filtering some fields.
+For instance, the following function determines if two cards have the same suite:</p>
+
+<pre><code class="language-haskell">sameSuite :: (Card, Card) -&gt; Bool
+sameSuite ((Card _ suite1), (Card _ suite2)) =
+  suite1 == suite2
+</code></pre>
+
+<p>Call examples:</p>
+
+<pre><code>*Main&gt; :{
+*Main| sameSuite (
+*Main|        Card {rank=R1, suite=Diamond},
+*Main|        Card {rank=R1, suite=Heart} )
+*Main| :}
+False
+*Main&gt; :{
+*Main| sameSuite (
+*Main|      Card {rank=Jack, suite=Heart},
+*Main|      Card {rank=R1, suite=Diamond} )
+*Main| :}
+False
+</code></pre>
+
+<p>Card ranks, that are not needed by our function, have been filtered using the <em>wild-card</em> symbol (<code>_</code>).</p>
+
+<p>That&rsquo;s all, folks! 🤓</p>
+
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <aside><div id="disqus_thread"></div></aside>
+    <script type="text/javascript">
+      var disqus_shortname = 'nicokosi-blog';
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; <a href="https://github.com/nicokosi">Nicolas Kosinski</a> 2016</p>
+  </div>
+</section>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/languages/java.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/languages/scala.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/languages/clojure.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/languages/haskell.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/languages/shell.min.js"></script>
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script>
+!function(a,b,c,d,e,f,g){a.GoogleAnalyticsObject=e,a[e]=a[e]||function(){(a[e].q=a[e].q||[]).push(arguments)},a[e].l=1*new Date,f=b.createElement(c),g=b.getElementsByTagName(c)[0],f.async=1,f.src=d,g.parentNode.insertBefore(f,g)}(window,document,"script","//www.google-analytics.com/analytics.js","ga"),ga("create","UA-11930016-2","auto"),ga("send","pageview");
+</script>
+
+

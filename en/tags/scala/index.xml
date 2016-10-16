@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Nicokosi&#39;s blog</title>
+    <link>https://nicokosi.github.io/en/tags/scala/index.xml</link>
+    <description>Recent content on Nicokosi&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <copyright>&amp;copy; &lt;a href=&#34;https://github.com/nicokosi&#34;&gt;Nicolas Kosinski&lt;/a&gt; 2016</copyright>
+    <atom:link href="https://nicokosi.github.io/en/tags/scala/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Let&#39;s play with pattern matching in Scala</title>
+      <link>https://nicokosi.github.io/en/post/scala-pattern-matching/</link>
+      <pubDate>Wed, 14 Sep 2016 00:00:00 +0100</pubDate>
+      
+      <guid>https://nicokosi.github.io/en/post/scala-pattern-matching/</guid>
+      <description>
+
+&lt;p&gt;Pattern matching is a powerful technique for filtering and testing variables. This article aims at illustrating pattern matching in Scala using a simple example.
+Let&amp;rsquo;s say we want to return the color (red or black) of a playing card.&lt;/p&gt;
+
+&lt;p&gt;Notes: The code below &amp;ldquo;shows&amp;rdquo; the console output using comments (ex: &lt;code&gt;&amp;quot;foo&amp;quot; // foo&lt;/code&gt;). I have used a &lt;a href=&#34;https://confluence.jetbrains.com/display/IntelliJIDEA/Working+with+Scala+Worksheet&#34;&gt;IntelliJ IDEA worksheet&lt;/a&gt; but the standard Scala console can also be used (REPL FTW!)&lt;/p&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;step-1-let-s-create-a-simple-class&#34;&gt;Step #1: let&amp;rsquo;s create a simple class&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s create a immutable class for the &amp;ldquo;club&amp;rdquo; suite:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;class Club {
+  val symbol = &amp;quot;♣&amp;quot;
+  val label = &amp;quot;club&amp;quot;
+}
+
+val club: Club = new Club()
+club.symbol // ♣
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So far, so good. Instances can be compared by identity (reference) but not by value because we did not override the &lt;code&gt;equals&lt;/code&gt; method:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;club.equals(club) // true
+club == new Club // false
+club.eq(new Club) // false
+club.equals(new Club) // false
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;hashCode&lt;/code&gt; and &lt;code&gt;toString&lt;/code&gt; are also default ones:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;club // Club@1ac88f64
+club.hashCode() // 1976061787
+new Club().hashCode() // 1751431390
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;step-2-let-s-create-a-case-class&#34;&gt;Step #2: let&amp;rsquo;s create a case class&lt;/h2&gt;
+
+&lt;p&gt;A &lt;code&gt;case class&lt;/code&gt; has two benefits:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;auto-implement &lt;code&gt;equals&lt;/code&gt;, &lt;code&gt;hashCode&lt;/code&gt; and &lt;code&gt;toString&lt;/code&gt; methods.&lt;/li&gt;
+&lt;li&gt;enhance pattern matching capability via two methods: a &amp;ldquo;constructor&amp;rdquo; method, &lt;code&gt;apply&lt;/code&gt;, and a &amp;ldquo;de-constructor&amp;rdquo; method, &lt;code&gt;unapply&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;case class CardSuite(symbol: String, label: String)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;apply&lt;/code&gt; method is a kind of free constructor. By the way, we don&amp;rsquo;t need to use the &lt;code&gt;new&lt;/code&gt; keyword:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;CardSuite(&amp;quot;♣&amp;quot;, &amp;quot;club&amp;quot;) // CardSuite(♣,club)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;equals&lt;/code&gt;, &lt;code&gt;hashCode&lt;/code&gt; and &lt;code&gt;toString&lt;/code&gt; methods are also implemented for free:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;CardSuite(&amp;quot;♣&amp;quot;, &amp;quot;club&amp;quot;).symbol
+CardSuite(&amp;quot;♣&amp;quot;, &amp;quot;club&amp;quot;) == CardSuite(&amp;quot;♣&amp;quot;, &amp;quot;club&amp;quot;) // true
+CardSuite(&amp;quot;♣&amp;quot;, &amp;quot;club&amp;quot;).equals(CardSuite(&amp;quot;♣&amp;quot;, &amp;quot;club&amp;quot;)) // true
+CardSuite(&amp;quot;♣&amp;quot;, &amp;quot;club&amp;quot;).eq(CardSuite(&amp;quot;♣&amp;quot;, &amp;quot;club&amp;quot;)) // false
+CardSuite(&amp;quot;♣&amp;quot;, &amp;quot;club&amp;quot;).hashCode() // 1302714609
+CardSuite(&amp;quot;♣&amp;quot;, &amp;quot;club&amp;quot;).hashCode() // 1302714609
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;bonus-step-use-an-enumeration&#34;&gt;&amp;ldquo;Bonus&amp;rdquo; step: use an enumeration&lt;/h2&gt;
+
+&lt;p&gt;Since there are four suites in French playing cards, we can create an enumeration. This is not directly related to our pattern matching example, but let&amp;rsquo;s do it, for fun and profit. ;-)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;object CardSuites {
+  val CLUB = CardSuite(&amp;quot;♣&amp;quot;, &amp;quot;club&amp;quot;)
+  val DIAMOND = CardSuite(&amp;quot;♦&amp;quot;, &amp;quot;diamond&amp;quot;)
+  val HEART = CardSuite(&amp;quot;♥&amp;quot;, &amp;quot;heart&amp;quot;)
+  val SPADE = CardSuite(&amp;quot;♠&amp;quot;, &amp;quot;spade&amp;quot;)
+  def values() = List(DIAMOND, HEART, SPADE, CLUB)
+}
+CardSuites.CLUB != CardSuites.DIAMOND // true
+CardSuites.values // List(CardSuite(♦,diamond), CardSuite(♥,heart), CardSuite(♠,spade), CardSuite(♣,club))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;last-step-let-s-use-pattern-matching&#34;&gt;Last step: let&amp;rsquo;s use pattern matching!&lt;/h2&gt;
+
+&lt;h3 id=&#34;first-example&#34;&gt;First example&lt;/h3&gt;
+
+&lt;p&gt;Here is a first pattern matching example, used in a function that returns the color of a suite card:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def justColor(cardSuite: CardSuite): String = cardSuite match {
+  case CardSuites.CLUB | CardSuites.SPADE =&amp;gt; &amp;quot;black&amp;quot;
+  case CardSuites.DIAMOND | CardSuites.HEART =&amp;gt; &amp;quot;red&amp;quot;
+  case _ =&amp;gt; &amp;quot;none&amp;quot;
+}
+
+justColor(CardSuites.SPADE) // black
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This example demonstrates:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;the &lt;code&gt;|&lt;/code&gt; notation (&lt;em&gt;disjunction&lt;/em&gt;) that can be used to group several cases;&lt;/li&gt;
+&lt;li&gt;the &lt;code&gt;_&lt;/code&gt; notation (&lt;em&gt;wildcard&lt;/em&gt;) for &amp;ldquo;other cases&amp;rdquo;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;second-example&#34;&gt;Second example&lt;/h3&gt;
+
+&lt;p&gt;Here is a second example to demonstrate field filtering, also known as &amp;ldquo;de-structuring&amp;rdquo;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-scala&#34;&gt;def describeColor(cardSuite: CardSuite): String = cardSuite match {
+  case CardSuite(_, label) =&amp;gt; s&amp;quot;$label is ${justColor(cardSuite)}&amp;quot;
+}
+
+describeColor(CardSuites.SPADE) // spade is black
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We only keep the suite label using the &lt;code&gt;unapply&lt;/code&gt; method of our case class.&lt;/p&gt;
+
+&lt;p&gt;That&amp;rsquo;s all folks! 🤓&lt;/p&gt;
+
+&lt;p&gt;PS: Thanks to Jérôme Prudent for the Scala tips and for the review. Jérôme contributes to the &lt;a href=&#34;http://www.arolla.fr/blog&#34;&gt;Arolla blog&lt;/a&gt; (&lt;a href=&#34;http://www.arolla.fr/blog/author/jerome-prudent/&#34;&gt;direct link to his posts&lt;/a&gt;).&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

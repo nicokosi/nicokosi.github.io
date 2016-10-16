@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Versionner sa configuration système via des &#39;dotfiles&#39; | Le blog de Nicokosi</title>
+<link rel="stylesheet" href="https://nicokosi.github.io//css/style.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/styles/github.min.css">
+
+
+<section class="section">
+  <div class="container">
+    <nav class="nav">
+      <div class="nav-left">
+        <img src="/images/nicokosi.jpg" width="90" height="90" alt="Le blog de Nicokosi" title="Le blog de Nicokosi"/>
+        <a class="nav-item" href="https://nicokosi.github.io/"><h1 class="title is-4">Le blog de Nicokosi</h1></a>
+      </div>
+      <div>
+        
+      </div>
+      <div class="nav-right">
+        <nav class="nav-item level is-mobile">
+          
+          <a class="level-item" href="https://github.com/nicokosi">
+            <span class="icon">
+              <i class="fa fa-github"></i>
+            </span>
+          </a>
+          
+          <a class="level-item" href="https://twitter.com/nicokosi">
+            <span class="icon">
+              <i class="fa fa-twitter"></i>
+            </span>
+          </a>
+          
+          <a class="level-item" href="https://www.linkedin.com/in/nicolas-kosinski-95184811">
+            <span class="icon">
+              <i class="fa fa-linkedin"></i>
+            </span>
+          </a>
+          
+          <a class="level-item" href="/index.xml">
+            <span class="icon">
+              <i class="fa fa-rss"></i>
+            </span>
+          </a>
+          
+        </nav>
+      </div>
+    </nav>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="subtitle is-6">August 18, 2016</h2>
+    <h1 class="title">Versionner sa configuration système via des &#39;dotfiles&#39;</h1>
+    <div class="content">
+      
+
+<h2 id="introduction-la-puissance-du-shell-avec-ou-sans-maîtrise">Introduction : la puissance du shell, avec ou sans maîtrise ?</h2>
+
+<p>Cela fait environ deux ans que je développe sur un poste &ldquo;*nix&rdquo; (Linux et Mac) après avoir développé de nombreuses années sur un poste Windows. La puissance du shell est indéniable : combiner des lignes de commandes simples, bénéficier de l&rsquo;historique des commandes lancées, etc. Pourquoi ne pas en profiter pour maîtriser davantage son système en <strong>versionnant sa configuration</strong> ?</p>
+
+<h2 id="présentation-dotfiles-quezako">Présentation : Dotfiles, quezako ?</h2>
+
+<p>Pour un système *nix (Linux, Mac, etc.), la configuration du shell et des applications est généralement centralisée dans les &ldquo;dotfiles&rdquo;, des fichiers / répertoires dont le nom commence par un point (&ldquo;dot&rdquo; en anglais) et qui sont chargés en début de session interactive ou au lancement d&rsquo;applications. En utilisant un gestionnaire de sources et des liens symboliques, on peut facilement <strong>historiser</strong> et <strong>synchroniser</strong> l&rsquo;évolution de ces dotfiles afin de :</p>
+
+<ul>
+<li><p><strong>personnaliser le système d&rsquo;exploitation</strong>  : options d&rsquo;affichage (exemple : choisir de masquer automatiquement la barre des applications), audio, etc.</p></li>
+
+<li><p><strong>personnaliser son shell</strong> :</p>
+
+<ul>
+<li><p>positionnement de variables d&rsquo;environnement (exemples : <code>PATH</code>, <code>JAVA_HOME</code>, <code>MVN_OPTIONS</code> etc.)</p></li>
+
+<li><p>création d&rsquo;alias pour les commandes fréquemment utilisées et/ou dures à mémoriser (exemple : <code>alias mcist=&quot;mvn clean install -DskipTests&quot;</code>)</p></li>
+
+<li><p>utilisation d&rsquo;un shell &ldquo;sur-vitaminé&rdquo; du type <a href="https://github.com/robbyrussell/oh-my-zsh">Oh My Zsh</a></p></li>
+</ul></li>
+
+<li><p><strong>gérér les applications installées</strong>, à condition d&rsquo;utiliser un gestionnaire de paquets du type <code>homebrew</code> (ou <code>apt</code>, <code>OneGet</code> etc.).</p></li>
+</ul>
+
+<h2 id="comment-un-exemple-d-utilisation-du-mini-framework-holman-dotfiles">Comment ? Un exemple d&rsquo;utilisation du mini-framework &ldquo;holman/dotfiles&rdquo;</h2>
+
+<p>On peut créer son propre environnement ou bien utiliser un framework &ldquo;dotfiles&rdquo; prêt à l&rsquo;emploi car il existe de nombreux frameworks &ldquo;dotfiles&rdquo;, en voici une liste non-exhaustive : <a href="https://dotfiles.github.io/">https://dotfiles.github.io/</a>.</p>
+
+<p>J&rsquo;ai pour ma part utilisé <a href="https://github.com/holman/dotfiles">https://github.com/holman/dotfiles</a> qui permet de gérer sa configuration <code>ZSH</code> en proposant les fonctionnalités suivantes :</p>
+
+<ul>
+<li><p>chargement automatique des fichiers nommés <code>*.zsh</code>, quel que soit leur répertoire, favorisant ainsi une structure thématique. Par exemple, on peut distinguer la configuration du compilateur Java, dans le script <code>java/env.zsh</code>, de la configuration du compilateur Go, dans le script <code>golang/env.zsh</code>. Cette approche thématique remplace avantageusement l&rsquo;utilisation d&rsquo;un script monolithique.</p></li>
+
+<li><p>création de liens symboliques (&ldquo;symlinks&rdquo;) pointant vers les scripts de démarrage du shell (exemple : le fichier <code>$HOME/.zshrc</code> pour le shell <code>ZSH</code>).</p></li>
+</ul>
+
+<p>Après avoir &ldquo;forké&rdquo; <a href="https://github.com/holman/dotfile">https://github.com/holman/dotfiles</a>, j&rsquo;ai créé deux branches :</p>
+
+<ul>
+<li><p>une pour mon ordinateur personnel sous Mac : <a href="https://github.com/nicokosi/dotfiles">https://github.com/nicokosi/dotfiles</a></p></li>
+
+<li><p>une autre pour mon ordinateur professionnel sous Linux : <a href="https://github.com/nicokosi/dotfiles/tree/vidal">https://github.com/nicokosi/dotfiles/tree/vidal</a>
+Ces branches me permettent d&rsquo;avoir deux configurations bien distinctes même si elles partagent certaines similitudes.</p></li>
+</ul>
+
+<h2 id="conclusion-dotfiles-all-the-things">Conclusion : <em>Dotfiles all the things</em>!</h2>
+
+<p>Même si la mise en place et la maintenance de ses dotfiles prend du temps, l&rsquo;investissement vaut le coup pour notamment :</p>
+
+<ul>
+<li><p><strong>la résolution de problèmes</strong> (exemples : identifier ce qui a été récemment modifié, revenir à une configuration précédente, etc.) ;</p></li>
+
+<li><p><strong>synchroniser</strong> des changements entre plusieurs machines (exemple : PC sous Linux au travail et Mac perso), chacune ayant  une configuration distincte ;</p></li>
+
+<li><p><strong>partager</strong> sa configuration avec d&rsquo;autres développeurs (&ldquo;Voici le dernier réglage que j&rsquo;ai utilisé pour &hellip;&rdquo;).
+:</p></li>
+</ul>
+
+<p>PS : merci à Jean-Christophe Gay pour l&rsquo;inspiration et les &ldquo;bons tuyaux&rdquo;. Voici son blog : <a href="https://jeanchristophegay.com/">https://jeanchristophegay.com/</a>.</p>
+
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <aside><div id="disqus_thread"></div></aside>
+    <script type="text/javascript">
+      var disqus_shortname = 'nicokosi-blog';
+      (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+
+<section class="section">
+  <div class="container has-text-centered">
+    <p>&copy; <a href="https://github.com/nicokosi">Nicolas Kosinski</a> 2016</p>
+  </div>
+</section>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/highlight.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/languages/java.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/languages/scala.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/languages/clojure.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/languages/haskell.min.js"></script>
+
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.6.0/languages/shell.min.js"></script>
+
+<script>hljs.initHighlightingOnLoad();</script>
+
+<script>
+!function(a,b,c,d,e,f,g){a.GoogleAnalyticsObject=e,a[e]=a[e]||function(){(a[e].q=a[e].q||[]).push(arguments)},a[e].l=1*new Date,f=b.createElement(c),g=b.getElementsByTagName(c)[0],f.async=1,f.src=d,g.parentNode.insertBefore(f,g)}(window,document,"script","//www.google-analytics.com/analytics.js","ga"),ga("create","UA-11930016-2","auto"),ga("send","pageview");
+</script>
+
+
