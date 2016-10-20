@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all-fr.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2016-09-27T00:00:00+02:00</updated><entry><title>Jouons avec le pattern matching en Haskell</title><link href="https://nicokosi.github.io/haskell-pattern-matching.html" rel="alternate"></link><published>2016-09-27T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-27:haskell-pattern-matching.html</id><summary type="html">&lt;p&gt;Découvrons le pattern matching en Haskell en reprenant l'exemple des cartes à jouer utilisé dans l'article &lt;a href="https://nicokosi.github.io/scala-pattern-matching.html"&gt;"Jouons avec le pattern matching en Scala"&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Préambule : création d'une énumération&lt;/h2&gt;
+&lt;p&gt;Codons notre énumération correspondant à nos quatre enseignes (carreau, cœur, pique et trèfle) :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kr"&gt;data&lt;/span&gt; &lt;span class="kt"&gt;Enseigne&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;Carreau&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Coeur&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Pique&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Trèfle&lt;/span&gt;
+  &lt;span class="kr"&gt;deriving&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Eq&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Enum&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Show&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Nous venons de créer notre propre type (&lt;em&gt;data type&lt;/em&gt;) qui :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;a quatre constructeurs (&lt;em&gt;value constructors&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;hérite des classes de base :&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Eq&lt;/code&gt; pour implémenter l'égalité entre deux valeurs&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Enum&lt;/code&gt; pour que les valeurs sont finies et ordonnées (&lt;em&gt;sequentially ordered types&lt;/em&gt;)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Show&lt;/code&gt; pour avoir une représentation sous forme de chaîne de caractères, ce qui peut être utile pour débugguer ou pour évaluer interactivement du code via le REPL.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Utilisons maintenant &lt;code&gt;ghci&lt;/code&gt; (&lt;em&gt;Glascow Haskell Compiler Interactive environment&lt;/em&gt;), le REPL d'Haskell, pour interagir avec cette énumération :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="kt"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;Coeur&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="kt"&gt;Coeur&lt;/span&gt;
+&lt;span class="kt"&gt;True&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="kt"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;succ&lt;/span&gt; &lt;span class="kt"&gt;Coeur&lt;/span&gt;
+&lt;span class="kt"&gt;Pique&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Exemples de pattern matching&lt;/h2&gt;
+&lt;h3&gt;Premier exemple basique&lt;/h3&gt;
+&lt;p&gt;La fonction suivante retourne le symbole d'une enseigne :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;symbole&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;Enseigne&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
+&lt;span class="nf"&gt;symbole&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt;
+  &lt;span class="kr"&gt;case&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="kr"&gt;of&lt;/span&gt;
+    &lt;span class="kt"&gt;Carreau&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♦&amp;quot;&lt;/span&gt;
+    &lt;span class="kt"&gt;Coeur&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;♥&amp;quot;&lt;/span&gt;
+    &lt;span class="kt"&gt;Pique&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;♠&amp;quot;&lt;/span&gt;
+    &lt;span class="kt"&gt;Trèfle&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;    
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Exemple d'appel :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="kt"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;putStrLn&lt;/span&gt; &lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="n"&gt;symbole&lt;/span&gt; &lt;span class="o"&gt;$&lt;/span&gt; &lt;span class="kt"&gt;Coeur&lt;/span&gt;
+&lt;span class="err"&gt;♥&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Notons que :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;L'opérateur &lt;code&gt;$&lt;/code&gt; nous permet de chaîner nos fonctions, plutôt que de les imbriquer dans des parenthèses (&lt;code&gt;putStrLn(symbole(Coeur))&lt;/code&gt;).&lt;/li&gt;
+&lt;li&gt;la fonction &lt;code&gt;putStrLn&lt;/code&gt; permet d'afficher des caractères Unicode, à l'inverse de la fonction standard &lt;code&gt;show&lt;/code&gt; qui ne retourne que des chaînes ASCII. 😎&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br/&gt;
+Remarque : le compilateur sait détecter un pattern matching non exhaustif. Par exemple, le code suivant :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;symbole&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;Enseigne&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
+&lt;span class="nf"&gt;symbole&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="kr"&gt;case&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="kr"&gt;of&lt;/span&gt;
+    &lt;span class="kt"&gt;Carreau&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♦&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;génère un avertissement de compilation :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;warning&lt;/span&gt;&lt;span class="kt"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="kt"&gt;Wincomplete&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;patterns&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+    &lt;span class="kt"&gt;Pattern&lt;/span&gt; &lt;span class="n"&gt;match&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;es&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="n"&gt;are&lt;/span&gt; &lt;span class="n"&gt;non&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;exhaustive&lt;/span&gt;
+    &lt;span class="kt"&gt;In&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="kr"&gt;case&lt;/span&gt; &lt;span class="n"&gt;alternative&lt;/span&gt;&lt;span class="kt"&gt;:&lt;/span&gt;
+        &lt;span class="kt"&gt;Patterns&lt;/span&gt; &lt;span class="n"&gt;not&lt;/span&gt; &lt;span class="n"&gt;matched&lt;/span&gt;&lt;span class="kt"&gt;:&lt;/span&gt;
+            &lt;span class="kt"&gt;Coeur&lt;/span&gt;
+            &lt;span class="kt"&gt;Pique&lt;/span&gt;
+            &lt;span class="kt"&gt;Trèfle&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Et l'appel de cette fonction génére une exception :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="kt"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;symbole&lt;/span&gt; &lt;span class="kt"&gt;Coeur&lt;/span&gt;
+&lt;span class="s"&gt;&amp;quot;*** Exception: test.hs:(5,20)-(6,17): Non-exhaustive patterns in case&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Deuxième exemple, partage d'expression via un bloc 'where'&lt;/h3&gt;
+&lt;p&gt;Autre exemple, implémentons une fonction &lt;code&gt;couleur&lt;/code&gt; qui retourne la couleur d'une enseigne (chaîne de caractères "rouge" ou "noir") :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;couleur&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;Enseigne&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
+&lt;span class="nf"&gt;couleur&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="kr"&gt;case&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="kr"&gt;of&lt;/span&gt;
+    &lt;span class="kt"&gt;Carreau&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;rouge&lt;/span&gt;
+    &lt;span class="kt"&gt;Coeur&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;rouge&lt;/span&gt;
+    &lt;span class="kt"&gt;Pique&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;noir&lt;/span&gt;
+    &lt;span class="kt"&gt;Trèfle&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;noir&lt;/span&gt;
+    &lt;span class="kr"&gt;where&lt;/span&gt;
+      &lt;span class="n"&gt;rouge&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;rouge&amp;quot;&lt;/span&gt;
+      &lt;span class="n"&gt;noir&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;noir&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Exemple d'appel :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;*Main&amp;gt; couleur(Coeur)
+&amp;quot;rouge&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Nous avons ici utilisé le mot-clé &lt;code&gt;where&lt;/code&gt; qui nous permet de partager des expressions.
+&lt;br/&gt;
+&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Troisième exemple, déstructuration&lt;/h3&gt;
+&lt;p&gt;Définissons notre propre type &lt;code&gt;Carte&lt;/code&gt; combinant un rang (1, 2, 3, ..., valet, dame, roi) et une enseigne :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kr"&gt;data&lt;/span&gt; &lt;span class="kt"&gt;Rang&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt;
+  &lt;span class="kt"&gt;R1&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R2&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R3&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R4&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R5&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R6&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R7&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R8&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R9&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;R10&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Valet&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Dame&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="kt"&gt;Roi&lt;/span&gt;
+  &lt;span class="kr"&gt;deriving&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Eq&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Ord&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Enum&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Show&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="kr"&gt;data&lt;/span&gt; &lt;span class="kt"&gt;Carte&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;Carte&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;rang&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;Rang&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;Enseigne&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="kr"&gt;deriving&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Eq&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Show&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Le type &lt;code&gt;Carte&lt;/code&gt; utilise la syntaxe &lt;em&gt;record&lt;/em&gt; permettant de nommer les champs.&lt;/p&gt;
+&lt;p&gt;Nous pouvons ainsi utiliser le pattern matching pour "déstructurer" une carte en filtrant les champs. Par exemple, la fonction suivante permet de déterminer si deux cartes, associées par un &lt;em&gt;tuple&lt;/em&gt;, sont de même enseigne :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;mêmeEnseigne&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Carte&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kt"&gt;Carte&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;Bool&lt;/span&gt;
+&lt;span class="nf"&gt;mêmeEnseigne&lt;/span&gt; &lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="kt"&gt;Carte&lt;/span&gt; &lt;span class="kr"&gt;_&lt;/span&gt; &lt;span class="n"&gt;enseigne1&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;Carte&lt;/span&gt; &lt;span class="kr"&gt;_&lt;/span&gt; &lt;span class="n"&gt;enseigne2&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt;
+  &lt;span class="n"&gt;enseigne1&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="n"&gt;enseigne2&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Exemples d'appel :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;*Main&amp;gt; :{
+*Main| mêmeEnseigne (
+*Main|     Carte {rang=R1, enseigne=Carreau},
+*Main|     Carte {rang=R1, enseigne=Coeur} )
+*Main| :}
+False
+*Main&amp;gt; :{
+*Main| mêmeEnseigne (
+*Main|     Carte {rang=Valet, enseigne=Coeur},
+*Main|     Carte {rang=R1, enseigne=Coeur} )
+*Main| :}
+True
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Les rangs, que l'on n'utilise pas dans la fonction, ont été filtrés via le caractère &lt;em&gt;wild-card&lt;/em&gt; (&lt;code&gt;_&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;Et voilà ! 🤓&lt;/p&gt;</summary><category term="haskell"></category><category term="pattern-matching"></category></entry><entry><title>Jouons avec le pattern matching en Scala</title><link href="https://nicokosi.github.io/scala-pattern-matching.html" rel="alternate"></link><published>2016-09-14T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-14:scala-pattern-matching.html</id><summary type="html">&lt;p&gt;Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d’illustrer par l'exemple le pattern matching en Scala.&lt;/p&gt;
+&lt;p&gt;Supposons que nous voulions créer une fonction retournant la couleur (noir / rouge) d'une enseigne d'une carte à jouer (les quatre enseignes du jeu français étant : trèfle, cœur, carreau et pique).&lt;/p&gt;
+&lt;p&gt;Notes : dans le code ci-dessous, les commentaires se trouvant à la fin de chaque ligne correspondent à la sortie standard de la console ; j'ai utilisé un &lt;a href="https://confluence.jetbrains.com/display/IntelliJIDEA/Working+with+Scala+Worksheet"&gt;worksheet IntelliJ IDEA&lt;/a&gt; pour coder interactivement cet exemple, mais on peut bien sûr utiliser la console Scala.&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;1ère étape : création d'une simple classe&lt;/h2&gt;
+&lt;p&gt;Commençons par créer une classe immuable représentant l'enseigne "trèfle" :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Trèfle&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+   &lt;span class="k"&gt;val&lt;/span&gt; &lt;span class="n"&gt;symbole&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;
+   &lt;span class="k"&gt;val&lt;/span&gt; &lt;span class="n"&gt;libellé&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;trèfle&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;val&lt;/span&gt; &lt;span class="n"&gt;trèfle&lt;/span&gt;&lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Trèfle&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nc"&gt;Trèfle&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;trèfle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;symbole&lt;/span&gt; &lt;span class="c1"&gt;// ♣&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Notons que cette classe permet de comparer des objets par identité (référence) et non par valeur car on ne surcharge pas la méthode &lt;code&gt;equals&lt;/code&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;trèfle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;equals&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;trèfle&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;// true&lt;/span&gt;
+&lt;span class="n"&gt;trèfle&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nc"&gt;Trèfle&lt;/span&gt; &lt;span class="c1"&gt;// false&lt;/span&gt;
+&lt;span class="n"&gt;trèfle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;eq&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nc"&gt;Trèfle&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;// false&lt;/span&gt;
+&lt;span class="n"&gt;trèfle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;equals&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nc"&gt;Trèfle&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;// false&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;De même, les méthodes &lt;code&gt;hashCode&lt;/code&gt;, &lt;code&gt;toString&lt;/code&gt; sont celles par défaut :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;trèfle&lt;/span&gt; &lt;span class="c1"&gt;// Trèfle@1ac88f64&lt;/span&gt;
+&lt;span class="n"&gt;trèfle&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;hashCode&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;// 123717365&lt;/span&gt;
+&lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nc"&gt;Trèfle&lt;/span&gt;&lt;span class="o"&gt;().&lt;/span&gt;&lt;span class="n"&gt;hashCode&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;// 1323753063&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;2ème étape : création d'une case class&lt;/h2&gt;
+&lt;p&gt;La création d'une &lt;code&gt;case class&lt;/code&gt; permet :&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;d'auto-implémenter les méthodes &lt;code&gt;equals&lt;/code&gt;, &lt;code&gt;hashCode&lt;/code&gt; et &lt;code&gt;toString&lt;/code&gt; ;&lt;/li&gt;
+&lt;li&gt;de bénéficier de deux méthodes utiles au pattern matching : un "constructeur", la méthode &lt;code&gt;apply&lt;/code&gt;, et un "dé-constructeur", la méthode &lt;code&gt;unapply&lt;/code&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;symbole&lt;/span&gt;&lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;libellé&lt;/span&gt;&lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Nous avons un constructeur "gratuit", la méthode &lt;code&gt;apply&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;trèfle&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;// Enseigne(♣,trèfle)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Nous avons également une implémentation "gratuite", basée sur les champs, des méthodes &lt;code&gt;equals&lt;/code&gt;, &lt;code&gt;hashCode&lt;/code&gt; et &lt;code&gt;toString&lt;/code&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;trèfle&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;).&lt;/span&gt;&lt;span class="n"&gt;symbole&lt;/span&gt; &lt;span class="c1"&gt;// ♣&lt;/span&gt;
+&lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;trèfle&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;trèfle&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;// true&lt;/span&gt;
+&lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;trèfle&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;).&lt;/span&gt;&lt;span class="n"&gt;equals&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;trèfle&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;))&lt;/span&gt; &lt;span class="c1"&gt;// true&lt;/span&gt;
+&lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;trèfle&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;).&lt;/span&gt;&lt;span class="n"&gt;eq&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;trèfle&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;))&lt;/span&gt; &lt;span class="c1"&gt;// false&lt;/span&gt;
+&lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;trèfle&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;).&lt;/span&gt;&lt;span class="n"&gt;hashCode&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;// 841520215&lt;/span&gt;
+&lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;trèfle&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;).&lt;/span&gt;&lt;span class="n"&gt;hashCode&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;// 841520215&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Etape "bonus" : création d'une énumération&lt;/h2&gt;
+&lt;p&gt;Puisque nous avons quatre enseignes, nous pouvons créer une énumération. Ca ne servira pas directement à implémenter notre exemple final mais l'exemple s'y prête bien.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;object&lt;/span&gt; &lt;span class="nc"&gt;Enseignes&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;val&lt;/span&gt; &lt;span class="nc"&gt;TREFLE&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♣&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;trèfle&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;val&lt;/span&gt; &lt;span class="nc"&gt;CARREAU&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♦&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;carreau&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;val&lt;/span&gt; &lt;span class="nc"&gt;COEUR&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♥&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;coeur&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;val&lt;/span&gt; &lt;span class="nc"&gt;PIQUE&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;♠&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;pique&amp;quot;&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="n"&gt;values&lt;/span&gt;&lt;span class="o"&gt;()&lt;/span&gt; &lt;span class="k"&gt;=&lt;/span&gt; &lt;span class="nc"&gt;List&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nc"&gt;CARREAU&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nc"&gt;COEUR&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nc"&gt;PIQUE&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="nc"&gt;TREFLE&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;span class="nc"&gt;Enseignes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;TREFLE&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="nc"&gt;Enseignes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;CARREAU&lt;/span&gt; &lt;span class="c1"&gt;// true&lt;/span&gt;
+&lt;span class="nc"&gt;Enseignes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;values&lt;/span&gt; &lt;span class="c1"&gt;// List[Enseigne] = List(Enseigne(♦,carreau), Enseigne(♥,coeur), Enseigne(♠,pique), Enseigne(♣,trèfle))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Dernière étape : pattern matchons !&lt;/h2&gt;
+&lt;h3&gt;Premier exemple&lt;/h3&gt;
+&lt;p&gt;Un premier exemple de pattern matching, utilisé dans une fonction qui retourne la couleur de l'enseigne :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="n"&gt;indiquerJusteLaCouleur&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cardSuite&lt;/span&gt;&lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cardSuite&lt;/span&gt; &lt;span class="k"&gt;match&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nc"&gt;Enseignes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;TREFLE&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="nc"&gt;Enseignes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;PIQUE&lt;/span&gt; &lt;span class="k"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;noir&amp;quot;&lt;/span&gt;
+  &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nc"&gt;Enseignes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;CARREAU&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="nc"&gt;Enseignes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;COEUR&lt;/span&gt; &lt;span class="k"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;rouge&amp;quot;&lt;/span&gt;
+  &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="k"&gt;_&lt;/span&gt; &lt;span class="k"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;aucune&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="n"&gt;indiquerJusteLaCouleur&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nc"&gt;Enseignes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;PIQUE&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;// noir&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Ce premier exemple met en avant :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;la notation &lt;code&gt;|&lt;/code&gt; (&lt;em&gt;disjunction&lt;/em&gt;) permettant de regrouper plusieurs cas ;&lt;/li&gt;
+&lt;li&gt;la notation &lt;code&gt;_&lt;/code&gt; (&lt;em&gt;wildcard&lt;/em&gt;) pour gérer les autres cas.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Deuxième exemple&lt;/h3&gt;
+&lt;p&gt;Voici un deuxième exemple montrant comment récupérer sélectivement certains champs (ici, le libellé de l'enseigne) en "dé-structurant" notre instance de &lt;code&gt;case class&lt;/code&gt;, via la méthode &lt;code&gt;unapply&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="n"&gt;décrireLaCouleur&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;enseigne&lt;/span&gt;&lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="k"&gt;:&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt; &lt;span class="k"&gt;match&lt;/span&gt; &lt;span class="o"&gt;{&lt;/span&gt;
+  &lt;span class="k"&gt;case&lt;/span&gt; &lt;span class="nc"&gt;Enseigne&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="k"&gt;_&lt;/span&gt;&lt;span class="o"&gt;,&lt;/span&gt; &lt;span class="n"&gt;libellé&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="k"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s"&gt;s&amp;quot;&lt;/span&gt;&lt;span class="si"&gt;$libellé&lt;/span&gt;&lt;span class="s"&gt; is &lt;/span&gt;&lt;span class="si"&gt;${&lt;/span&gt;&lt;span class="n"&gt;indiquerJusteLaCouleur&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="n"&gt;enseigne&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;&lt;span class="si"&gt;}&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="o"&gt;}&lt;/span&gt;
+
+&lt;span class="n"&gt;décrireLaCouleur&lt;/span&gt;&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="nc"&gt;Enseignes&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nc"&gt;PIQUE&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;// pique est noir&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Et voilà ! 🤓&lt;/p&gt;
+&lt;p&gt;PS : merci à Jérôme Prudent pour ses tuyaux en Scala et ses avis éclairés.
+Jérôme est contributeur au &lt;a href="http://www.arolla.fr/blog"&gt;blog d'Arolla&lt;/a&gt; (&lt;a href="http://www.arolla.fr/blog/author/jerome-prudent/"&gt;lien direct vers ses articles&lt;/a&gt;).&lt;/p&gt;</summary><category term="scala"></category><category term="pattern-matching"></category><category term="console"></category><category term="repl"></category></entry><entry><title>Versionner sa configuration système via des "dotfiles"</title><link href="https://nicokosi.github.io/dotfiles.html" rel="alternate"></link><published>2016-08-17T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-08-17:dotfiles.html</id><summary type="html">&lt;h2&gt;Introduction : la puissance du shell, avec ou sans maîtrise ?&lt;/h2&gt;
+&lt;p&gt;Cela fait environ deux ans que je développe sur un poste "*nix" (Linux et Mac) après avoir développé de nombreuses années sur un poste Windows. La puissance du shell est indéniable : combiner des lignes de commandes simples, bénéficier de l'historique des commandes lancées, etc. Pourquoi ne pas en profiter pour maîtriser davantage son système en &lt;strong&gt;versionnant sa configuration&lt;/strong&gt; ?&lt;/p&gt;
+&lt;h2&gt;Présentation : Dotfiles, quezako ?&lt;/h2&gt;
+&lt;p&gt;Pour un système *nix (Linux, Mac, etc.), la configuration du shell et des applications est généralement centralisée dans les "dotfiles", des fichiers / répertoires dont le nom commence par un point ("dot" en anglais) et qui sont chargés en début de session interactive ou au lancement d'applications. En utilisant un gestionnaire de sources et des liens symboliques, on peut facilement &lt;strong&gt;historiser&lt;/strong&gt; et &lt;strong&gt;synchroniser&lt;/strong&gt; l'évolution de ces dotfiles afin de :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;personnaliser le système d'exploitation&lt;/strong&gt;  : options d'affichage (exemple : choisir de masquer automatiquement la barre des applications), audio, etc.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;personnaliser son shell&lt;/strong&gt; :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;positionnement de variables d'environnement (exemples : &lt;code&gt;PATH&lt;/code&gt;, &lt;code&gt;JAVA_HOME&lt;/code&gt;, &lt;code&gt;MVN_OPTIONS&lt;/code&gt; etc.)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;création d'alias pour les commandes fréquemment utilisées et/ou dures à mémoriser (exemple : &lt;code&gt;alias mcist="mvn clean install -DskipTests"&lt;/code&gt;)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;utilisation d'un shell "sur-vitaminé" du type &lt;a href="https://github.com/robbyrussell/oh-my-zsh"&gt;Oh My Zsh&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;gérér les applications installées&lt;/strong&gt;, à condition d'utiliser un gestionnaire de paquets du type &lt;code&gt;homebrew&lt;/code&gt; (ou &lt;code&gt;apt&lt;/code&gt;, &lt;code&gt;OneGet&lt;/code&gt; etc.).&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Comment ? Un exemple d'utilisation du mini-framework "holman/dotfiles"&lt;/h2&gt;
+&lt;p&gt;On peut créer son propre environnement ou bien utiliser un framework "dotfiles" prêt à l'emploi car il existe de nombreux frameworks "dotfiles", en voici une liste non-exhaustive : &lt;a href="https://dotfiles.github.io/"&gt;https://dotfiles.github.io/&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;J'ai pour ma part utilisé &lt;a href="https://github.com/holman/dotfiles"&gt;https://github.com/holman/dotfiles&lt;/a&gt; qui permet de gérer sa configuration &lt;code&gt;ZSH&lt;/code&gt; en proposant les fonctionnalités suivantes :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;chargement automatique des fichiers nommés &lt;code&gt;*.zsh&lt;/code&gt;, quel que soit leur répertoire, favorisant ainsi une structure thématique. Par exemple, on peut distinguer la configuration du compilateur Java, dans le script &lt;code&gt;java/env.zsh&lt;/code&gt;, de la configuration du compilateur Go, dans le script &lt;code&gt;golang/env.zsh&lt;/code&gt;. Cette approche thématique remplace avantageusement l'utilisation d'un script monolithique.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;création de liens symboliques ("symlinks") pointant vers les scripts de démarrage du shell (exemple : le fichier &lt;code&gt;$HOME/.zshrc&lt;/code&gt; pour le shell &lt;code&gt;ZSH&lt;/code&gt;).&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Après avoir "forké" &lt;a href="https://github.com/holman/dotfile"&gt;https://github.com/holman/dotfiles&lt;/a&gt;, j'ai créé deux branches :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;une pour mon ordinateur personnel sous Mac : &lt;a href="https://github.com/nicokosi/dotfiles"&gt;https://github.com/nicokosi/dotfiles&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;une autre pour mon ordinateur professionnel sous Linux : &lt;a href="https://github.com/nicokosi/dotfiles/tree/vidal"&gt;https://github.com/nicokosi/dotfiles/tree/vidal&lt;/a&gt;
+Ces branches me permettent d'avoir deux configurations bien distinctes même si elles partagent certaines similitudes.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Conclusion : &lt;em&gt;Dotfiles all the things&lt;/em&gt;!&lt;/h2&gt;
+&lt;p&gt;Même si la mise en place et la maintenance de ses dotfiles prend du temps, l'investissement vaut le coup pour notamment :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;la résolution de problèmes&lt;/strong&gt; (exemples : identifier ce qui a été récemment modifié, revenir à une configuration précédente, etc.) ;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;synchroniser&lt;/strong&gt; des changements entre plusieurs machines (exemple : PC sous Linux au travail et Mac perso), chacune ayant  une configuration distincte ;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;partager&lt;/strong&gt; sa configuration avec d'autres développeurs ("Voici le dernier réglage que j'ai utilisé pour ...").
+:&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;PS : merci à Jean-Christophe Gay pour l'inspiration et les "bons tuyaux". Voici son blog : &lt;a href="https://jeanchristophegay.com/"&gt;https://jeanchristophegay.com/&lt;/a&gt;.&lt;/p&gt;</summary><category term="tools"></category></entry></feed>
