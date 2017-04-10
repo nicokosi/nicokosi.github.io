@@ -80,8 +80,8 @@
 &lt;p&gt;Le graphique généré :
 &lt;img alt="Chart: average speed over time" src="images/chart-average-speed-over-time.png" /&gt;&lt;/p&gt;
 &lt;p&gt;Le code complet, qui affiche plusieurs graphiques similaires, se trouve sur le &lt;a href="https://github.com/nicokosi/strava-activity-graphs/"&gt;repository GitHub strava-activity-graphs&lt;/a&gt;.&lt;/p&gt;</summary><category term="strava charts clojure incanter"></category></entry><entry><title>Creating Strava charts with Clojure and Incanter</title><link href="https://nicokosi.github.io/creating-strava-charts-with-clojure-and-incanter-en.html" rel="alternate"></link><published>2017-04-09T17:37:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-04-09:creating-strava-charts-with-clojure-and-incanter-en.html</id><summary type="html">&lt;h1&gt;Creating Strava charts via Clojure and Incanter&lt;/h1&gt;
-&lt;p&gt;I use &lt;a href="https://www.strava.com/"&gt;Strava&lt;/a&gt; to record my jogging sessions: I can record my sessions via my smartphone, publish them so that I can view/share them on strava.com.&lt;/p&gt;
-&lt;p&gt;In addition to Strava dashboard, I wanted to generate my own charts in order to visualize my progress.&lt;/p&gt;
+&lt;p&gt;I use &lt;a href="https://www.strava.com/"&gt;Strava&lt;/a&gt; to record my jogging sessions: I can record my sessions via my smartphone and publish them. I can then review or share them.&lt;/p&gt;
+&lt;p&gt;In addition to provided Strava dashboards, I wanted to generate my own charts in order to visualize my progress.&lt;/p&gt;
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h2&gt;First attempt: via R&lt;/h2&gt;
 &lt;p&gt;In first tried to use &lt;a href="https://www.rstudio.com/"&gt;RStudio&lt;/a&gt;, an IDE for R. I know this tool is very well-suited but I don't know much about it. After a few hours, I was not able to load and transform JSON data.&lt;/p&gt;
@@ -102,7 +102,11 @@
 &lt;p&gt;So let's dive into it!&lt;/p&gt;
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h3&gt;1. Retrieve data via Strava API&lt;/h3&gt;
-&lt;p&gt;The following function calls the &lt;a href="http://strava.github.io/api/v3/activities/"&gt;Strava API for activities&lt;/a&gt; with an authorization token, and retrieves the 200 last activities (run/ride/swim) as a JSON object array and converts is to a sequence of Clojure maps:&lt;/p&gt;
+&lt;p&gt;The following function:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;calls the &lt;a href="http://strava.github.io/api/v3/activities/"&gt;Strava API for activities&lt;/a&gt; with an authorization token to retrieves the 200 last activities (run/ride/swim), as a JSON object array&lt;/li&gt;
+&lt;li&gt;converts this JSON object array to a sequence of Clojure maps:&lt;/li&gt;
+&lt;/ul&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;defn &lt;/span&gt;&lt;span class="nv"&gt;strava-activities&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;token&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
   &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;json/read-str&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;:body&lt;/span&gt;
                    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;http-client/get&lt;/span&gt;
