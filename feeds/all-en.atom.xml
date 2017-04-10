@@ -1,5 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all-en.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2016-09-27T00:00:00+02:00</updated><entry><title>Let's play with pattern matching in Haskell</title><link href="https://nicokosi.github.io/haskell-pattern-matching-en.html" rel="alternate"></link><published>2016-09-27T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-27:haskell-pattern-matching-en.html</id><summary type="html">&lt;p&gt;Let's discover Haskell and pattern matching via basic examples similar to &lt;a href="https://nicokosi.github.io/scala-pattern-matching-en.html"&gt;"Let's play with pattern matching in Scala"&lt;/a&gt;.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all-en.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2017-04-09T17:37:00+02:00</updated><entry><title>Creating Strava charts with Clojure and Incanter</title><link href="https://nicokosi.github.io/creating-strava-charts-with-clojure-and-incanter-en.html" rel="alternate"></link><published>2017-04-09T17:37:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-04-09:creating-strava-charts-with-clojure-and-incanter-en.html</id><summary type="html">&lt;h1&gt;Creating Strava charts via Clojure and Incanter&lt;/h1&gt;
+&lt;p&gt;I use &lt;a href="https://www.strava.com/"&gt;Strava&lt;/a&gt; to record my jogging sessions: I can record my sessions via my smartphone, publish them so that I can view/share them on strava.com.&lt;/p&gt;
+&lt;p&gt;In addition to Strava dashboard, I wanted to generate my own charts in order to visualize my progress.&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;First attempt: via R&lt;/h2&gt;
+&lt;p&gt;In first tried to use &lt;a href="https://www.rstudio.com/"&gt;RStudio&lt;/a&gt;, an IDE for R. I know this tool is very well-suited but I don't know much about it. After a few hours, I was not able to load and transform JSON data.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="RStudio: an IDE for R platform" src="images/RStudio.png" /&gt;&lt;/p&gt;
+&lt;p&gt;Note to myself: try again another time! 😅&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Second attempt: via Clojure and Incanter&lt;/h2&gt;
+&lt;p&gt;I then used another option: &lt;a href="http://incanter.org"&gt;Incanter&lt;/a&gt;, which is&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Clojure-based, R-like platform for statistical computing and graphics.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Basically, I had to:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;call Strava API that return activities as JSON data&lt;/li&gt;
+&lt;li&gt;transform data: do basic conversions (meters per second into km/h, seconds into minutes)&lt;/li&gt;
+&lt;li&gt;display charts: average speed per date&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So let's dive into it!&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;1. Retrieve data via Strava API&lt;/h3&gt;
+&lt;p&gt;The following function calls the &lt;a href="http://strava.github.io/api/v3/activities/"&gt;Strava API for activities&lt;/a&gt; with an authorization token, and retrieves the 200 last activities (run/ride/swim) as a JSON object array and converts is to a sequence of Clojure maps:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;defn &lt;/span&gt;&lt;span class="nv"&gt;strava-activities&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;token&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+  &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;json/read-str&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;:body&lt;/span&gt;
+                   &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;http-client/get&lt;/span&gt;
+                     &lt;span class="s"&gt;&amp;quot;https://www.strava.com/api/v3/activities&amp;quot;&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="ss"&gt;:query-params&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="ss"&gt;:access_token&lt;/span&gt; &lt;span class="nv"&gt;token&lt;/span&gt; &lt;span class="ss"&gt;:per_page&lt;/span&gt; &lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="p"&gt;}}))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;2. Transform data&lt;/h3&gt;
+&lt;p&gt;We can operate some data transformation, defining the following functions:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;; Display speed unit in km/h (Strava API returns m/s):&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;def &lt;/span&gt;&lt;span class="nv"&gt;meters-per-second-&amp;gt;kilometers-per-hour&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;partial * &lt;/span&gt;&lt;span class="mf"&gt;3.6&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;; Display durations in minutes (Strava API returns seconds):&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;defn- &lt;/span&gt;&lt;span class="nv"&gt;seconds-&amp;gt;minutes&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;s&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;/ &lt;/span&gt;&lt;span class="nv"&gt;s&lt;/span&gt; &lt;span class="mi"&gt;60&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;; Incanter can only generate charts for numerical data, so ISO dates must be converted to timestamps:&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;defn- &lt;/span&gt;&lt;span class="nv"&gt;string-date-&amp;gt;millis&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;str-date&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+  &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;.getTime&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;clojure.instant/read-instant-date&lt;/span&gt; &lt;span class="nv"&gt;str-date&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;These functions can be applied on activities data via the "thread-last" operator (&lt;code&gt;-&amp;gt;&amp;gt;&lt;/code&gt;), which is great for function pipelines:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;-&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;strava-activities&lt;/span&gt; &lt;span class="nv"&gt;token&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+       &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;map &lt;/span&gt;&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;update-in&lt;/span&gt; &lt;span class="nv"&gt;%&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;average_speed&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="nv"&gt;meters-per-second-&amp;gt;kilometers-per-hour&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+       &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;map &lt;/span&gt;&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;update-in&lt;/span&gt; &lt;span class="nv"&gt;%&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;start_date_local&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="nv"&gt;string-date-&amp;gt;millis&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+       &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;map &lt;/span&gt;&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;update-in&lt;/span&gt; &lt;span class="nv"&gt;%&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;elapsed_time&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="nv"&gt;seconds-&amp;gt;minutes&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+       &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;map &lt;/span&gt;&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;update-in&lt;/span&gt; &lt;span class="nv"&gt;%&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;moving_time&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="nv"&gt;seconds-&amp;gt;minutes&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;3. Display a chart via Incanter&lt;/h3&gt;
+&lt;p&gt;The final step is to use an Incanter function to display a chart:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;defn &lt;/span&gt;&lt;span class="nv"&gt;display-chart&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;token&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+  &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;activities&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;get-activities&lt;/span&gt; &lt;span class="nv"&gt;token&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;with-data&lt;/span&gt;
+      &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;to-dataset&lt;/span&gt; &lt;span class="nv"&gt;activities&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="nv"&gt;_&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;view&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;view&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;time-series-plot&lt;/span&gt;
+          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;$&lt;/span&gt; &lt;span class="ss"&gt;:start_date_local&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;$&lt;/span&gt; &lt;span class="ss"&gt;:average_speed&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+          &lt;span class="ss"&gt;:group-by&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;$&lt;/span&gt; &lt;span class="ss"&gt;:type&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+          &lt;span class="ss"&gt;:title&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Average speed over time&amp;quot;&lt;/span&gt;
+          &lt;span class="ss"&gt;:x-label&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;time&amp;quot;&lt;/span&gt;
+          &lt;span class="ss"&gt;:y-label&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;average speed (km/h)&amp;quot;&lt;/span&gt;
+          &lt;span class="ss"&gt;:points&lt;/span&gt; &lt;span class="nv"&gt;true&lt;/span&gt;
+          &lt;span class="ss"&gt;:legend&lt;/span&gt; &lt;span class="nv"&gt;true&lt;/span&gt;&lt;span class="p"&gt;)))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;All this code displays this kind of chart:
+&lt;img alt="Chart: average speed over time" src="images/chart-average-speed-over-time.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;
+You can find the full code that generates several charts in &lt;a href="https://github.com/nicokosi/strava-activity-graphs/"&gt;strava-activity-graphs GitHub repository&lt;/a&gt;.&lt;/p&gt;</summary><category term="strava charts clojure incanter"></category></entry><entry><title>Discovering GitHub APIs while learning Clojure</title><link href="https://nicokosi.github.io/discover-github-apis-with-clojure-en.html" rel="alternate"></link><published>2017-01-11T08:56:00+01:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-01-11:discover-github-apis-with-clojure-en.html</id><summary type="html">&lt;p&gt;As a developer, it's important to keep on learning/discovering stuff. Quoting &lt;a href="https://pragprog.com/book/tpp/the-pragmatic-programmer"&gt;The Pragmatic Programmer&lt;/a&gt; :&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Invest Regularly in Your Knowledge Portfolio&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;My last project "for learning" was to create a command-line tool, named &lt;a href="https://github.com/nicokosi/hubstats"&gt;hubstats&lt;/a&gt;, that outputs a summary for &lt;a href="https://help.github.com/articles/github-glossary/#pull-request"&gt;pull requests GitHub&lt;/a&gt;. This tool aims at giving some metrics for me and my team.&lt;/p&gt;
+&lt;p&gt;The real purposes were to practice &lt;a href="https://clojure.org/"&gt;Clojure&lt;/a&gt; (which I knew little) but also to discover &lt;a href="https://developer.github.com/v3/"&gt;REST&lt;/a&gt; and &lt;a href="https://developer.github.com/early-access/graphql/"&gt;GraphQL&lt;/a&gt; GitHub APIs.&lt;/p&gt;
+&lt;p&gt;Moreover, I was lucky to interact with a colleague of mine who is an advanced Clojure developer. That was really cool, thanks Jérôme aka &lt;a href="https://github.com/jprudent"&gt;@jprudent&lt;/a&gt;!&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;What is &lt;em&gt;hubstats&lt;/em&gt;?&lt;/h2&gt;
+&lt;p&gt;&lt;em&gt;hubstats&lt;/em&gt; is a simple command line tool that outputs, for a given &lt;a href="https://help.github.com/articles/github-glossary/#repository"&gt;GitHub repository&lt;/a&gt;, the number of opened/commented/merged pull requests by author for a given period (last week, since a given date, etc.).&lt;/p&gt;
+&lt;p&gt;Here is an output example:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;lein run --organization softwarevidal --repository arthur --token &lt;span class="nv"&gt;$token&lt;/span&gt;
+pull requests &lt;span class="k"&gt;for&lt;/span&gt; softwarevidal/arthur -&amp;gt;
+    since &lt;span class="m"&gt;1&lt;/span&gt; week&lt;span class="o"&gt;(&lt;/span&gt;s&lt;span class="o"&gt;)&lt;/span&gt;:
+        &lt;span class="m"&gt;9&lt;/span&gt; opened / &lt;span class="m"&gt;56&lt;/span&gt; commented / &lt;span class="m"&gt;5&lt;/span&gt; closed
+        opened per author: &lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;cmahalin&amp;quot;&lt;/span&gt; 5, &lt;span class="s2"&gt;&amp;quot;jcgay&amp;quot;&lt;/span&gt; 2, &lt;span class="s2"&gt;&amp;quot;AElMehdiVidal&amp;quot;&lt;/span&gt; 2&lt;span class="o"&gt;}&lt;/span&gt;
+        commented per author: &lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;vidal-rm&amp;quot;&lt;/span&gt; 30, &lt;span class="s2"&gt;&amp;quot;jcgay&amp;quot;&lt;/span&gt; 17, &lt;span class="s2"&gt;&amp;quot;cmahalin&amp;quot;&lt;/span&gt; 9&lt;span class="o"&gt;}&lt;/span&gt;
+        closed per author: &lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;cmahalin&amp;quot;&lt;/span&gt; 2, &lt;span class="s2"&gt;&amp;quot;AElMehdiVidal&amp;quot;&lt;/span&gt; 2, &lt;span class="s2"&gt;&amp;quot;jprudent&amp;quot;&lt;/span&gt; 1&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;How does it work?&lt;/h2&gt;
+&lt;p&gt;I have chosen Clojure, a language that is different from the language that I use every day (Java).&lt;/p&gt;
+&lt;p&gt;The following characteristics appealed to me:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;dynamic and interactive development: code is short and simple, which seems cool for an internal tool; what's more, the &lt;a href="https://clojure.org/about/dynamic#_the_repl"&gt;REPL&lt;/a&gt; is a base tool that greatly fit to a discovery mindset.&lt;/li&gt;
+&lt;li&gt;functional programming: functions are &lt;em&gt;first-class citizen&lt;/em&gt;, immutability and function recursion are basics&lt;/li&gt;
+&lt;li&gt;Lisp: Clojure is a Lisp, so writing code is a bit different from C-like languages ; Code is data and can be edited via &lt;a href="https://www.emacswiki.org/emacs/ParEdit"&gt;paredit&lt;/a&gt; (emacs-like mode for editing code while keeping parentheses balanced).&lt;/li&gt;
+&lt;li&gt;simplicity: Clojure encourages too use small libraries instead of huge frameworks.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;See &lt;a href="https://clojure.org/about/rationale"&gt;Clojure Rationale&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;My dev setup:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.jetbrains.com/idea/"&gt;IntelliJ IDEA&lt;/a&gt; with &lt;a href="https://cursive-ide.com/"&gt;Cursive plugin&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://cursive-ide.com/userguide/paredit.html"&gt;Cursive &lt;em&gt;paredit&lt;/em&gt; mode&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://leiningen.org/"&gt;Leiningen&lt;/a&gt; as build tool&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://travis-ci.org/"&gt;Travis CI&lt;/a&gt; for continuous integration&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;So what?&lt;/h2&gt;
+&lt;p&gt;What I liked:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;a "parenthesis" (haha!) with my daily Java routines/habits&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;paredit&lt;/em&gt; is confusing at first, then pleasant to use&lt;/li&gt;
+&lt;li&gt;REPL rocks for&lt;ul&gt;
+&lt;li&gt;shaping code (acts as a draft for new code)&lt;/li&gt;
+&lt;li&gt;troubleshooting bugs (example: incorrect GitHub pagination traversing that led to out-of-memory crash)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;unit tests are easy to write (example: &lt;a href="https://clojuredocs.org/clojure.core/with-redefs"&gt;&lt;code&gt;with-redefs&lt;/code&gt;&lt;/a&gt; macro can be used to mock functions: https://clojuredocs.org/clojure.core/with-redefs)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;What I did not like:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;WTFs when runtime bugs occurred (obscure stack traces)&lt;/li&gt;
+&lt;li&gt;integrated documentation lacks examples. I often had to browse &lt;a href="https://clojuredocs.org/"&gt;Clojure Docs&lt;/a&gt; to understand Clojure base functions via useful examples.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;What's next?&lt;/h2&gt;
+&lt;p&gt;Some ideas for some evolutions (or an other project, maybe?):&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;use &lt;a href="https://developer.github.com/early-access/graphql/"&gt;GitHub GraphQL&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;make a web app for &lt;em&gt;hubstats&lt;/em&gt; (via &lt;a href="https://clojurescript.org/"&gt;ClojureScript&lt;/a&gt;?)&lt;/li&gt;
+&lt;li&gt;build another CLI tool&lt;/li&gt;
+&lt;li&gt;learn another language (for example: &lt;a href="https://golang.org/"&gt;Go&lt;/a&gt; or &lt;a href="https://www.rust-lang.org/"&gt;Rust&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;That's all folk! 😉&lt;/p&gt;</summary><category term="clojure github"></category></entry><entry><title>Let's play with pattern matching in Haskell</title><link href="https://nicokosi.github.io/haskell-pattern-matching-en.html" rel="alternate"></link><published>2016-09-27T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-27:haskell-pattern-matching-en.html</id><summary type="html">&lt;p&gt;Let's discover Haskell and pattern matching via basic examples similar to &lt;a href="https://nicokosi.github.io/scala-pattern-matching-en.html"&gt;"Let's play with pattern matching in Scala"&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h2&gt;Step #1: create an enumeration&lt;/h2&gt;
 &lt;p&gt;We can create an enumeration that represent the four suites in French playing cards:&lt;/p&gt;
@@ -30,7 +177,7 @@
 
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h2&gt;Pattern matching examples&lt;/h2&gt;
-&lt;h3&gt;Basic example&lt;/h3&gt;
+&lt;h3&gt;Example #1&lt;/h3&gt;
 &lt;p&gt;The following function returns the Unicode symbol for a given card suite:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;symbol&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;CardSuite&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
 &lt;span class="nf"&gt;symbol&lt;/span&gt; &lt;span class="n"&gt;cardSuite&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt;
@@ -80,7 +227,7 @@ Morevover, the Haskell compiler can detect a non-exhaustive pattern matching. Fo
 
 
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
-&lt;h3&gt;Exemple #2, share expression with a 'where' block&lt;/h3&gt;
+&lt;h3&gt;Example #2, share expression with a 'where' block&lt;/h3&gt;
 &lt;p&gt;Let's implement a &lt;code&gt;color&lt;/code&gt; function that returns "red" or "black" depending on the input card suite:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;color&lt;/span&gt; &lt;span class="ow"&gt;::&lt;/span&gt; &lt;span class="kt"&gt;CardSuite&lt;/span&gt; &lt;span class="ow"&gt;-&amp;gt;&lt;/span&gt; &lt;span class="kt"&gt;String&lt;/span&gt;
 &lt;span class="nf"&gt;color&lt;/span&gt; &lt;span class="n"&gt;cardSuite&lt;/span&gt; &lt;span class="ow"&gt;=&lt;/span&gt;

@@ -1,5 +1,151 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/nicolas-kosinski.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2016-09-27T00:00:00+02:00</updated><entry><title>Jouons avec le pattern matching en Haskell</title><link href="https://nicokosi.github.io/haskell-pattern-matching.html" rel="alternate"></link><published>2016-09-27T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-27:haskell-pattern-matching.html</id><summary type="html">&lt;p&gt;Découvrons le pattern matching en Haskell en reprenant l'exemple des cartes à jouer utilisé dans l'article &lt;a href="https://nicokosi.github.io/scala-pattern-matching.html"&gt;"Jouons avec le pattern matching en Scala"&lt;/a&gt;.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/nicolas-kosinski.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2017-04-09T17:37:00+02:00</updated><entry><title>Générer ses graphiques Strava avec Clojure et Incanter</title><link href="https://nicokosi.github.io/creating-strava-charts-with-clojure-and-incanter.html" rel="alternate"></link><published>2017-04-09T17:37:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-04-09:creating-strava-charts-with-clojure-and-incanter.html</id><summary type="html">&lt;h1&gt;Générer ses graphiques Strava avec Clojure et Incanter&lt;/h1&gt;
+&lt;p&gt;J'utilise &lt;a href="https://www.strava.com/"&gt;Strava&lt;/a&gt; pour enregistrer mes sessions de jogging : après avoir enregistré une session avec mon smartphone, je la publie pour pouvoir la partager et la revoir plus tard.&lt;/p&gt;
+&lt;p&gt;Strava fournit quelques tableaux de bord mais je voulais générer mes propres graphiques afin de visualiser ma progression.&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Premier essai avec R&lt;/h2&gt;
+&lt;p&gt;J'ai d'abord essayé d'utiliser &lt;a href="https://www.rstudio.com/"&gt;RStudio&lt;/a&gt;, un IDE pour le langage R. Je pense que c'est un outil adapté mais je le connais très peu. Après avoir essayé pendant quelques heures d'importer mes données et de les transformer, j'ai abandonné !&lt;/p&gt;
+&lt;p&gt;&lt;img alt="RStudio : un IDE pour la plate-forme R" src="images/RStudio.png" /&gt;&lt;/p&gt;
+&lt;p&gt;J'essairai une autre fois ! 😅&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Deuxième essai avec Clojure et Incanter&lt;/h2&gt;
+&lt;p&gt;J'ai ensuite essayé d'utiliser &lt;a href="incanter.org"&gt;Incanter&lt;/a&gt;, une librairie Clojure inspirée de R :&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Clojure-based, R-like platform for statistical computing and graphics.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;J'avais besoin de faire 3 choses :&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;appeler l'API Strava pour récupérer les données au format JSON&lt;/li&gt;
+&lt;li&gt;faire quelques transformations, essentiellement des conversions (m/s en km/h, secondes en minutes)&lt;/li&gt;
+&lt;li&gt;afficher des graphiques (exemple : évolution de la vitesse moyenne par sortie en fonction du temps)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Allons-y !&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;1. Récupérer les données Strava&lt;/h3&gt;
+&lt;p&gt;La fonction suivante appelle l'&lt;a href="http://strava.github.io/api/v3/activities/"&gt;API Strava "activities"&lt;/a&gt; avec un jeton d'autorisation (access token) et récupère les 200 dernières sorties ("activities" = activité de course à pied, vélo ou natation) sous forme d'un tableau d'objets JSON :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;defn &lt;/span&gt;&lt;span class="nv"&gt;strava-activities&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;token&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+  &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;json/read-str&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ss"&gt;:body&lt;/span&gt;
+                   &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;http-client/get&lt;/span&gt;
+                     &lt;span class="s"&gt;&amp;quot;https://www.strava.com/api/v3/activities&amp;quot;&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="ss"&gt;:query-params&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="ss"&gt;:access_token&lt;/span&gt; &lt;span class="nv"&gt;token&lt;/span&gt; &lt;span class="ss"&gt;:per_page&lt;/span&gt; &lt;span class="mi"&gt;200&lt;/span&gt;&lt;span class="p"&gt;}}))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;2. Transformer les données&lt;/h3&gt;
+&lt;p&gt;On définit les fonctions suivantes pour transformer les données :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;; Convertir les vitesses en km/h (l&amp;#39;API Strava retourne des m/s) :&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;def &lt;/span&gt;&lt;span class="nv"&gt;meters-per-second-&amp;gt;kilometers-per-hour&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;partial * &lt;/span&gt;&lt;span class="mf"&gt;3.6&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;; Convertir les distances en minutes (l&amp;#39;API Strava API retourne des secondes) :&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;defn- &lt;/span&gt;&lt;span class="nv"&gt;seconds-&amp;gt;minutes&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;s&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;/ &lt;/span&gt;&lt;span class="nv"&gt;s&lt;/span&gt; &lt;span class="mi"&gt;60&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+
+&lt;span class="c1"&gt;; Incanter peut seulement générer des graphiques à partir de données numériques, les dates au format ISO doivent donc être converties en timestamps :&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;defn- &lt;/span&gt;&lt;span class="nv"&gt;string-date-&amp;gt;millis&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;str-date&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+  &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;.getTime&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;clojure.instant/read-instant-date&lt;/span&gt; &lt;span class="nv"&gt;str-date&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Ces fonctions peuvent être appliquées aux données brutes, en utilisant par exemple l'opérateur "thread-last" (&lt;code&gt;-&amp;gt;&amp;gt;&lt;/code&gt;), bien pratique pour chaîner les appels de fonctions :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;-&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;strava-activities&lt;/span&gt; &lt;span class="nv"&gt;token&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+       &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;map &lt;/span&gt;&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;update-in&lt;/span&gt; &lt;span class="nv"&gt;%&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;average_speed&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="nv"&gt;meters-per-second-&amp;gt;kilometers-per-hour&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+       &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;map &lt;/span&gt;&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;update-in&lt;/span&gt; &lt;span class="nv"&gt;%&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;start_date_local&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="nv"&gt;string-date-&amp;gt;millis&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+       &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;map &lt;/span&gt;&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;update-in&lt;/span&gt; &lt;span class="nv"&gt;%&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;elapsed_time&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="nv"&gt;seconds-&amp;gt;minutes&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+       &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;map &lt;/span&gt;&lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;update-in&lt;/span&gt; &lt;span class="nv"&gt;%&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;moving_time&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="nv"&gt;seconds-&amp;gt;minutes&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;3. Affichage d'un graphique avec Incanter&lt;/h3&gt;
+&lt;p&gt;La dernière étape consiste à utilise l'une des fonctions de la librairie Incanter pour afficher un graphique. L'exemple de code suivant affiche l'évolution de la vitesse moyenne de chaque sortie en fonction de la date de la sortie :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;defn &lt;/span&gt;&lt;span class="nv"&gt;display-chart&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;token&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+  &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let &lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="nv"&gt;activities&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;get-activities&lt;/span&gt; &lt;span class="nv"&gt;token&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
+    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;with-data&lt;/span&gt;
+      &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;to-dataset&lt;/span&gt; &lt;span class="nv"&gt;activities&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="o"&gt;#&lt;/span&gt;&lt;span class="nv"&gt;_&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;view&lt;/span&gt; &lt;span class="nv"&gt;$data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+      &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;view&lt;/span&gt;
+        &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;time-series-plot&lt;/span&gt;
+          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;$&lt;/span&gt; &lt;span class="ss"&gt;:start_date_local&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+          &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;$&lt;/span&gt; &lt;span class="ss"&gt;:average_speed&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+          &lt;span class="ss"&gt;:group-by&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;$&lt;/span&gt; &lt;span class="ss"&gt;:type&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+          &lt;span class="ss"&gt;:title&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Average speed over time&amp;quot;&lt;/span&gt;
+          &lt;span class="ss"&gt;:x-label&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;time&amp;quot;&lt;/span&gt;
+          &lt;span class="ss"&gt;:y-label&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;average speed (km/h)&amp;quot;&lt;/span&gt;
+          &lt;span class="ss"&gt;:points&lt;/span&gt; &lt;span class="nv"&gt;true&lt;/span&gt;
+          &lt;span class="ss"&gt;:legend&lt;/span&gt; &lt;span class="nv"&gt;true&lt;/span&gt;&lt;span class="p"&gt;)))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Le graphique généré :
+&lt;img alt="Chart: average speed over time" src="images/chart-average-speed-over-time.png" /&gt;&lt;/p&gt;
+&lt;p&gt;Le code complet, qui affiche plusieurs graphiques similaires, se trouve sur le &lt;a href="https://github.com/nicokosi/strava-activity-graphs/"&gt;repository GitHub strava-activity-graphs&lt;/a&gt;.&lt;/p&gt;</summary><category term="strava charts clojure incanter"></category></entry><entry><title>A la découverte des API GitHub en apprenant Clojure</title><link href="https://nicokosi.github.io/discover-github-apis-with-clojure.html" rel="alternate"></link><published>2017-01-11T08:56:00+01:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-01-11:discover-github-apis-with-clojure.html</id><summary type="html">&lt;p&gt;Il est toujours intéressant d'apprendre quelque chose, même si ça ne concerne pas directement le travail quotidien. Pour citer &lt;a href="https://pragprog.com/book/tpp/the-pragmatic-programmer"&gt;The Pragmatic Programmer&lt;/a&gt; (note pour moi-même : relire ce livre 🤓) :&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Invest Regularly in Your Knowledge Portfolio&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Mon dernier projet personnel "pour apprendre" a été de créer un outil en ligne de commande, nommé &lt;a href="https://github.com/nicokosi/hubstats"&gt;hubstats&lt;/a&gt;, permettant d'afficher un résumé statistique concernant les &lt;a href="https://help.github.com/articles/github-glossary/#pull-request"&gt;pull requests GitHub&lt;/a&gt;, afin d'avoir quelques métriques sur leur utilisation par mon équipe, au travail.&lt;/p&gt;
+&lt;p&gt;Ce modeste projet m'a permis de mettre en pratique le langage de programmation &lt;a href="https://clojure.org/"&gt;Clojure&lt;/a&gt; (que je connaissais un tout petit peu), mais aussi de découvrir les &lt;a href="https://developer.github.com/v3/"&gt;API REST&lt;/a&gt; et &lt;a href="https://developer.github.com/early-access/graphql/"&gt;GraphQL&lt;/a&gt; de GitHub.&lt;/p&gt;
+&lt;p&gt;J'ai en plus eu la chance d'échanger régulièrement avec un collègue connaissant bien Clojure. Ce fut appréciable et motivant, merci Jérôme aka &lt;a href="https://github.com/jprudent"&gt;@jprudent&lt;/a&gt; !&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;A quoi ça sert, &lt;em&gt;hubstats&lt;/em&gt; ?&lt;/h2&gt;
+&lt;p&gt;&lt;em&gt;hubstats&lt;/em&gt; est un outil en ligne de commandes qui permet de connaître, pour un &lt;a href="https://help.github.com/articles/github-glossary/#repository"&gt;repository GitHub&lt;/a&gt; donné, le nombre de pull requests ouvertes / commentées / mergées par auteur sur une période donnée (dernière semaine, deux dernières semaines, depuis une date donnée etc.).&lt;/p&gt;
+&lt;p&gt;Voici un exemple de rapport fourni par &lt;em&gt;hubstats&lt;/em&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;lein run --organization softwarevidal --repository arthur --token &lt;span class="nv"&gt;$token&lt;/span&gt;
+pull requests &lt;span class="k"&gt;for&lt;/span&gt; softwarevidal/arthur -&amp;gt;
+    since &lt;span class="m"&gt;1&lt;/span&gt; week&lt;span class="o"&gt;(&lt;/span&gt;s&lt;span class="o"&gt;)&lt;/span&gt;:
+        &lt;span class="m"&gt;9&lt;/span&gt; opened / &lt;span class="m"&gt;56&lt;/span&gt; commented / &lt;span class="m"&gt;5&lt;/span&gt; closed
+        opened per author: &lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;cmahalin&amp;quot;&lt;/span&gt; 5, &lt;span class="s2"&gt;&amp;quot;jcgay&amp;quot;&lt;/span&gt; 2, &lt;span class="s2"&gt;&amp;quot;AElMehdiVidal&amp;quot;&lt;/span&gt; 2&lt;span class="o"&gt;}&lt;/span&gt;
+        commented per author: &lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;vidal-rm&amp;quot;&lt;/span&gt; 30, &lt;span class="s2"&gt;&amp;quot;jcgay&amp;quot;&lt;/span&gt; 17, &lt;span class="s2"&gt;&amp;quot;cmahalin&amp;quot;&lt;/span&gt; 9&lt;span class="o"&gt;}&lt;/span&gt;
+        closed per author: &lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;cmahalin&amp;quot;&lt;/span&gt; 2, &lt;span class="s2"&gt;&amp;quot;AElMehdiVidal&amp;quot;&lt;/span&gt; 2, &lt;span class="s2"&gt;&amp;quot;jprudent&amp;quot;&lt;/span&gt; 1&lt;span class="o"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Comment ça marche ?&lt;/h2&gt;
+&lt;p&gt;J'ai choisi d'utiliser Clojure, un langage très différent de Java que j'utilise au quotidien.
+Les particularités suivantes ont notamment retenu mon attention :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;développement dynamique et interactif : code plus simple, notamment pour un petit outil "interne" ; le &lt;a href="https://clojure.org/about/dynamic#_the_repl"&gt;REPL&lt;/a&gt; est un outil de base et son utilisation est particulièrement adaptée pour un projet de "découverte"&lt;/li&gt;
+&lt;li&gt;programmation fonctionnelle : l'approche fonctionnelle, bien qu'encouragée dans les langages "mainstream" tel Java, est obligatoire en Clojure. Les fonctions sont reines ("&lt;em&gt;first-class citizen&lt;/em&gt;"), l'immutabilité et la récursivité sont de mise.&lt;/li&gt;
+&lt;li&gt;Lisp : Clojure étant un Lisp, le code s'écrit un peu différemment : il s'apparente à de la donnée et peut se transformer facilement via des commandes de type &lt;a href="https://www.emacswiki.org/emacs/ParEdit"&gt;paredit&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;simplicité : Clojure est un langage simple dont la philosophie est d'utiliser des petites librairies plutôt que des gros frameworks.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Se référer à &lt;a href="https://clojure.org/about/rationale"&gt;Clojure Rationale&lt;/a&gt; pour plus d'informations sur les apports de Clojure.&lt;/p&gt;
+&lt;p&gt;Mon environnement de développement a été :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.jetbrains.com/idea/"&gt;IntelliJ IDEA&lt;/a&gt; avec le &lt;a href="https://cursive-ide.com/"&gt;plugin Cursive&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://cursive-ide.com/userguide/paredit.html"&gt;mode &lt;em&gt;paredit&lt;/em&gt; de Cursive&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://leiningen.org/"&gt;Leiningen&lt;/a&gt; comme outil de build&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://travis-ci.org/"&gt;Travis CI&lt;/a&gt; pour l'intégration continue&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Et alors ?&lt;/h2&gt;
+&lt;p&gt;Ce que j'ai aimé :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;cet aparté qui m'a changé de mes "habitudes en Java"&lt;/li&gt;
+&lt;li&gt;l'utilisation de &lt;em&gt;paredit&lt;/em&gt; pour manipuler son code (créer, déplacer ou supprimer du code) est un peu déroutante au début mais très plaisante ensuite&lt;/li&gt;
+&lt;li&gt;l'utilisation du REPL qui m'a servi :&lt;ul&gt;
+&lt;li&gt;de "brouillon" pour écrire mon code&lt;/li&gt;
+&lt;li&gt;pour diagnostiquer et corriger des bug&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;les tests unitaires faciles à écrire (par exemple, la macro &lt;a href="https://clojuredocs.org/clojure.core/with-redefs"&gt;&lt;code&gt;with-redefs&lt;/code&gt;&lt;/a&gt; peut être utilisée pour "mocker" des functions)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Ce que j'ai moins aimé :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;la découverte de certaines erreurs à l'exécution, sans comprendre directement la cause de l'erreur (du genre : stack trace obscure)&lt;/li&gt;
+&lt;li&gt;la documentation intégrée dans le langage ne contient pas assez d'exemples à mon goût. J'ai dû souvent avoir recourt à internet et notamment à &lt;a href="https://clojuredocs.org/"&gt;Clojure Docs&lt;/a&gt; où les exemples sont nombreux et utiles.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Et ensuite ?&lt;/h2&gt;
+&lt;p&gt;Cet projet m'a donné envie d'explorer d'autres pistes :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;utiliser les API &lt;a href="https://developer.github.com/early-access/graphql/"&gt;GraphQL de GitHub&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;transformer la ligne de commande &lt;em&gt;hubstats&lt;/em&gt; en application web (via &lt;a href="https://clojurescript.org/"&gt;ClojureScript&lt;/a&gt; ?)&lt;/li&gt;
+&lt;li&gt;faire un autre outil en ligne de commande&lt;/li&gt;
+&lt;li&gt;essayer un autre langage (par exemple : &lt;a href="https://golang.org/"&gt;Go&lt;/a&gt; ou &lt;a href="https://www.rust-lang.org/"&gt;Rust&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;La suite au prochain épisode ! 😉&lt;/p&gt;</summary><category term="clojure github"></category></entry><entry><title>Jouons avec le pattern matching en Haskell</title><link href="https://nicokosi.github.io/haskell-pattern-matching.html" rel="alternate"></link><published>2016-09-27T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-27:haskell-pattern-matching.html</id><summary type="html">&lt;p&gt;Découvrons le pattern matching en Haskell en reprenant l'exemple des cartes à jouer utilisé dans l'article &lt;a href="https://nicokosi.github.io/scala-pattern-matching.html"&gt;"Jouons avec le pattern matching en Scala"&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h2&gt;Préambule : création d'une énumération&lt;/h2&gt;
 &lt;p&gt;Codons notre énumération correspondant à nos quatre enseignes (carreau, cœur, pique et trèfle) :&lt;/p&gt;
