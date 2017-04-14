@@ -154,7 +154,7 @@
 <div class="highlight"><pre><span></span><span class="c1">; Convertir les vitesses en km/h (l&#39;API Strava retourne des m/s) :</span>
 <span class="p">(</span><span class="k">def </span><span class="nv">meters-per-second-&gt;kilometers-per-hour</span> <span class="p">(</span><span class="nb">partial * </span><span class="mf">3.6</span><span class="p">))</span>
 
-<span class="c1">; Convertir les distances en minutes (l&#39;API Strava API retourne des secondes) :</span>
+<span class="c1">; Convertir les durées en minutes (l&#39;API Strava API retourne des secondes) :</span>
 <span class="p">(</span><span class="kd">defn- </span><span class="nv">seconds-&gt;minutes</span> <span class="p">[</span><span class="nv">s</span><span class="p">]</span> <span class="p">(</span><span class="nb">/ </span><span class="nv">s</span> <span class="mi">60</span><span class="p">))</span>
 
 <span class="c1">; Incanter peut seulement générer des graphiques à partir de données numériques, les dates au format ISO doivent donc être converties en timestamps :</span>
