@@ -122,8 +122,8 @@
 <p>Le but est toujours de :</p>
 <ol>
 <li>appeler l'API Strava pour récupérer les données au format JSON</li>
-<li>faire quelques transformations, essentiellement des conversions (m/s en km/h, secondes en minutes)</li>
-<li>afficher des graphiques (exemple : évolution de la vitesse moyenne par sortie en fonction du temps)</li>
+<li>faire quelques transformations, essentiellement des conversions</li>
+<li>afficher des graphiques (exemple : temps en mouvement en fonction de la distance parcourue)</li>
 </ol>
 <p>C'est parti !</p>
 <p><br/>
@@ -159,25 +159,19 @@ df <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p
 
 <p>J'avoue que j'ai triché en "googlant" car les manipulations de structures ne sont pas super évidentes pour moi ! 🤓</p>
 <p>On peut en tout cas remarquer que les variables ne sont pas typées - R est un language dynamique - et peuvent être ré-affectées. Par exemple, <code>activities</code> est une variable de type <code>character</code> (chaîne de caractères, contenant les données JSON) qui devient ensuite une variable de type <code>list</code>.</p>
-<p>Il m'a fallu convertir les dates, les distances et les vitesses pour utiliser des unités plus appriopriées :</p>
-<div class="highlight"><pre><span></span><span class="c1"># Convertir les vitesses en km/h (l&#39;API Strava retourne des m/s) :</span>
-df<span class="o">$</span>average_speed <span class="o">&lt;-</span> <span class="kp">as.numeric</span><span class="p">(</span><span class="kp">as.character</span><span class="p">(</span>df<span class="o">$</span>average_speed<span class="p">))</span> <span class="o">*</span> <span class="m">3.6</span>
-
-<span class="c1"># Convertir les distances en minutes (l&#39;API Strava API retourne des secondes) :</span>
+<p>Il m'a fallu convertir les distances et les durées pour utiliser des unités plus appriopriées :</p>
+<div class="highlight"><pre><span></span><span class="c1"># Convertir les durées en minutes (l&#39;API Strava API retourne des secondes) :</span>
 df<span class="o">$</span>moving_time <span class="o">&lt;-</span> <span class="kp">as.numeric</span><span class="p">(</span><span class="kp">as.character</span><span class="p">(</span>df<span class="o">$</span>moving_time<span class="p">))</span> <span class="o">/</span> <span class="m">60</span>
 
-<span class="c1"># Convertir les mètres en kilomètres :</span>
+<span class="c1"># Convertir les distances en kilomètres (l&#39;API Strava API retourne des mètres) :</span>
 df<span class="o">$</span>distance <span class="o">&lt;-</span> <span class="kp">as.numeric</span><span class="p">(</span><span class="kp">as.character</span><span class="p">(</span>df<span class="o">$</span>distance<span class="p">))</span> <span class="o">/</span> <span class="m">1000</span>
-
-<span class="c1"># Formater les dates ISO :</span>
-df<span class="o">$</span>start_date <span class="o">&lt;-</span> <span class="kp">as.Date</span><span class="p">(</span>df<span class="o">$</span>start_date<span class="p">)</span> <span class="c1"># yyyy-mm-dd</span>
 </pre></div>
 
 
 <p>Pour l'anectode, les données sont des <code>factors</code>, c'est-à-dire des données dont on connaît toutes les valeurs (une énumération, en quelque sorte). Avant de les convertir, il faut récupérer leur libellé via la fonction <code>as.character</code>.</p>
 <p><br/></p>
 <h3>3. Affichage d'un graphique</h3>
-<p>La dernière étape consiste à utiliser l'une des fonctions de la librairie <code>ggplot2</code> pour afficher et sauvegarder un graphique. Le code suivant affiche l'évolution de la vitesse moyenne de chaque sortie en fonction de la date :</p>
+<p>La dernière étape consiste à utiliser l'une des fonctions de la librairie <code>ggplot2</code> pour afficher et sauvegarder un graphique. Le code suivant affiche le temps en mouvement en fonction de la distance parcourue :</p>
 <div class="highlight"><pre><span></span>  ggplot<span class="p">(</span>df<span class="p">,</span> aes<span class="p">(</span>x<span class="o">=</span>distance<span class="p">,</span> y<span class="o">=</span>moving_time<span class="p">))</span> <span class="o">+</span> <span class="c1"># à partir du dataframe, afficher les données &#39;distance&#39; en fonction de &#39;moving_time`</span>
     geom_point<span class="p">(</span>size<span class="o">=</span><span class="m">1</span><span class="p">,</span> colour<span class="o">=</span><span class="s">&quot;#CC0000&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="c1"># afficher les points en rouge</span>
     geom_smooth<span class="p">(</span>method<span class="o">=</span>lm<span class="p">)</span> <span class="c1"># ajout d&#39;une courbe de régression linéaire +</span>
@@ -188,7 +182,7 @@ df<span class="o">$</span>start_date <span class="o">&lt;-</span> <span class="k
 
 
 <p>Le graphique généré :
-<img alt="Chart: average speed over time" src="images/r-chart-average-speed-over-time.png" /></p>
+<img alt="Chart: distance et temps en mouvement" src="images/r-chart-distance-per-moving-time.png" /></p>
 <p>Voici le lien vers le <a href="https://gist.github.com/nicokosi/241331f67692945ddca4e4ea2cc0597d">code complet</a> pour afficher plusieurs graphiques similaires.</p>
     </article>
 

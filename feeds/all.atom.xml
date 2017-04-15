@@ -5,8 +5,8 @@
 &lt;p&gt;Le but est toujours de :&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;appeler l'API Strava pour récupérer les données au format JSON&lt;/li&gt;
-&lt;li&gt;faire quelques transformations, essentiellement des conversions (m/s en km/h, secondes en minutes)&lt;/li&gt;
-&lt;li&gt;afficher des graphiques (exemple : évolution de la vitesse moyenne par sortie en fonction du temps)&lt;/li&gt;
+&lt;li&gt;faire quelques transformations, essentiellement des conversions&lt;/li&gt;
+&lt;li&gt;afficher des graphiques (exemple : temps en mouvement en fonction de la distance parcourue)&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;C'est parti !&lt;/p&gt;
 &lt;p&gt;&lt;br/&gt;
@@ -42,25 +42,19 @@ df &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;data.fram
 
 &lt;p&gt;J'avoue que j'ai triché en "googlant" car les manipulations de structures ne sont pas super évidentes pour moi ! 🤓&lt;/p&gt;
 &lt;p&gt;On peut en tout cas remarquer que les variables ne sont pas typées - R est un language dynamique - et peuvent être ré-affectées. Par exemple, &lt;code&gt;activities&lt;/code&gt; est une variable de type &lt;code&gt;character&lt;/code&gt; (chaîne de caractères, contenant les données JSON) qui devient ensuite une variable de type &lt;code&gt;list&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Il m'a fallu convertir les dates, les distances et les vitesses pour utiliser des unités plus appriopriées :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Convertir les vitesses en km/h (l&amp;#39;API Strava retourne des m/s) :&lt;/span&gt;
-df&lt;span class="o"&gt;$&lt;/span&gt;average_speed &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;as.numeric&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="o"&gt;$&lt;/span&gt;average_speed&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;3.6&lt;/span&gt;
-
-&lt;span class="c1"&gt;# Convertir les distances en minutes (l&amp;#39;API Strava API retourne des secondes) :&lt;/span&gt;
+&lt;p&gt;Il m'a fallu convertir les distances et les durées pour utiliser des unités plus appriopriées :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Convertir les durées en minutes (l&amp;#39;API Strava API retourne des secondes) :&lt;/span&gt;
 df&lt;span class="o"&gt;$&lt;/span&gt;moving_time &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;as.numeric&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="o"&gt;$&lt;/span&gt;moving_time&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;60&lt;/span&gt;
 
-&lt;span class="c1"&gt;# Convertir les mètres en kilomètres :&lt;/span&gt;
+&lt;span class="c1"&gt;# Convertir les distances en kilomètres (l&amp;#39;API Strava API retourne des mètres) :&lt;/span&gt;
 df&lt;span class="o"&gt;$&lt;/span&gt;distance &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;as.numeric&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="o"&gt;$&lt;/span&gt;distance&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;1000&lt;/span&gt;
-
-&lt;span class="c1"&gt;# Formater les dates ISO :&lt;/span&gt;
-df&lt;span class="o"&gt;$&lt;/span&gt;start_date &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;as.Date&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="o"&gt;$&lt;/span&gt;start_date&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# yyyy-mm-dd&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Pour l'anectode, les données sont des &lt;code&gt;factors&lt;/code&gt;, c'est-à-dire des données dont on connaît toutes les valeurs (une énumération, en quelque sorte). Avant de les convertir, il faut récupérer leur libellé via la fonction &lt;code&gt;as.character&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h3&gt;3. Affichage d'un graphique&lt;/h3&gt;
-&lt;p&gt;La dernière étape consiste à utiliser l'une des fonctions de la librairie &lt;code&gt;ggplot2&lt;/code&gt; pour afficher et sauvegarder un graphique. Le code suivant affiche l'évolution de la vitesse moyenne de chaque sortie en fonction de la date :&lt;/p&gt;
+&lt;p&gt;La dernière étape consiste à utiliser l'une des fonctions de la librairie &lt;code&gt;ggplot2&lt;/code&gt; pour afficher et sauvegarder un graphique. Le code suivant affiche le temps en mouvement en fonction de la distance parcourue :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  ggplot&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="p"&gt;,&lt;/span&gt; aes&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="o"&gt;=&lt;/span&gt;distance&lt;span class="p"&gt;,&lt;/span&gt; y&lt;span class="o"&gt;=&lt;/span&gt;moving_time&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="c1"&gt;# à partir du dataframe, afficher les données &amp;#39;distance&amp;#39; en fonction de &amp;#39;moving_time`&lt;/span&gt;
     geom_point&lt;span class="p"&gt;(&lt;/span&gt;size&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; colour&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;#CC0000&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="c1"&gt;# afficher les points en rouge&lt;/span&gt;
     geom_smooth&lt;span class="p"&gt;(&lt;/span&gt;method&lt;span class="o"&gt;=&lt;/span&gt;lm&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# ajout d&amp;#39;une courbe de régression linéaire +&lt;/span&gt;
@@ -71,7 +65,7 @@ df&lt;span class="o"&gt;$&lt;/span&gt;start_date &lt;span class="o"&gt;&amp;lt;-
 
 
 &lt;p&gt;Le graphique généré :
-&lt;img alt="Chart: average speed over time" src="images/r-chart-average-speed-over-time.png" /&gt;&lt;/p&gt;
+&lt;img alt="Chart: distance et temps en mouvement" src="images/r-chart-distance-per-moving-time.png" /&gt;&lt;/p&gt;
 &lt;p&gt;Voici le lien vers le &lt;a href="https://gist.github.com/nicokosi/241331f67692945ddca4e4ea2cc0597d"&gt;code complet&lt;/a&gt; pour afficher plusieurs graphiques similaires.&lt;/p&gt;</summary><category term="strava charts r rstudio"></category></entry><entry><title>Creating Strava charts with R</title><link href="https://nicokosi.github.io/creating-strava-charts-with-r-en.html" rel="alternate"></link><published>2017-04-14T12:10:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-04-14:creating-strava-charts-with-r-en.html</id><summary type="html">&lt;h1&gt;Creating Strava charts with R&lt;/h1&gt;
 &lt;p&gt;This article is the sequel of &lt;a href="creating-strava-charts-with-clojure-and-incanter-en.html"&gt;Creating Strava charts with Clojure and Incanter&lt;/a&gt;: I decided to have another try generating charts with R (even though I don't know much about it).&lt;/p&gt;
 &lt;p&gt;R seems to be well-suited for charts generation. The free IDE &lt;a href="https://www.rstudio.com/products/RStudio/"&gt;RStudio Desktop&lt;/a&gt; brings several facilities: dataset visualization, variable history, integrated help etc. RStudio Desktop can be &lt;a href="http://www.rstudio.com/products/rstudio/download/"&gt;downloaded&lt;/a&gt; or installed via a packet manager (for instance, on a Mac with &lt;code&gt;homebrew&lt;/code&gt;, you can run &lt;code&gt;brew cask install rstudio&lt;/code&gt; from a terminal).&lt;/p&gt;
@@ -79,7 +73,7 @@ df&lt;span class="o"&gt;$&lt;/span&gt;start_date &lt;span class="o"&gt;&amp;lt;-
 &lt;ol&gt;
 &lt;li&gt;call Strava API that returns activities as JSON data&lt;/li&gt;
 &lt;li&gt;transform data: do basic conversions (meters per second into km/h, seconds into minutes, etc.)&lt;/li&gt;
-&lt;li&gt;display a chart (example: average speed per date)&lt;/li&gt;
+&lt;li&gt;display a chart (example: distance and moving time)&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;&lt;br/&gt;
 R has many additional libraries that are available on "CRAN repository". The following statements import the libraries I have selected:&lt;/p&gt;
@@ -104,11 +98,11 @@ activities &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; content&lt;span class="p
 &lt;h3&gt;2. Transform data&lt;/h3&gt;
 &lt;p&gt;We then need to transform our JSON content into tabular data, called &lt;code&gt;dataframes&lt;/code&gt;:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;activities &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; fromJSON&lt;span class="p"&gt;(&lt;/span&gt;activities&lt;span class="p"&gt;)&lt;/span&gt;      &lt;span class="c1"&gt;# Transform JSON content into lists&lt;/span&gt;
-activities &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;activities&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;      &lt;span class="c1"&gt;# Apply an anonyous function on each list element&lt;/span&gt;
+activities &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;activities&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;      &lt;span class="c1"&gt;# Apply an anonymous function on each list elements&lt;/span&gt;
   x&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="kp"&gt;sapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kp"&gt;is.null&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kc"&gt;NA&lt;/span&gt;           &lt;span class="c1"&gt;# Replace nulls by &amp;quot;missing&amp;quot; (N/A)&lt;/span&gt;
   &lt;span class="kp"&gt;unlist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;})&lt;/span&gt;
-df &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;do.call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;rbind&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; activities&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="c1"&gt;# transformer les listes de listes en dataframe&lt;/span&gt;
+df &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;do.call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;rbind&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; activities&lt;span class="p"&gt;))&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -118,25 +112,19 @@ df &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;data.fram
 &lt;li&gt;R is a dynamic languages: variable types are not specified.&lt;/li&gt;
 &lt;li&gt;Variables can be re-affected (and their type can change)&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Distances and speeds can be converted, and dates can be formatted :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Convert speeds into km/h (Strava API returns m/s):&lt;/span&gt;
-df&lt;span class="o"&gt;$&lt;/span&gt;average_speed &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;as.numeric&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="o"&gt;$&lt;/span&gt;average_speed&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="m"&gt;3.6&lt;/span&gt;
-
-&lt;span class="c1"&gt;# Convert durations into minutes (Strava API returns seconds):&lt;/span&gt;
+&lt;p&gt;Distances and durations can be converted:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Convert durations into minutes (Strava API returns seconds):&lt;/span&gt;
 df&lt;span class="o"&gt;$&lt;/span&gt;moving_time &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;as.numeric&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="o"&gt;$&lt;/span&gt;moving_time&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;60&lt;/span&gt;
 
-&lt;span class="c1"&gt;# Convert distances into kilometers :&lt;/span&gt;
+&lt;span class="c1"&gt;# Convert distances into kilometers (Strava API returns meters):&lt;/span&gt;
 df&lt;span class="o"&gt;$&lt;/span&gt;distance &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;as.numeric&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="o"&gt;$&lt;/span&gt;distance&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;1000&lt;/span&gt;
-
-&lt;span class="c1"&gt;# Format dates:&lt;/span&gt;
-df&lt;span class="o"&gt;$&lt;/span&gt;start_date &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;as.Date&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="o"&gt;$&lt;/span&gt;start_date&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# ISO to yyyy-mm-dd&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;Nota bene: our dataframe contains &lt;code&gt;factors&lt;/code&gt; (factors are data with all known values). Before converting them, we need to retrieve their name via the function &lt;code&gt;as.character&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h3&gt;3. Display a chart&lt;/h3&gt;
-&lt;p&gt;The final step consists in using the &lt;code&gt;ggplot2&lt;/code&gt; library to display a chart for "average speed over time" and export it as a PNG image:&lt;/p&gt;
+&lt;p&gt;The final step consists in using the &lt;code&gt;ggplot2&lt;/code&gt; library to display a chart for "distance and moving time" and export it as a PNG image:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  ggplot&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="p"&gt;,&lt;/span&gt; aes&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="o"&gt;=&lt;/span&gt;distance&lt;span class="p"&gt;,&lt;/span&gt; y&lt;span class="o"&gt;=&lt;/span&gt;moving_time&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt;
     geom_point&lt;span class="p"&gt;(&lt;/span&gt;size&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; colour&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;#CC0000&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="c1"&gt;# red points&lt;/span&gt;
     geom_smooth&lt;span class="p"&gt;(&lt;/span&gt;method&lt;span class="o"&gt;=&lt;/span&gt;lm&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="c1"&gt;# add a line for linear regression&lt;/span&gt;
@@ -147,7 +135,7 @@ df&lt;span class="o"&gt;$&lt;/span&gt;start_date &lt;span class="o"&gt;&amp;lt;-
 
 
 &lt;p&gt;The generated chart:
-&lt;img alt="Chart: average speed over time" src="images/r-chart-average-speed-over-time.png" /&gt;&lt;/p&gt;
+&lt;img alt="Chart: distance and moving time" src="images/r-chart-distance-per-moving-time.png" /&gt;&lt;/p&gt;
 &lt;p&gt;The &lt;a href="https://gist.github.com/nicokosi/241331f67692945ddca4e4ea2cc0597d"&gt;full code&lt;/a&gt; that displays several charts.&lt;/p&gt;</summary><category term="strava charts r rstudio"></category></entry><entry><title>Générer ses graphiques Strava avec Clojure et Incanter</title><link href="https://nicokosi.github.io/creating-strava-charts-with-clojure-and-incanter.html" rel="alternate"></link><published>2017-04-09T17:37:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-04-09:creating-strava-charts-with-clojure-and-incanter.html</id><summary type="html">&lt;h1&gt;Générer ses graphiques Strava avec Clojure et Incanter&lt;/h1&gt;
 &lt;p&gt;J'utilise &lt;a href="https://www.strava.com/"&gt;Strava&lt;/a&gt; pour enregistrer mes sessions de jogging : après avoir enregistré une session avec mon smartphone, je la publie pour pouvoir la partager et la revoir plus tard.&lt;/p&gt;
 &lt;p&gt;Strava fournit quelques tableaux de bord mais je voulais générer mes propres graphiques afin de visualiser ma progression.&lt;/p&gt;
