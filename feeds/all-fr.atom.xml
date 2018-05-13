@@ -1,5 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all-fr.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2017-04-14T12:10:00+02:00</updated><entry><title>Générer ses graphiques Strava avec R</title><link href="https://nicokosi.github.io/creating-strava-charts-with-r.html" rel="alternate"></link><published>2017-04-14T12:10:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-04-14:creating-strava-charts-with-r.html</id><summary type="html">&lt;h1&gt;Générer ses graphiques Strava avec R&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all-fr.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2017-05-12T13:00:00+02:00</updated><entry><title>Du Clojure "natif" grâce à GraalVM</title><link href="https://nicokosi.github.io/clojure-goes-native-with-graalvm.html" rel="alternate"></link><published>2017-05-12T13:00:00+02:00</published><updated>2017-05-12T13:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-05-12:/clojure-goes-native-with-graalvm.html</id><summary type="html">&lt;p&gt;Générer un programme exécutable natif via GraalVM pour un projet Clojure, 'hubstats'&lt;/p&gt;</summary><content type="html">&lt;h2&gt;GraalVM, qu'est-ce que c'est ?&lt;/h2&gt;
+&lt;p&gt;&lt;a href="http://www.graalvm.org/"&gt;GraalVM&lt;/a&gt; est une machine virtuelle multi-langages : Java, autres langages de la machine virtuelle Java (Scala, Groovy, Kotlin etc.), JavaScript, LLVM, Ruby et R.&lt;/p&gt;
+&lt;p&gt;GraalVM permet également de générer des exécutables natifs à partir du code Java :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;For JVM-based languages, GraalVM offers a mechanism to create precompiled native images with instant start up and low memory footprint.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Oracle labs a annoncé en avril 2018 la sortie de &lt;a href="https://blogs.oracle.com/developers/announcing-graalvm"&gt;GraalVM 1.0 release candidate&lt;/a&gt;, donc c'est parti pour un essai !&lt;/p&gt;
+&lt;h2&gt;Construire un exécutable à partir d'un projet Clojure&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://github.com/nicokosi/hubstats"&gt;hubstats&lt;/a&gt; est mon projet perso implémenté en Clojure qui permet d'afficher des statistiques sur les pull requests GitHub. C'est un outil en ligne de commande utilisant une machine virtuelle Java, donc GraalVM devrait permettre d'accélérer son démarrage en générant un exécutable "natif".&lt;/p&gt;
+&lt;p&gt;Notes :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Cet &lt;a href="https://www.innoq.com/en/blog/native-clojure-and-graalvm/"&gt;article intéressant&lt;/a&gt; m'a inspiré et m'a aidé.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;J'ai utilisé la version "Community Edition" de GraalVM qui est gratuite et open source (une version "Enterprise Edition" existe également).&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Essai n°1&lt;/h3&gt;
+&lt;p&gt;A partir du "fat" JAR de mon projet 'hubstats' ("fat jar" : archive de code Java qui inclut toutes les dépendances), j'ai lancé la commande &lt;code&gt;native-image&lt;/code&gt; de &lt;a href="https://github.com/Danny02/graalvm-docker"&gt;GraaVM 1.0.0-rc1 dans un conteneur Docker&lt;/a&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;native-image &lt;span class="se"&gt;\&lt;/span&gt;
+  -jar hubstats-0.1.0-SNAPSHOT-standalone.jar &lt;span class="se"&gt;\&lt;/span&gt;
+  -H:+ReportUnsupportedElementsAtRuntime &lt;span class="se"&gt;\&lt;/span&gt;
+  hubstats.core
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;(cf. &lt;a href="https://github.com/nicokosi/hubstats/pull/12/files"&gt;tous les détails&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;Pas de chance, la génération de l'exécutable échoue :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Step 4/15 : RUN native-image   -jar hubstats-0.1.0-SNAPSHOT-standalone.jar   -H:+ReportUnsupportedElementsAtRuntime   hubstats.core
+ ---&amp;gt; Running in e7f911774bd4
+Build on Server(pid: 11, port: 26681)*
+   classlist:   3,159.26 ms
+       (cap):   1,485.02 ms
+       setup:   2,563.80 ms
+    analysis:  10,109.06 ms
+fatal error: java.lang.NullPointerException
+    at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+    at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+    at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+    at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+    at java.util.concurrent.ForkJoinTask.getThrowableException(ForkJoinTask.java:598)
+    at java.util.concurrent.ForkJoinTask.get(ForkJoinTask.java:1005)
+    at com.oracle.svm.hosted.NativeImageGenerator.run(NativeImageGenerator.java:398)
+    at com.oracle.svm.hosted.NativeImageGeneratorRunner.buildImage(NativeImageGeneratorRunner.java:240)
+    at com.oracle.svm.hosted.NativeImageGeneratorRunner.build(NativeImageGeneratorRunner.java:337)
+    at com.oracle.svm.hosted.server.NativeImageBuildServer.executeCompilation(NativeImageBuildServer.java:378)
+    at com.oracle.svm.hosted.server.NativeImageBuildServer.lambda$processCommand$8(NativeImageBuildServer.java:315)
+    at com.oracle.svm.hosted.server.NativeImageBuildServer.withJVMContext(NativeImageBuildServer.java:396)
+    at com.oracle.svm.hosted.server.NativeImageBuildServer.processCommand(NativeImageBuildServer.java:312)
+    at com.oracle.svm.hosted.server.NativeImageBuildServer.processRequest(NativeImageBuildServer.java:256)
+    at com.oracle.svm.hosted.server.NativeImageBuildServer.lambda$serve$7(NativeImageBuildServer.java:216)
+    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+    at java.lang.Thread.run(Thread.java:748)
+Caused by: java.lang.NullPointerException
+    at com.oracle.graal.pointsto.ObjectScanner.scanField(ObjectScanner.java:113)
+    at com.oracle.graal.pointsto.ObjectScanner.doScan(ObjectScanner.java:263)
+    at com.oracle.graal.pointsto.ObjectScanner.finish(ObjectScanner.java:307)
+    at com.oracle.graal.pointsto.ObjectScanner.scanBootImageHeapRoots(ObjectScanner.java:78)
+    at com.oracle.graal.pointsto.ObjectScanner.scanBootImageHeapRoots(ObjectScanner.java:60)
+    at com.oracle.graal.pointsto.BigBang.checkObjectGraph(BigBang.java:581)
+    at com.oracle.graal.pointsto.BigBang.finish(BigBang.java:552)
+    at com.oracle.svm.hosted.NativeImageGenerator.doRun(NativeImageGenerator.java:653)
+    at com.oracle.svm.hosted.NativeImageGenerator.lambda$run$0(NativeImageGenerator.java:381)
+    at java.util.concurrent.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1386)
+    at java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:289)
+    at java.util.concurrent.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1056)
+    at java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1692)
+    at java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:157)
+Error: Processing image build request failed
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Le problème ressemble fortement à &lt;a href="https://github.com/oracle/graal/issues/385"&gt;issue#385&lt;/a&gt; et &lt;a href="https://github.com/oracle/graal/issues/375"&gt;issue#375&lt;/a&gt;. Si je comprends bien, il est lié à l'une des limitations de GraalVM : &lt;a href="https://github.com/oracle/graal/blob/master/substratevm/LIMITATIONS.md#static-initializers"&gt;"static initializers" limitation&lt;/a&gt;. 😢&lt;/p&gt;
+&lt;h3&gt;Essai n°2&lt;/h3&gt;
+&lt;p&gt;Puisque certaines corrections étaient uniquement disponibles dans le &lt;a href="https://github.com/graalvm/"&gt;code source de GraalVM&lt;/a&gt;, j'ai voulu essayer avec le module &lt;code&gt;substratevm&lt;/code&gt;
+(qui inclut la commande 'native-image') construit à partir du code source.&lt;/p&gt;
+&lt;p&gt;J'ai donc récupéré le code source de GraalVM :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;git clone git@github.com:oracle/graal.git
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Puis en suivant les &lt;a href="https://github.com/oracle/graal/tree/master/substratevm"&gt;indications du module substratevm&lt;/a&gt;, j'ai téléchargé le &lt;a href="http://www.oracle.com/technetwork/oracle-labs/program-languages/downloads/index.html"&gt;JDK GraalVM "labs"&lt;/a&gt; puis j'ai construit le module 'substratevm' :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt; substratevm
+&lt;span class="nv"&gt;JAVA_HOME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;~/Downloads/labsjdk1.8.0_161-jvmci-0.42/Contents/Home ../../mx/mx build
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;J'ai ensuite lancé la commande 'native-image' qui est malheuresement restée "coincée" :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$&amp;gt; JAVA_HOME=~/Downloads/labsjdk1.8.0_161-jvmci-0.42/Contents/Home ../graal/substratevm/native-image -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar hubstats.core
+Build on Server(pid: 18933, port: 55103)*
+   classlist:   2,744.32 ms
+       (cap):   1,531.16 ms
+       setup:   2,401.40 ms
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Une anomalie similaire à déjà été rapportée : &lt;a href="https://github.com/oracle/graal/issues/411"&gt;"native image failed to build jar&lt;/a&gt;. 😭&lt;/p&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;C'est sûr, ces premiers essais ont été infructueux. GraalVM est un projet encore jeune que je ne connais pas vraiment. Néanmoins, ce fut une expérience sympathique de découvrir cet outil prometteur ! 😍&lt;/p&gt;
+&lt;p&gt;A refaire sous peu, avec un nouvel article à la clé ?&lt;/p&gt;</content><category term="clojure native graalvm"></category></entry><entry><title>Générer ses graphiques Strava avec R</title><link href="https://nicokosi.github.io/creating-strava-charts-with-r.html" rel="alternate"></link><published>2017-04-14T12:10:00+02:00</published><updated>2017-04-14T12:10:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-04-14:/creating-strava-charts-with-r.html</id><summary type="html">&lt;p&gt;Utilisation de R pour générer des graphiques Strava personnalisés&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Générer ses graphiques Strava avec R&lt;/h1&gt;
 &lt;p&gt;Cet article fait suite à &lt;a href="creating-strava-charts-with-clojure-and-incanter.html"&gt;Générer ses graphiques Strava avec Clojure et Incanter&lt;/a&gt; : en effet, j'ai décidé de faire un deuxième essai de génération de graphiques avec R.&lt;/p&gt;
 &lt;p&gt;R est un langage idéal pour le calcul statistique et la génération de graphiques. J'ai fait le choix d'utiliser l'IDE gratuit &lt;a href="https://www.rstudio.com/products/RStudio/"&gt;RStudio Desktop&lt;/a&gt; qui contient de nombreuses facilités (visualisation des données, historique des variables et des graphiques, aide intégrée etc.). RStudio Desktop est &lt;a href="http://www.rstudio.com/products/rstudio/download/"&gt;téléchargeable&lt;/a&gt; ou peut être installé via certains gestionnaires de paquets (exemple pour mac avec &lt;code&gt;homebrew&lt;/code&gt;, exécuter &lt;code&gt;brew cask install rstudio&lt;/code&gt; dans un terminal).&lt;/p&gt;
 &lt;p&gt;Le but est toujours de :&lt;/p&gt;
@@ -65,14 +167,14 @@ df&lt;span class="o"&gt;$&lt;/span&gt;distance &lt;span class="o"&gt;&amp;lt;-&l
 
 
 &lt;p&gt;Le graphique généré :
-&lt;img alt="Chart: distance et temps en mouvement" src="images/r-chart-distance-per-moving-time.png" /&gt;&lt;/p&gt;
-&lt;p&gt;Voici le lien vers le &lt;a href="https://gist.github.com/nicokosi/241331f67692945ddca4e4ea2cc0597d"&gt;code complet&lt;/a&gt; pour afficher plusieurs graphiques similaires.&lt;/p&gt;</summary><category term="strava charts r rstudio"></category></entry><entry><title>Générer ses graphiques Strava avec Clojure et Incanter</title><link href="https://nicokosi.github.io/creating-strava-charts-with-clojure-and-incanter.html" rel="alternate"></link><published>2017-04-09T17:37:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-04-09:creating-strava-charts-with-clojure-and-incanter.html</id><summary type="html">&lt;h1&gt;Générer ses graphiques Strava avec Clojure et Incanter&lt;/h1&gt;
+&lt;img alt="Chart: distance et temps en mouvement" src="images/r-chart-distance-per-moving-time.png"&gt;&lt;/p&gt;
+&lt;p&gt;Voici le lien vers le &lt;a href="https://gist.github.com/nicokosi/241331f67692945ddca4e4ea2cc0597d"&gt;code complet&lt;/a&gt; pour afficher plusieurs graphiques similaires.&lt;/p&gt;</content><category term="strava charts r rstudio"></category></entry><entry><title>Générer ses graphiques Strava avec Clojure et Incanter</title><link href="https://nicokosi.github.io/creating-strava-charts-with-clojure-and-incanter.html" rel="alternate"></link><published>2017-04-09T17:37:00+02:00</published><updated>2017-04-09T17:37:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-04-09:/creating-strava-charts-with-clojure-and-incanter.html</id><summary type="html">&lt;p&gt;Utilisation de la librairie Clojure Incanter pour générer des graphiques Strava personnalisés&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Générer ses graphiques Strava avec Clojure et Incanter&lt;/h1&gt;
 &lt;p&gt;J'utilise &lt;a href="https://www.strava.com/"&gt;Strava&lt;/a&gt; pour enregistrer mes sessions de jogging : après avoir enregistré une session avec mon smartphone, je la publie pour pouvoir la partager et la revoir plus tard.&lt;/p&gt;
 &lt;p&gt;Strava fournit quelques tableaux de bord mais je voulais générer mes propres graphiques afin de visualiser ma progression.&lt;/p&gt;
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h2&gt;Premier essai avec R&lt;/h2&gt;
 &lt;p&gt;J'ai d'abord essayé d'utiliser &lt;a href="https://www.rstudio.com/"&gt;RStudio&lt;/a&gt;, un IDE pour le langage R. Je pense que c'est un outil adapté mais je le connais très peu. Après avoir essayé pendant quelques heures d'importer mes données et de les transformer, j'ai abandonné !&lt;/p&gt;
-&lt;p&gt;&lt;img alt="RStudio : un IDE pour la plate-forme R" src="images/RStudio.png" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="RStudio : un IDE pour la plate-forme R" src="images/RStudio.png"&gt;&lt;/p&gt;
 &lt;p&gt;J'essairai une autre fois ! 😅&lt;/p&gt;
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h2&gt;Deuxième essai avec Clojure et Incanter&lt;/h2&gt;
@@ -145,8 +247,8 @@ df&lt;span class="o"&gt;$&lt;/span&gt;distance &lt;span class="o"&gt;&amp;lt;-&l
 
 
 &lt;p&gt;Le graphique généré :
-&lt;img alt="Chart: average speed over time" src="images/chart-average-speed-over-time.png" /&gt;&lt;/p&gt;
-&lt;p&gt;Le code complet, qui affiche plusieurs graphiques similaires, se trouve sur le &lt;a href="https://github.com/nicokosi/strava-activity-graphs/"&gt;repository GitHub strava-activity-graphs&lt;/a&gt;.&lt;/p&gt;</summary><category term="strava charts clojure incanter"></category></entry><entry><title>A la découverte des API GitHub en apprenant Clojure</title><link href="https://nicokosi.github.io/discover-github-apis-with-clojure.html" rel="alternate"></link><published>2017-01-11T08:56:00+01:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-01-11:discover-github-apis-with-clojure.html</id><summary type="html">&lt;p&gt;Il est toujours intéressant d'apprendre quelque chose, même si ça ne concerne pas directement le travail quotidien. Pour citer &lt;a href="https://pragprog.com/book/tpp/the-pragmatic-programmer"&gt;The Pragmatic Programmer&lt;/a&gt; (note pour moi-même : relire ce livre 🤓) :&lt;/p&gt;
+&lt;img alt="Chart: average speed over time" src="images/chart-average-speed-over-time.png"&gt;&lt;/p&gt;
+&lt;p&gt;Le code complet, qui affiche plusieurs graphiques similaires, se trouve sur le &lt;a href="https://github.com/nicokosi/strava-activity-graphs/"&gt;repository GitHub strava-activity-graphs&lt;/a&gt;.&lt;/p&gt;</content><category term="strava charts clojure incanter"></category></entry><entry><title>A la découverte des API GitHub en apprenant Clojure</title><link href="https://nicokosi.github.io/discover-github-apis-with-clojure.html" rel="alternate"></link><published>2017-01-11T08:56:00+01:00</published><updated>2017-01-11T08:56:00+01:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2017-01-11:/discover-github-apis-with-clojure.html</id><summary type="html">&lt;p&gt;A la découverte des API GitHub en apprenant Clojure&lt;/p&gt;</summary><content type="html">&lt;p&gt;Il est toujours intéressant d'apprendre quelque chose, même si ça ne concerne pas directement le travail quotidien. Pour citer &lt;a href="https://pragprog.com/book/tpp/the-pragmatic-programmer"&gt;The Pragmatic Programmer&lt;/a&gt; (note pour moi-même : relire ce livre 🤓) :&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Invest Regularly in Your Knowledge Portfolio&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -161,9 +263,9 @@ df&lt;span class="o"&gt;$&lt;/span&gt;distance &lt;span class="o"&gt;&amp;lt;-&l
 pull requests &lt;span class="k"&gt;for&lt;/span&gt; softwarevidal/arthur -&amp;gt;
     since &lt;span class="m"&gt;1&lt;/span&gt; week&lt;span class="o"&gt;(&lt;/span&gt;s&lt;span class="o"&gt;)&lt;/span&gt;:
         &lt;span class="m"&gt;9&lt;/span&gt; opened / &lt;span class="m"&gt;56&lt;/span&gt; commented / &lt;span class="m"&gt;5&lt;/span&gt; closed
-        opened per author: &lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;cmahalin&amp;quot;&lt;/span&gt; 5, &lt;span class="s2"&gt;&amp;quot;jcgay&amp;quot;&lt;/span&gt; 2, &lt;span class="s2"&gt;&amp;quot;AElMehdiVidal&amp;quot;&lt;/span&gt; 2&lt;span class="o"&gt;}&lt;/span&gt;
-        commented per author: &lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;vidal-rm&amp;quot;&lt;/span&gt; 30, &lt;span class="s2"&gt;&amp;quot;jcgay&amp;quot;&lt;/span&gt; 17, &lt;span class="s2"&gt;&amp;quot;cmahalin&amp;quot;&lt;/span&gt; 9&lt;span class="o"&gt;}&lt;/span&gt;
-        closed per author: &lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;cmahalin&amp;quot;&lt;/span&gt; 2, &lt;span class="s2"&gt;&amp;quot;AElMehdiVidal&amp;quot;&lt;/span&gt; 2, &lt;span class="s2"&gt;&amp;quot;jprudent&amp;quot;&lt;/span&gt; 1&lt;span class="o"&gt;}&lt;/span&gt;
+        opened per author: &lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;cmahalin&amp;quot;&lt;/span&gt; &lt;span class="m"&gt;5&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;jcgay&amp;quot;&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;AElMehdiVidal&amp;quot;&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+        commented per author: &lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;vidal-rm&amp;quot;&lt;/span&gt; &lt;span class="m"&gt;30&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;jcgay&amp;quot;&lt;/span&gt; &lt;span class="m"&gt;17&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;cmahalin&amp;quot;&lt;/span&gt; &lt;span class="m"&gt;9&lt;/span&gt;&lt;span class="o"&gt;}&lt;/span&gt;
+        closed per author: &lt;span class="o"&gt;{&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;cmahalin&amp;quot;&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;AElMehdiVidal&amp;quot;&lt;/span&gt; &lt;span class="m"&gt;2&lt;/span&gt;, &lt;span class="s2"&gt;&amp;quot;jprudent&amp;quot;&lt;/span&gt; &lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;}&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -212,7 +314,7 @@ Les particularités suivantes ont notamment retenu mon attention :&lt;/p&gt;
 &lt;li&gt;faire un autre outil en ligne de commande&lt;/li&gt;
 &lt;li&gt;essayer un autre langage (par exemple : &lt;a href="https://golang.org/"&gt;Go&lt;/a&gt; ou &lt;a href="https://www.rust-lang.org/"&gt;Rust&lt;/a&gt;)&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;La suite au prochain épisode ! 😉&lt;/p&gt;</summary><category term="clojure github"></category></entry><entry><title>Jouons avec le pattern matching en Haskell</title><link href="https://nicokosi.github.io/haskell-pattern-matching.html" rel="alternate"></link><published>2016-09-27T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-27:haskell-pattern-matching.html</id><summary type="html">&lt;p&gt;Découvrons le pattern matching en Haskell en reprenant l'exemple des cartes à jouer utilisé dans l'article &lt;a href="https://nicokosi.github.io/scala-pattern-matching.html"&gt;"Jouons avec le pattern matching en Scala"&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;La suite au prochain épisode ! 😉&lt;/p&gt;</content><category term="clojure github"></category></entry><entry><title>Jouons avec le pattern matching en Haskell</title><link href="https://nicokosi.github.io/haskell-pattern-matching.html" rel="alternate"></link><published>2016-09-27T00:00:00+02:00</published><updated>2016-09-27T00:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-27:/haskell-pattern-matching.html</id><summary type="html">&lt;p&gt;Découvrons par l'exemple le pattern matching en Haskell&lt;/p&gt;</summary><content type="html">&lt;p&gt;Découvrons le pattern matching en Haskell en reprenant l'exemple des cartes à jouer utilisé dans l'article &lt;a href="https://nicokosi.github.io/scala-pattern-matching.html"&gt;"Jouons avec le pattern matching en Scala"&lt;/a&gt;.&lt;/p&gt;
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h2&gt;Préambule : création d'une énumération&lt;/h2&gt;
 &lt;p&gt;Codons notre énumération correspondant à nos quatre enseignes (carreau, cœur, pique et trèfle) :&lt;/p&gt;
@@ -351,7 +453,7 @@ True
 
 
 &lt;p&gt;Les rangs, que l'on n'utilise pas dans la fonction, ont été filtrés via le caractère &lt;em&gt;wild-card&lt;/em&gt; (&lt;code&gt;_&lt;/code&gt;).&lt;/p&gt;
-&lt;p&gt;Et voilà ! 🤓&lt;/p&gt;</summary><category term="haskell"></category><category term="pattern-matching"></category></entry><entry><title>Jouons avec le pattern matching en Scala</title><link href="https://nicokosi.github.io/scala-pattern-matching.html" rel="alternate"></link><published>2016-09-14T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-14:scala-pattern-matching.html</id><summary type="html">&lt;p&gt;Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d’illustrer par l'exemple le pattern matching en Scala.&lt;/p&gt;
+&lt;p&gt;Et voilà ! 🤓&lt;/p&gt;</content><category term="haskell"></category><category term="pattern-matching"></category></entry><entry><title>Jouons avec le pattern matching en Scala</title><link href="https://nicokosi.github.io/scala-pattern-matching.html" rel="alternate"></link><published>2016-09-14T00:00:00+02:00</published><updated>2016-09-14T00:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-09-14:/scala-pattern-matching.html</id><summary type="html">&lt;p&gt;Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d’illustrer par l'exemple le pattern matching en Scala.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d’illustrer par l'exemple le pattern matching en Scala.&lt;/p&gt;
 &lt;p&gt;Supposons que nous voulions créer une fonction retournant la couleur (noir / rouge) d'une enseigne d'une carte à jouer (les quatre enseignes du jeu français étant : trèfle, cœur, carreau et pique).&lt;/p&gt;
 &lt;p&gt;Notes : dans le code ci-dessous, les commentaires se trouvant à la fin de chaque ligne correspondent à la sortie standard de la console ; j'ai utilisé un &lt;a href="https://confluence.jetbrains.com/display/IntelliJIDEA/Working+with+Scala+Worksheet"&gt;worksheet IntelliJ IDEA&lt;/a&gt; pour coder interactivement cet exemple, mais on peut bien sûr utiliser la console Scala.&lt;/p&gt;
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
@@ -454,7 +556,7 @@ True
 
 &lt;p&gt;Et voilà ! 🤓&lt;/p&gt;
 &lt;p&gt;PS : merci à Jérôme Prudent pour ses tuyaux en Scala et ses avis éclairés.
-Jérôme est contributeur au &lt;a href="http://www.arolla.fr/blog"&gt;blog d'Arolla&lt;/a&gt; (&lt;a href="http://www.arolla.fr/blog/author/jerome-prudent/"&gt;lien direct vers ses articles&lt;/a&gt;).&lt;/p&gt;</summary><category term="scala"></category><category term="pattern-matching"></category><category term="console"></category><category term="repl"></category></entry><entry><title>Versionner sa configuration système via des "dotfiles"</title><link href="https://nicokosi.github.io/dotfiles.html" rel="alternate"></link><published>2016-08-17T00:00:00+02:00</published><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-08-17:dotfiles.html</id><summary type="html">&lt;h2&gt;Introduction : la puissance du shell, avec ou sans maîtrise ?&lt;/h2&gt;
+Jérôme est contributeur au &lt;a href="http://www.arolla.fr/blog"&gt;blog d'Arolla&lt;/a&gt; (&lt;a href="http://www.arolla.fr/blog/author/jerome-prudent/"&gt;lien direct vers ses articles&lt;/a&gt;).&lt;/p&gt;</content><category term="scala"></category><category term="pattern-matching"></category><category term="console"></category><category term="repl"></category></entry><entry><title>Versionner sa configuration système via des "dotfiles"</title><link href="https://nicokosi.github.io/dotfiles.html" rel="alternate"></link><published>2016-08-17T00:00:00+02:00</published><updated>2016-08-17T00:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2016-08-17:/dotfiles.html</id><summary type="html">&lt;p&gt;pourquoi et comment versionner sa configuration système (système d'exploitation, shell et applications).&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Introduction : la puissance du shell, avec ou sans maîtrise ?&lt;/h2&gt;
 &lt;p&gt;Cela fait environ deux ans que je développe sur un poste "*nix" (Linux et Mac) après avoir développé de nombreuses années sur un poste Windows. La puissance du shell est indéniable : combiner des lignes de commandes simples, bénéficier de l'historique des commandes lancées, etc. Pourquoi ne pas en profiter pour maîtriser davantage son système en &lt;strong&gt;versionnant sa configuration&lt;/strong&gt; ?&lt;/p&gt;
 &lt;h2&gt;Présentation : Dotfiles, quezako ?&lt;/h2&gt;
 &lt;p&gt;Pour un système *nix (Linux, Mac, etc.), la configuration du shell et des applications est généralement centralisée dans les "dotfiles", des fichiers / répertoires dont le nom commence par un point ("dot" en anglais) et qui sont chargés en début de session interactive ou au lancement d'applications. En utilisant un gestionnaire de sources et des liens symboliques, on peut facilement &lt;strong&gt;historiser&lt;/strong&gt; et &lt;strong&gt;synchroniser&lt;/strong&gt; l'évolution de ces dotfiles afin de :&lt;/p&gt;
@@ -515,4 +617,4 @@ Ces branches me permettent d'avoir deux configurations bien distinctes même si 
 :&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;PS : merci à Jean-Christophe Gay pour l'inspiration et les "bons tuyaux". Voici son blog : &lt;a href="https://jeanchristophegay.com/"&gt;https://jeanchristophegay.com/&lt;/a&gt;.&lt;/p&gt;</summary><category term="tools"></category></entry></feed>
+&lt;p&gt;PS : merci à Jean-Christophe Gay pour l'inspiration et les "bons tuyaux". Voici son blog : &lt;a href="https://jeanchristophegay.com/"&gt;https://jeanchristophegay.com/&lt;/a&gt;.&lt;/p&gt;</content><category term="tools"></category></entry></feed>
