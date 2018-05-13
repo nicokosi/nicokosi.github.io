@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+            <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+            <meta name="google-site-verification" content="DJHKjkpGljcaLi1uAkfR27mqILGCLLKjX_EKY4C4nxk">
+
+        <title>Creating Strava charts with Clojure and Incanter</title>
+
+        <link href="https://nicokosi.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Nicokosi's blog Full Atom Feed" />
+        <!-- Bootstrap Core CSS -->
+        <link href="https://nicokosi.github.io/theme/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="https://nicokosi.github.io/theme/css/clean-blog.min.css" rel="stylesheet">
+
+        <!-- Code highlight color scheme -->
+            <link href="https://nicokosi.github.io/theme/css/code_blocks/darkly.css" rel="stylesheet">
+
+            <!-- CSS specified by the user -->
+            <link href="https://nicokosi.github.io/css/nicokosi.css" rel="stylesheet">
+
+        <!-- Custom Fonts -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+
+        <meta name="description" content="Use Clojure Incanter to generate custom Strava charts">
+
+        <meta name="author" content="Nicolas Kosinski">
+
+        <meta name="tags" content="strava charts clojure incanter">
+
+	                <meta property="og:locale" content="">
+		<meta property="og:site_name" content="Nicokosi's blog">
+
+	<meta property="og:type" content="article">
+            <meta property="article:author" content="https://nicokosi.github.io/author/nicolas-kosinski.html">
+	<meta property="og:url" content="https://nicokosi.github.io/creating-strava-charts-with-clojure-and-incanter-en.html">
+	<meta property="og:title" content="Creating Strava charts with Clojure and Incanter">
+	<meta property="article:published_time" content="2017-04-09 17:37:00+02:00">
+            <meta property="og:description" content="Use Clojure Incanter to generate custom Strava charts">
+
+            <meta property="og:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@nicokosi">
+        <meta name="twitter:title" content="Creating Strava charts with Clojure and Incanter">
+
+            <meta name="twitter:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
+
+            <meta name="twitter:description" content="Use Clojure Incanter to generate custom Strava charts">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="https://nicokosi.github.io/">Nicokosi's blog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+        <header class="intro-header" style="background-color: PowderBlue">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="post-heading">
+                        <h1>Creating Strava charts with Clojure and Incanter</h1>
+                        <span class="meta">Posted by
+                                <a href="https://nicokosi.github.io/author/nicolas-kosinski.html">Nicolas Kosinski</a>
+                             on 2017-04-09
+                        </span>
+                        Translations: 
+<a href="https://nicokosi.github.io/creating-strava-charts-with-clojure-and-incanter.html">fr</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+    <!-- Post Content -->
+    <article>
+        <h1>Creating Strava charts via Clojure and Incanter</h1>
+<p>I use <a href="https://www.strava.com/">Strava</a> to record my jogging sessions: I can record my sessions via my smartphone and publish them. I can then review or share them.</p>
+<p>In addition to provided Strava dashboards, I wanted to generate my own charts in order to visualize my progress.</p>
+<p><br/></p>
+<h2>First attempt: via R</h2>
+<p>In first tried to use <a href="https://www.rstudio.com/">RStudio</a>, an IDE for R. I know this tool is very well-suited but I don't know much about it. After a few hours, I was not able to load and transform JSON data.</p>
+<p><img alt="RStudio: an IDE for R platform" src="images/RStudio.png"></p>
+<p>Note to myself: try again another time! 😅</p>
+<p><br/></p>
+<h2>Second attempt: via Clojure and Incanter</h2>
+<p>I then used another option: <a href="http://incanter.org">Incanter</a>, which is</p>
+<blockquote>
+<p>Clojure-based, R-like platform for statistical computing and graphics.</p>
+</blockquote>
+<p>Basically, I had to:</p>
+<ol>
+<li>call Strava API that return activities as JSON data</li>
+<li>transform data: do basic conversions (meters per second into km/h, seconds into minutes)</li>
+<li>display charts: average speed per date</li>
+</ol>
+<p>So let's dive into it!</p>
+<p><br/></p>
+<h3>1. Retrieve data via Strava API</h3>
+<p>The following function:</p>
+<ul>
+<li>calls the <a href="http://strava.github.io/api/v3/activities/">Strava API for activities</a> with an authorization token to retrieve the 200 last activities (run/ride/swim), as a JSON object array</li>
+<li>converts this JSON object array to a sequence of Clojure maps:</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">strava-activities</span> <span class="p">[</span><span class="nv">token</span><span class="p">]</span>
+  <span class="p">(</span><span class="nf">json/read-str</span> <span class="p">(</span><span class="ss">:body</span>
+                   <span class="p">(</span><span class="nf">http-client/get</span>
+                     <span class="s">&quot;https://www.strava.com/api/v3/activities&quot;</span>
+<span class="p">{</span><span class="ss">:query-params</span> <span class="p">{</span><span class="ss">:access_token</span> <span class="nv">token</span> <span class="ss">:per_page</span> <span class="mi">200</span><span class="p">}}))))</span>
+</pre></div>
+
+
+<p><br/></p>
+<h3>2. Transform data</h3>
+<p>We can operate some data transformation, defining the following functions:</p>
+<div class="highlight"><pre><span></span><span class="c1">; Display speed unit in km/h (Strava API returns m/s):</span>
+<span class="p">(</span><span class="k">def </span><span class="nv">meters-per-second-&gt;kilometers-per-hour</span> <span class="p">(</span><span class="nb">partial * </span><span class="mf">3.6</span><span class="p">))</span>
+
+<span class="c1">; Display durations in minutes (Strava API returns seconds):</span>
+<span class="p">(</span><span class="kd">defn- </span><span class="nv">seconds-&gt;minutes</span> <span class="p">[</span><span class="nv">s</span><span class="p">]</span> <span class="p">(</span><span class="nb">/ </span><span class="nv">s</span> <span class="mi">60</span><span class="p">))</span>
+
+<span class="c1">; Incanter can only generate charts for numerical data, so ISO dates must be converted to timestamps:</span>
+<span class="p">(</span><span class="kd">defn- </span><span class="nv">string-date-&gt;millis</span> <span class="p">[</span><span class="nv">str-date</span><span class="p">]</span>
+  <span class="p">(</span><span class="nf">.getTime</span>
+    <span class="p">(</span><span class="nf">clojure.instant/read-instant-date</span> <span class="nv">str-date</span><span class="p">)))</span>
+</pre></div>
+
+
+<p>These functions can be applied on activities data via the "thread-last" operator (<code>-&gt;&gt;</code>), which is great for function pipelines:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">-&gt;&gt;</span> <span class="p">(</span><span class="nf">strava-activities</span> <span class="nv">token</span><span class="p">)</span>
+       <span class="p">(</span><span class="nb">map </span><span class="o">#</span><span class="p">(</span><span class="nf">update-in</span> <span class="nv">%</span> <span class="p">[</span><span class="s">&quot;average_speed&quot;</span><span class="p">]</span> <span class="nv">meters-per-second-&gt;kilometers-per-hour</span><span class="p">))</span>
+       <span class="p">(</span><span class="nb">map </span><span class="o">#</span><span class="p">(</span><span class="nf">update-in</span> <span class="nv">%</span> <span class="p">[</span><span class="s">&quot;start_date_local&quot;</span><span class="p">]</span> <span class="nv">string-date-&gt;millis</span><span class="p">))</span>
+       <span class="p">(</span><span class="nb">map </span><span class="o">#</span><span class="p">(</span><span class="nf">update-in</span> <span class="nv">%</span> <span class="p">[</span><span class="s">&quot;elapsed_time&quot;</span><span class="p">]</span> <span class="nv">seconds-&gt;minutes</span><span class="p">))</span>
+       <span class="p">(</span><span class="nb">map </span><span class="o">#</span><span class="p">(</span><span class="nf">update-in</span> <span class="nv">%</span> <span class="p">[</span><span class="s">&quot;moving_time&quot;</span><span class="p">]</span> <span class="nv">seconds-&gt;minutes</span><span class="p">)))</span>
+</pre></div>
+
+
+<p><br/></p>
+<h3>3. Display a chart via Incanter</h3>
+<p>The final step is to use an Incanter function to display a chart:</p>
+<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">display-chart</span> <span class="p">[</span><span class="nv">token</span><span class="p">]</span>
+  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">activities</span> <span class="p">(</span><span class="nf">get-activities</span> <span class="nv">token</span><span class="p">)]</span>
+    <span class="p">(</span><span class="nf">with-data</span>
+      <span class="p">(</span><span class="nf">to-dataset</span> <span class="nv">activities</span><span class="p">)</span>
+      <span class="o">#</span><span class="nv">_</span><span class="p">(</span><span class="nf">view</span> <span class="nv">$data</span><span class="p">)</span>
+      <span class="p">(</span><span class="nf">view</span>
+        <span class="p">(</span><span class="nf">time-series-plot</span>
+          <span class="p">(</span><span class="nf">$</span> <span class="ss">:start_date_local</span><span class="p">)</span>
+          <span class="p">(</span><span class="nf">$</span> <span class="ss">:average_speed</span><span class="p">)</span>
+          <span class="ss">:group-by</span> <span class="p">(</span><span class="nf">$</span> <span class="ss">:type</span><span class="p">)</span>
+          <span class="ss">:title</span> <span class="s">&quot;Average speed over time&quot;</span>
+          <span class="ss">:x-label</span> <span class="s">&quot;time&quot;</span>
+          <span class="ss">:y-label</span> <span class="s">&quot;average speed (km/h)&quot;</span>
+          <span class="ss">:points</span> <span class="nv">true</span>
+          <span class="ss">:legend</span> <span class="nv">true</span><span class="p">)))))</span>
+</pre></div>
+
+
+<p>All this code displays this kind of chart:
+<img alt="Chart: average speed over time" src="images/chart-average-speed-over-time.png"></p>
+<p><br/>
+You can find the full code that generates several charts in <a href="https://github.com/nicokosi/strava-activity-graphs/">strava-activity-graphs GitHub repository</a>.</p>
+    </article>
+
+        <div class="tags">
+            <p>tags: <a href="https://nicokosi.github.io/tag/strava-charts-clojure-incanter.html">strava charts clojure incanter</a></p>
+        </div>
+
+    <hr>
+
+        <div class="comments">
+            <h2>Comments !</h2>
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'nicokosi-blog';
+                var disqus_identifier = 'creating-strava-charts-with-clojure-and-incanter-en.html';
+                var disqus_url = 'https://nicokosi.github.io/creating-strava-charts-with-clojure-and-incanter-en.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//nicokosi-blog.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                            <li>
+                                <a href="http://twitter.com/nicokosi">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="http://github.com/nicokosi">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.linkedin.com/in/nicolas-kosinski-95184811">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://nicokosi.github.io/feeds/all.atom.xml">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                    </ul>
+<p class="copyright text-muted">
+    Generated by <a href="http://getpelican.com">Pelican</a> with <a href="https://github.com/gilsondev/pelican-clean-blog">pelican-clean-blog</a> theme
+</p>                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="https://nicokosi.github.io/theme/js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="https://nicokosi.github.io/theme/js/bootstrap.min.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="https://nicokosi.github.io/theme/js/clean-blog.min.js"></script>
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-11930016-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script type="text/javascript">
+    var disqus_shortname = 'nicokosi-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+
+</html>

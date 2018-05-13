@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+            <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+            <meta name="google-site-verification" content="DJHKjkpGljcaLi1uAkfR27mqILGCLLKjX_EKY4C4nxk">
+
+        <title>Discovering GitHub APIs while learning Clojure</title>
+
+        <link href="https://nicokosi.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Nicokosi's blog Full Atom Feed" />
+        <!-- Bootstrap Core CSS -->
+        <link href="https://nicokosi.github.io/theme/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="https://nicokosi.github.io/theme/css/clean-blog.min.css" rel="stylesheet">
+
+        <!-- Code highlight color scheme -->
+            <link href="https://nicokosi.github.io/theme/css/code_blocks/darkly.css" rel="stylesheet">
+
+            <!-- CSS specified by the user -->
+            <link href="https://nicokosi.github.io/css/nicokosi.css" rel="stylesheet">
+
+        <!-- Custom Fonts -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+
+        <meta name="description" content="Discovering GitHub APIs while learning Clojure">
+
+        <meta name="author" content="Nicolas Kosinski">
+
+        <meta name="tags" content="clojure github">
+
+	                <meta property="og:locale" content="">
+		<meta property="og:site_name" content="Nicokosi's blog">
+
+	<meta property="og:type" content="article">
+            <meta property="article:author" content="https://nicokosi.github.io/author/nicolas-kosinski.html">
+	<meta property="og:url" content="https://nicokosi.github.io/discover-github-apis-with-clojure-en.html">
+	<meta property="og:title" content="Discovering GitHub APIs while learning Clojure">
+	<meta property="article:published_time" content="2017-01-11 08:56:00+01:00">
+            <meta property="og:description" content="Discovering GitHub APIs while learning Clojure">
+
+            <meta property="og:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@nicokosi">
+        <meta name="twitter:title" content="Discovering GitHub APIs while learning Clojure">
+
+            <meta name="twitter:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
+
+            <meta name="twitter:description" content="Discovering GitHub APIs while learning Clojure">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="https://nicokosi.github.io/">Nicokosi's blog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+        <header class="intro-header" style="background-color: PowderBlue">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="post-heading">
+                        <h1>Discovering GitHub APIs while learning Clojure</h1>
+                        <span class="meta">Posted by
+                                <a href="https://nicokosi.github.io/author/nicolas-kosinski.html">Nicolas Kosinski</a>
+                             on 2017-01-11
+                        </span>
+                        Translations: 
+<a href="https://nicokosi.github.io/discover-github-apis-with-clojure.html">fr</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+    <!-- Post Content -->
+    <article>
+        <p>As a developer, it's important to keep on learning/discovering stuff. Quoting <a href="https://pragprog.com/book/tpp/the-pragmatic-programmer">The Pragmatic Programmer</a> :</p>
+<blockquote>
+<p>Invest Regularly in Your Knowledge Portfolio</p>
+</blockquote>
+<p>My last project "for learning" was to create a command-line tool, named <a href="https://github.com/nicokosi/hubstats">hubstats</a>, that outputs a summary for <a href="https://help.github.com/articles/github-glossary/#pull-request">pull requests GitHub</a>. This tool aims at giving some metrics for me and my team.</p>
+<p>The real purposes were to practice <a href="https://clojure.org/">Clojure</a> (which I knew little) but also to discover <a href="https://developer.github.com/v3/">REST</a> and <a href="https://developer.github.com/early-access/graphql/">GraphQL</a> GitHub APIs.</p>
+<p>Moreover, I was lucky to interact with a colleague of mine who is an advanced Clojure developer. That was really cool, thanks Jérôme aka <a href="https://github.com/jprudent">@jprudent</a>!</p>
+<p><br/></p>
+<h2>What is <em>hubstats</em>?</h2>
+<p><em>hubstats</em> is a simple command line tool that outputs, for a given <a href="https://help.github.com/articles/github-glossary/#repository">GitHub repository</a>, the number of opened/commented/merged pull requests by author for a given period (last week, since a given date, etc.).</p>
+<p>Here is an output example:</p>
+<div class="highlight"><pre><span></span>lein run --organization softwarevidal --repository arthur --token <span class="nv">$token</span>
+pull requests <span class="k">for</span> softwarevidal/arthur -&gt;
+    since <span class="m">1</span> week<span class="o">(</span>s<span class="o">)</span>:
+        <span class="m">9</span> opened / <span class="m">56</span> commented / <span class="m">5</span> closed
+        opened per author: <span class="o">{</span><span class="s2">&quot;cmahalin&quot;</span> <span class="m">5</span>, <span class="s2">&quot;jcgay&quot;</span> <span class="m">2</span>, <span class="s2">&quot;AElMehdiVidal&quot;</span> <span class="m">2</span><span class="o">}</span>
+        commented per author: <span class="o">{</span><span class="s2">&quot;vidal-rm&quot;</span> <span class="m">30</span>, <span class="s2">&quot;jcgay&quot;</span> <span class="m">17</span>, <span class="s2">&quot;cmahalin&quot;</span> <span class="m">9</span><span class="o">}</span>
+        closed per author: <span class="o">{</span><span class="s2">&quot;cmahalin&quot;</span> <span class="m">2</span>, <span class="s2">&quot;AElMehdiVidal&quot;</span> <span class="m">2</span>, <span class="s2">&quot;jprudent&quot;</span> <span class="m">1</span><span class="o">}</span>
+</pre></div>
+
+
+<p><br/></p>
+<h2>How does it work?</h2>
+<p>I have chosen Clojure, a language that is different from the language that I use every day (Java).</p>
+<p>The following characteristics appealed to me:</p>
+<ul>
+<li>dynamic and interactive development: code is short and simple, which seems cool for an internal tool; what's more, the <a href="https://clojure.org/about/dynamic#_the_repl">REPL</a> is a base tool that greatly fit to a discovery mindset.</li>
+<li>functional programming: functions are <em>first-class citizen</em>, immutability and function recursion are basics</li>
+<li>Lisp: Clojure is a Lisp, so writing code is a bit different from C-like languages ; Code is data and can be edited via <a href="https://www.emacswiki.org/emacs/ParEdit">paredit</a> (emacs-like mode for editing code while keeping parentheses balanced).</li>
+<li>simplicity: Clojure encourages too use small libraries instead of huge frameworks.</li>
+</ul>
+<p>See <a href="https://clojure.org/about/rationale">Clojure Rationale</a>.</p>
+<p>My dev setup:</p>
+<ul>
+<li><a href="https://www.jetbrains.com/idea/">IntelliJ IDEA</a> with <a href="https://cursive-ide.com/">Cursive plugin</a></li>
+<li><a href="https://cursive-ide.com/userguide/paredit.html">Cursive <em>paredit</em> mode</a></li>
+<li><a href="https://leiningen.org/">Leiningen</a> as build tool</li>
+<li><a href="https://travis-ci.org/">Travis CI</a> for continuous integration</li>
+</ul>
+<p><br/></p>
+<h2>So what?</h2>
+<p>What I liked:</p>
+<ul>
+<li>a "parenthesis" (haha!) with my daily Java routines/habits</li>
+<li><em>paredit</em> is confusing at first, then pleasant to use</li>
+<li>REPL rocks for<ul>
+<li>shaping code (acts as a draft for new code)</li>
+<li>troubleshooting bugs (example: incorrect GitHub pagination traversing that led to out-of-memory crash)</li>
+</ul>
+</li>
+<li>unit tests are easy to write (example: <a href="https://clojuredocs.org/clojure.core/with-redefs"><code>with-redefs</code></a> macro can be used to mock functions: https://clojuredocs.org/clojure.core/with-redefs)</li>
+</ul>
+<p>What I did not like:</p>
+<ul>
+<li>WTFs when runtime bugs occurred (obscure stack traces)</li>
+<li>integrated documentation lacks examples. I often had to browse <a href="https://clojuredocs.org/">Clojure Docs</a> to understand Clojure base functions via useful examples.</li>
+</ul>
+<p><br/></p>
+<h2>What's next?</h2>
+<p>Some ideas for some evolutions (or an other project, maybe?):</p>
+<ul>
+<li>use <a href="https://developer.github.com/early-access/graphql/">GitHub GraphQL</a></li>
+<li>make a web app for <em>hubstats</em> (via <a href="https://clojurescript.org/">ClojureScript</a>?)</li>
+<li>build another CLI tool</li>
+<li>learn another language (for example: <a href="https://golang.org/">Go</a> or <a href="https://www.rust-lang.org/">Rust</a>)</li>
+</ul>
+<p>That's all folk! 😉</p>
+    </article>
+
+        <div class="tags">
+            <p>tags: <a href="https://nicokosi.github.io/tag/clojure-github.html">clojure github</a></p>
+        </div>
+
+    <hr>
+
+        <div class="comments">
+            <h2>Comments !</h2>
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'nicokosi-blog';
+                var disqus_identifier = 'discover-github-apis-with-clojure-en.html';
+                var disqus_url = 'https://nicokosi.github.io/discover-github-apis-with-clojure-en.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//nicokosi-blog.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                            <li>
+                                <a href="http://twitter.com/nicokosi">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="http://github.com/nicokosi">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.linkedin.com/in/nicolas-kosinski-95184811">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://nicokosi.github.io/feeds/all.atom.xml">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                    </ul>
+<p class="copyright text-muted">
+    Generated by <a href="http://getpelican.com">Pelican</a> with <a href="https://github.com/gilsondev/pelican-clean-blog">pelican-clean-blog</a> theme
+</p>                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="https://nicokosi.github.io/theme/js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="https://nicokosi.github.io/theme/js/bootstrap.min.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="https://nicokosi.github.io/theme/js/clean-blog.min.js"></script>
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-11930016-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script type="text/javascript">
+    var disqus_shortname = 'nicokosi-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+
+</html>

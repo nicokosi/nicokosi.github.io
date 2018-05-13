@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+            <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+            <meta name="google-site-verification" content="DJHKjkpGljcaLi1uAkfR27mqILGCLLKjX_EKY4C4nxk">
+
+        <title>Let's play with pattern matching in Scala</title>
+
+        <link href="https://nicokosi.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Nicokosi's blog Full Atom Feed" />
+        <!-- Bootstrap Core CSS -->
+        <link href="https://nicokosi.github.io/theme/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="https://nicokosi.github.io/theme/css/clean-blog.min.css" rel="stylesheet">
+
+        <!-- Code highlight color scheme -->
+            <link href="https://nicokosi.github.io/theme/css/code_blocks/darkly.css" rel="stylesheet">
+
+            <!-- CSS specified by the user -->
+            <link href="https://nicokosi.github.io/css/nicokosi.css" rel="stylesheet">
+
+        <!-- Custom Fonts -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+
+        <meta name="description" content="Pattern matching is a powerful technique for filtering and testing variables. This article aims at illustrating pattern matching in...">
+
+        <meta name="author" content="Nicolas Kosinski">
+
+        <meta name="tags" content="scala">
+        <meta name="tags" content="pattern-matching">
+        <meta name="tags" content="console">
+        <meta name="tags" content="repl">
+
+	                <meta property="og:locale" content="">
+		<meta property="og:site_name" content="Nicokosi's blog">
+
+	<meta property="og:type" content="article">
+            <meta property="article:author" content="https://nicokosi.github.io/author/nicolas-kosinski.html">
+	<meta property="og:url" content="https://nicokosi.github.io/scala-pattern-matching-en.html">
+	<meta property="og:title" content="Let's play with pattern matching in Scala">
+	<meta property="article:published_time" content="2016-09-14 00:00:00+02:00">
+            <meta property="og:description" content="Pattern matching is a powerful technique for filtering and testing variables. This article aims at illustrating pattern matching in...">
+
+            <meta property="og:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@nicokosi">
+        <meta name="twitter:title" content="Let's play with pattern matching in Scala">
+
+            <meta name="twitter:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
+
+            <meta name="twitter:description" content="Pattern matching is a powerful technique for filtering and testing variables. This article aims at illustrating pattern matching in...">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="https://nicokosi.github.io/">Nicokosi's blog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+        <header class="intro-header" style="background-color: PowderBlue">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="post-heading">
+                        <h1>Let's play with pattern matching in Scala</h1>
+                        <span class="meta">Posted by
+                                <a href="https://nicokosi.github.io/author/nicolas-kosinski.html">Nicolas Kosinski</a>
+                             on 2016-09-14
+                        </span>
+                        Translations: 
+<a href="https://nicokosi.github.io/scala-pattern-matching.html">fr</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+    <!-- Post Content -->
+    <article>
+        <p>Pattern matching is a powerful technique for filtering and testing variables. This article aims at illustrating pattern matching in Scala using a simple example.
+Let's say we want to return the color (red or black) of a playing card.</p>
+<p>Notes: The code below "shows" the console output using comments (ex: <code>"foo" // foo</code>). I have used a <a href="https://confluence.jetbrains.com/display/IntelliJIDEA/Working+with+Scala+Worksheet">IntelliJ IDEA worksheet</a> but the standard Scala console can also be used (REPL FTW!)</p>
+<p><br/></p>
+<h2>Step #1: let's create a simple class</h2>
+<p>Let's create a immutable class for the "club" suite:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Club</span> <span class="o">{</span>
+  <span class="k">val</span> <span class="n">symbol</span> <span class="k">=</span> <span class="s">&quot;♣&quot;</span>
+  <span class="k">val</span> <span class="n">label</span> <span class="k">=</span> <span class="s">&quot;club&quot;</span>
+<span class="o">}</span>
+
+<span class="k">val</span> <span class="n">club</span><span class="k">:</span> <span class="kt">Club</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Club</span><span class="o">()</span>
+<span class="n">club</span><span class="o">.</span><span class="n">symbol</span> <span class="c1">// ♣</span>
+</pre></div>
+
+
+<p>So far, so good. Instances can be compared by identity (reference) but not by value because we did not override the <code>equals</code> method:</p>
+<div class="highlight"><pre><span></span><span class="n">club</span><span class="o">.</span><span class="n">equals</span><span class="o">(</span><span class="n">club</span><span class="o">)</span> <span class="c1">// true</span>
+<span class="n">club</span> <span class="o">==</span> <span class="k">new</span> <span class="nc">Club</span> <span class="c1">// false</span>
+<span class="n">club</span><span class="o">.</span><span class="n">eq</span><span class="o">(</span><span class="k">new</span> <span class="nc">Club</span><span class="o">)</span> <span class="c1">// false</span>
+<span class="n">club</span><span class="o">.</span><span class="n">equals</span><span class="o">(</span><span class="k">new</span> <span class="nc">Club</span><span class="o">)</span> <span class="c1">// false</span>
+</pre></div>
+
+
+<p><code>hashCode</code> and <code>toString</code> are also default ones:</p>
+<div class="highlight"><pre><span></span><span class="n">club</span> <span class="c1">// Club@1ac88f64</span>
+<span class="n">club</span><span class="o">.</span><span class="n">hashCode</span><span class="o">()</span> <span class="c1">// 1976061787</span>
+<span class="k">new</span> <span class="nc">Club</span><span class="o">().</span><span class="n">hashCode</span><span class="o">()</span> <span class="c1">// 1751431390</span>
+</pre></div>
+
+
+<p><br/></p>
+<h2>Step #2: let's create a case class</h2>
+<p>A <code>case class</code> has two benefits:</p>
+<ol>
+<li>auto-implement <code>equals</code>, <code>hashCode</code> and <code>toString</code> methods.</li>
+<li>enhance pattern matching capability via two methods: a "constructor" method, <code>apply</code>, and a "de-constructor" method, <code>unapply</code>.</li>
+</ol>
+<div class="highlight"><pre><span></span><span class="k">case</span> <span class="k">class</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="n">symbol</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">label</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+</pre></div>
+
+
+<p><code>apply</code> method is a kind of free constructor. By the way, we don't need to use the <code>new</code> keyword:</p>
+<div class="highlight"><pre><span></span><span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">)</span> <span class="c1">// CardSuite(♣,club)</span>
+</pre></div>
+
+
+<p><code>equals</code>, <code>hashCode</code> and <code>toString</code> methods are also implemented for free:</p>
+<div class="highlight"><pre><span></span><span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">).</span><span class="n">symbol</span>
+<span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">)</span> <span class="o">==</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">)</span> <span class="c1">// true</span>
+<span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">).</span><span class="n">equals</span><span class="o">(</span><span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">))</span> <span class="c1">// true</span>
+<span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">).</span><span class="n">eq</span><span class="o">(</span><span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">))</span> <span class="c1">// false</span>
+<span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">).</span><span class="n">hashCode</span><span class="o">()</span> <span class="c1">// 1302714609</span>
+<span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">).</span><span class="n">hashCode</span><span class="o">()</span> <span class="c1">// 1302714609</span>
+</pre></div>
+
+
+<p><br/></p>
+<h2>"Bonus" step: use an enumeration</h2>
+<p>Since there are four suites in French playing cards, we can create an enumeration. This is not directly related to our pattern matching example, but let's do it, for fun and profit. ;-)</p>
+<div class="highlight"><pre><span></span><span class="k">object</span> <span class="nc">CardSuites</span> <span class="o">{</span>
+  <span class="k">val</span> <span class="nc">CLUB</span> <span class="k">=</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nc">DIAMOND</span> <span class="k">=</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♦&quot;</span><span class="o">,</span> <span class="s">&quot;diamond&quot;</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nc">HEART</span> <span class="k">=</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♥&quot;</span><span class="o">,</span> <span class="s">&quot;heart&quot;</span><span class="o">)</span>
+  <span class="k">val</span> <span class="nc">SPADE</span> <span class="k">=</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♠&quot;</span><span class="o">,</span> <span class="s">&quot;spade&quot;</span><span class="o">)</span>
+  <span class="k">def</span> <span class="n">values</span><span class="o">()</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span><span class="nc">DIAMOND</span><span class="o">,</span> <span class="nc">HEART</span><span class="o">,</span> <span class="nc">SPADE</span><span class="o">,</span> <span class="nc">CLUB</span><span class="o">)</span>
+<span class="o">}</span>
+<span class="nc">CardSuites</span><span class="o">.</span><span class="nc">CLUB</span> <span class="o">!=</span> <span class="nc">CardSuites</span><span class="o">.</span><span class="nc">DIAMOND</span> <span class="c1">// true</span>
+<span class="nc">CardSuites</span><span class="o">.</span><span class="n">values</span> <span class="c1">// List(CardSuite(♦,diamond), CardSuite(♥,heart), CardSuite(♠,spade), CardSuite(♣,club))</span>
+</pre></div>
+
+
+<p><br/></p>
+<h2>Last step: let's use pattern matching!</h2>
+<h3>First example</h3>
+<p>Here is a first pattern matching example, used in a function that returns the color of a suite card:</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="n">justColor</span><span class="o">(</span><span class="n">cardSuite</span><span class="k">:</span> <span class="kt">CardSuite</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="n">cardSuite</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">CardSuites</span><span class="o">.</span><span class="nc">CLUB</span> <span class="o">|</span> <span class="nc">CardSuites</span><span class="o">.</span><span class="nc">SPADE</span> <span class="k">=&gt;</span> <span class="s">&quot;black&quot;</span>
+  <span class="k">case</span> <span class="nc">CardSuites</span><span class="o">.</span><span class="nc">DIAMOND</span> <span class="o">|</span> <span class="nc">CardSuites</span><span class="o">.</span><span class="nc">HEART</span> <span class="k">=&gt;</span> <span class="s">&quot;red&quot;</span>
+  <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="s">&quot;none&quot;</span>
+<span class="o">}</span>
+
+<span class="n">justColor</span><span class="o">(</span><span class="nc">CardSuites</span><span class="o">.</span><span class="nc">SPADE</span><span class="o">)</span> <span class="c1">// black</span>
+</pre></div>
+
+
+<p>This example demonstrates:</p>
+<ul>
+<li>the <code>|</code> notation (<em>disjunction</em>) that can be used to group several cases;</li>
+<li>the <code>_</code> notation (<em>wildcard</em>) for "other cases".</li>
+</ul>
+<h3>Second example</h3>
+<p>Here is a second example to demonstrate field filtering, also known as "de-structuring":</p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="n">describeColor</span><span class="o">(</span><span class="n">cardSuite</span><span class="k">:</span> <span class="kt">CardSuite</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="n">cardSuite</span> <span class="k">match</span> <span class="o">{</span>
+  <span class="k">case</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">label</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="s">s&quot;</span><span class="si">$label</span><span class="s"> is </span><span class="si">${</span><span class="n">justColor</span><span class="o">(</span><span class="n">cardSuite</span><span class="o">)</span><span class="si">}</span><span class="s">&quot;</span>
+<span class="o">}</span>
+
+<span class="n">describeColor</span><span class="o">(</span><span class="nc">CardSuites</span><span class="o">.</span><span class="nc">SPADE</span><span class="o">)</span> <span class="c1">// spade is black</span>
+</pre></div>
+
+
+<p>We only keep the suite label using the <code>unapply</code> method of our case class.</p>
+<p>That's all folks! 🤓</p>
+<p>PS: Thanks to Jérôme Prudent for the Scala tips and for the review. Jérôme contributes to the <a href="http://www.arolla.fr/blog">Arolla blog</a> (<a href="http://www.arolla.fr/blog/author/jerome-prudent/">direct link to his posts</a>).</p>
+    </article>
+
+        <div class="tags">
+            <p>tags: <a href="https://nicokosi.github.io/tag/scala.html">scala</a>, <a href="https://nicokosi.github.io/tag/pattern-matching.html">pattern-matching</a>, <a href="https://nicokosi.github.io/tag/console.html">console</a>, <a href="https://nicokosi.github.io/tag/repl.html">repl</a></p>
+        </div>
+
+    <hr>
+
+        <div class="comments">
+            <h2>Comments !</h2>
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'nicokosi-blog';
+                var disqus_identifier = 'scala-pattern-matching-en.html';
+                var disqus_url = 'https://nicokosi.github.io/scala-pattern-matching-en.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//nicokosi-blog.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                            <li>
+                                <a href="http://twitter.com/nicokosi">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="http://github.com/nicokosi">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.linkedin.com/in/nicolas-kosinski-95184811">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://nicokosi.github.io/feeds/all.atom.xml">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                    </ul>
+<p class="copyright text-muted">
+    Generated by <a href="http://getpelican.com">Pelican</a> with <a href="https://github.com/gilsondev/pelican-clean-blog">pelican-clean-blog</a> theme
+</p>                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="https://nicokosi.github.io/theme/js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="https://nicokosi.github.io/theme/js/bootstrap.min.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="https://nicokosi.github.io/theme/js/clean-blog.min.js"></script>
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-11930016-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script type="text/javascript">
+    var disqus_shortname = 'nicokosi-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+
+</html>
