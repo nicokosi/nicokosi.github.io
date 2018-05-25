@@ -8,7 +8,7 @@
 
             <meta name="google-site-verification" content="DJHKjkpGljcaLi1uAkfR27mqILGCLLKjX_EKY4C4nxk">
 
-        <title>Clojure goes native with GraalVM</title>
+        <title>Du Clojure "natif" grâce à GraalVM</title>
 
         <link href="https://nicokosi.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Nicokosi's blog Full Atom Feed" />
         <!-- Bootstrap Core CSS -->
@@ -37,7 +37,7 @@
 
 
 
-        <meta name="description" content="Use GraalVM to generate native executable for 'hubstats', a Clojure project">
+        <meta name="description" content="Générer un programme exécutable natif via GraalVM pour un projet Clojure, 'hubstats'">
 
         <meta name="author" content="Nicolas Kosinski">
 
@@ -48,19 +48,19 @@
 
 	<meta property="og:type" content="article">
             <meta property="article:author" content="https://nicokosi.github.io/author/nicolas-kosinski.html">
-	<meta property="og:url" content="https://nicokosi.github.io/clojure-goes-native-with-graalvm-en.html">
-	<meta property="og:title" content="Clojure goes native with GraalVM">
-	<meta property="article:published_time" content="2017-05-12 13:00:00+02:00">
-            <meta property="og:description" content="Use GraalVM to generate native executable for 'hubstats', a Clojure project">
+	<meta property="og:url" content="https://nicokosi.github.io/clojure-goes-native-with-graalvm.html">
+	<meta property="og:title" content="Du Clojure "natif" grâce à GraalVM">
+	<meta property="article:published_time" content="2018-05-12 13:00:00+02:00">
+            <meta property="og:description" content="Générer un programme exécutable natif via GraalVM pour un projet Clojure, 'hubstats'">
 
             <meta property="og:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:site" content="@nicokosi">
-        <meta name="twitter:title" content="Clojure goes native with GraalVM">
+        <meta name="twitter:title" content="Du Clojure "natif" grâce à GraalVM">
 
             <meta name="twitter:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
 
-            <meta name="twitter:description" content="Use GraalVM to generate native executable for 'hubstats', a Clojure project">
+            <meta name="twitter:description" content="Générer un programme exécutable natif via GraalVM pour un projet Clojure, 'hubstats'">
 </head>
 
 <body>
@@ -96,13 +96,13 @@
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                     <div class="post-heading">
-                        <h1>Clojure goes native with GraalVM</h1>
+                        <h1>Du Clojure "natif" grâce à GraalVM</h1>
                         <span class="meta">Posted by
                                 <a href="https://nicokosi.github.io/author/nicolas-kosinski.html">Nicolas Kosinski</a>
-                             on 2017-05-12
+                             on 2018-05-12
                         </span>
                         Translations: 
-<a href="https://nicokosi.github.io/clojure-goes-native-with-graalvm.html">fr</a>
+<a href="https://nicokosi.github.io/clojure-goes-native-with-graalvm-en.html">en</a>
 
                     </div>
                 </div>
@@ -116,26 +116,27 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
     <!-- Post Content -->
     <article>
-        <h2>What is GraalVM?</h2>
-<p><a href="http://www.graalvm.org/">GraalVM</a> is a virtual machine that supports several programming languages: Java, JVM-based languages (Scala, Groovy, Kotlin etc.), JavaScript, LLVM, Ruby and R. It also allows to generate native executables from Java bytecode:</p>
+        <h2>GraalVM, qu'est-ce que c'est ?</h2>
+<p><a href="http://www.graalvm.org/">GraalVM</a> est une machine virtuelle multi-langages : Java, autres langages de la machine virtuelle Java (Scala, Groovy, Kotlin etc.), JavaScript, LLVM, Ruby et R.</p>
+<p>GraalVM permet également de générer des exécutables natifs à partir du code Java :</p>
 <div class="highlight"><pre><span></span>For JVM-based languages, GraalVM offers a mechanism to create precompiled native images with instant start up and low memory footprint.
 </pre></div>
 
 
-<p><a href="https://blogs.oracle.com/developers/announcing-graalvm">Oracle labs announced in April 2018</a> GraalVM 1.0 release candidate, so let's have a try!</p>
-<h2>Build a native executable for a Clojure project</h2>
-<p><a href="https://github.com/nicokosi/hubstats">hubstats</a> is my Clojure toy project for displaying statistics about GitHub pull requests. It is a command line tool that runs with a Java virtual machine, so GraalVM could bring instant startup via a native executable.</p>
-<p>Notes:</p>
+<p>Oracle labs a annoncé en avril 2018 la sortie de <a href="https://blogs.oracle.com/developers/announcing-graalvm">GraalVM 1.0 release candidate</a>, donc c'est parti pour un essai !</p>
+<h2>Construire un exécutable à partir d'un projet Clojure</h2>
+<p><a href="https://github.com/nicokosi/hubstats">hubstats</a> est mon projet perso implémenté en Clojure qui permet d'afficher des statistiques sur les pull requests GitHub. C'est un outil en ligne de commande utilisant une machine virtuelle Java, donc GraalVM devrait permettre d'accélérer son démarrage en générant un exécutable "natif".</p>
+<p>Notes :</p>
 <ul>
 <li>
-<p>I have used some tips from this <a href="https://www.innoq.com/en/blog/native-clojure-and-graalvm/">interesting blog post</a>.</p>
+<p>Cet <a href="https://www.innoq.com/en/blog/native-clojure-and-graalvm/">article intéressant</a> m'a inspiré et m'a aidé.</p>
 </li>
 <li>
-<p>I have used GraalVM Community Edition, which is free and open source (Enterprise Edition also exists).</p>
+<p>J'ai utilisé la version "Community Edition" de GraalVM qui est gratuite et open source (une version "Enterprise Edition" existe également).</p>
 </li>
 </ul>
-<h3>Attempt #1</h3>
-<p>From a "fat" JAR (an archive with Java bytecode that includes all its dependencies), I ran the command <code>native-image</code> from <a href="https://github.com/Danny02/graalvm-docker">GraalVM 1.0.0-rc1 inside a Docker container</a>:</p>
+<h3>Essai n°1</h3>
+<p>A partir du "fat" JAR de mon projet 'hubstats' ("fat jar" : archive de code Java qui inclut toutes les dépendances), j'ai lancé la commande <code>native-image</code> de <a href="https://github.com/Danny02/graalvm-docker">GraaVM 1.0.0-rc1 dans un conteneur Docker</a> :</p>
 <div class="highlight"><pre><span></span>native-image <span class="se">\</span>
   -jar hubstats-0.1.0-SNAPSHOT-standalone.jar <span class="se">\</span>
   -H:+ReportUnsupportedElementsAtRuntime <span class="se">\</span>
@@ -143,8 +144,8 @@
 </pre></div>
 
 
-<p>(see the <a href="https://github.com/nicokosi/hubstats/pull/12/files">full details here</a>)</p>
-<p>Bad luck, the native image generation failed:</p>
+<p>(cf. <a href="https://github.com/nicokosi/hubstats/pull/12/files">tous les détails</a>)</p>
+<p>Pas de chance, la génération de l'exécutable échoue :</p>
 <div class="highlight"><pre><span></span>Step 4/15 : RUN native-image   -jar hubstats-0.1.0-SNAPSHOT-standalone.jar   -H:+ReportUnsupportedElementsAtRuntime   hubstats.core
  ---&gt; Running in e7f911774bd4
 Build on Server(pid: 11, port: 26681)*
@@ -190,23 +191,22 @@ Error: Processing image build request failed
 </pre></div>
 
 
-<p>I visibly hit a similar issue than <a href="https://github.com/oracle/graal/issues/385">issue#385</a> and <a href="https://github.com/oracle/graal/issues/375">issue#375</a>. It seems to be related to the <a href="https://github.com/oracle/graal/blob/master/substratevm/LIMITATIONS.md#static-initializers">"static initializers" limitation</a>. 😢</p>
-<h3>Attempt #2</h3>
-<p>Since some fixes were available in <a href="https://github.com/graalvm/">GraalVM's GitHub repository</a>, I tried to build <code>substratevm</code> sub-module from source.</p>
-<ul>
-<li>I grabbed GraalVM's code:</li>
-</ul>
+<p>Le problème ressemble fortement à <a href="https://github.com/oracle/graal/issues/385">issue#385</a> et <a href="https://github.com/oracle/graal/issues/375">issue#375</a>. Si je comprends bien, il est lié à l'une des limitations de GraalVM : <a href="https://github.com/oracle/graal/blob/master/substratevm/LIMITATIONS.md#static-initializers">"static initializers" limitation</a>. 😢</p>
+<h3>Essai n°2</h3>
+<p>Puisque certaines corrections étaient uniquement disponibles dans le <a href="https://github.com/graalvm/">code source de GraalVM</a>, j'ai voulu essayer avec le module <code>substratevm</code>
+(qui inclut la commande 'native-image') construit à partir du code source.</p>
+<p>J'ai donc récupéré le code source de GraalVM :</p>
 <div class="highlight"><pre><span></span>git clone git@github.com:oracle/graal.git
 </pre></div>
 
 
-<p>As stated in <a href="https://github.com/oracle/graal/tree/master/substratevm">substratevm's README file</a>, I downloaded the <a href="http://www.oracle.com/technetwork/oracle-labs/program-languages/downloads/index.html">GraalVM "labs" JDK</a> then I built the 'substratevm' module that includes the 'native-image' command:</p>
+<p>Puis en suivant les <a href="https://github.com/oracle/graal/tree/master/substratevm">indications du module substratevm</a>, j'ai téléchargé le <a href="http://www.oracle.com/technetwork/oracle-labs/program-languages/downloads/index.html">JDK GraalVM "labs"</a> puis j'ai construit le module 'substratevm' :</p>
 <div class="highlight"><pre><span></span><span class="nb">cd</span> substratevm
 <span class="nv">JAVA_HOME</span><span class="o">=</span>~/Downloads/labsjdk1.8.0_161-jvmci-0.42/Contents/Home ../../mx/mx build
 </pre></div>
 
 
-<p>I then launched the 'native-image' command but it "hanged" forever:</p>
+<p>J'ai ensuite lancé la commande 'native-image' qui est malheuresement restée "coincée" :</p>
 <div class="highlight"><pre><span></span>$&gt; JAVA_HOME=~/Downloads/labsjdk1.8.0_161-jvmci-0.42/Contents/Home ../graal/substratevm/native-image -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar hubstats.core
 Build on Server(pid: 18933, port: 55103)*
    classlist:   2,744.32 ms
@@ -215,10 +215,10 @@ Build on Server(pid: 18933, port: 55103)*
 </pre></div>
 
 
-<p>A similar issue has already been reported in GraalVM issues: <a href="https://github.com/oracle/graal/issues/411">"native image failed to build jar</a>. 😭</p>
+<p>Une anomalie similaire à déjà été rapportée : <a href="https://github.com/oracle/graal/issues/411">"native image failed to build jar</a>. 😭</p>
 <h3>Conclusion</h3>
-<p>Obviously, these first attempts were not successful, but GraalVM is a young project and I do not know much about it. Nevertheless, it was fun to discover GraalVM which looks promising! 😍</p>
-<p>I will try again, stay tuned!</p>
+<p>C'est sûr, ces premiers essais ont été infructueux. GraalVM est un projet encore jeune que je ne connais pas vraiment. Néanmoins, ce fut une expérience sympathique de découvrir cet outil prometteur ! 😍</p>
+<p>A refaire sous peu, avec un nouvel article à la clé ?</p>
     </article>
 
         <div class="tags">
@@ -232,8 +232,8 @@ Build on Server(pid: 18933, port: 55103)*
             <div id="disqus_thread"></div>
             <script type="text/javascript">
                 var disqus_shortname = 'nicokosi-blog';
-                var disqus_identifier = 'clojure-goes-native-with-graalvm-en.html';
-                var disqus_url = 'https://nicokosi.github.io/clojure-goes-native-with-graalvm-en.html';
+                var disqus_identifier = 'clojure-goes-native-with-graalvm.html';
+                var disqus_url = 'https://nicokosi.github.io/clojure-goes-native-with-graalvm.html';
                 (function() {
                     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
                     dsq.src = '//nicokosi-blog.disqus.com/embed.js';
