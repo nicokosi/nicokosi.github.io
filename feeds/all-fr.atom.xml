@@ -92,7 +92,7 @@ Compiling void v1.0.2
 &lt;h2&gt;A propos de Rust, le langage&lt;/h2&gt;
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h3&gt;Ownership, gloups ! 😱&lt;/h3&gt;
-&lt;p&gt;Rust gère la mémoire de façon particulière. Au lieu d'utiliser un ramasse-miettes (&lt;em&gt;garbage collector&lt;/em&gt;) comme en Java ou une gestion manuelle comme en C/C++, la mémoire est automatiquement récupérée grâce aux &lt;a href="https://doc.rust-lang.org/book/second-edition/ch04-01-what-is-ownership.html"&gt;règles de d'&lt;em&gt;ownership&lt;/em&gt;&lt;/a&gt; :&lt;/p&gt;
+&lt;p&gt;Rust gère la mémoire de façon particulière. Au lieu d'utiliser un ramasse-miettes (&lt;em&gt;garbage collector&lt;/em&gt;) comme en Java ou une gestion manuelle comme en C/C++, la mémoire est automatiquement récupérée grâce aux &lt;a href="https://doc.rust-lang.org/book/second-edition/ch04-01-what-is-ownership.html"&gt;règles d'&lt;em&gt;ownership&lt;/em&gt;&lt;/a&gt; :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;    Each value in Rust has a variable that’s called its owner.
     There can only be one owner at a time.
     When the owner goes out of scope, the value will be dropped.
