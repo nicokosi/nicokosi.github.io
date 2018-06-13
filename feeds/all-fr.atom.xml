@@ -1,5 +1,280 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all-fr.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2018-05-12T13:00:00+02:00</updated><entry><title>Du Clojure "natif" grâce à GraalVM</title><link href="https://nicokosi.github.io/clojure-goes-native-with-graalvm.html" rel="alternate"></link><published>2018-05-12T13:00:00+02:00</published><updated>2018-05-12T13:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2018-05-12:/clojure-goes-native-with-graalvm.html</id><summary type="html">&lt;p&gt;Générer un programme exécutable natif via GraalVM pour un projet Clojure, 'hubstats'&lt;/p&gt;</summary><content type="html">&lt;h2&gt;GraalVM, qu'est-ce que c'est ?&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all-fr.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2018-06-10T15:00:00+02:00</updated><entry><title>Découvrons Rust</title><link href="https://nicokosi.github.io/discovering-rust.html" rel="alternate"></link><published>2018-06-10T15:00:00+02:00</published><updated>2018-06-10T15:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2018-06-10:/discovering-rust.html</id><summary type="html">&lt;p&gt;Découvrons le langage de programmation Rust en développant un petit projet personnel&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;En tant que développeur.se Java, je veux découvrir Rust, de façon à bien comprendre la phrase suivante citée de &lt;a href="https://www.rust-lang.org"&gt;rust-lang.org&lt;/a&gt;*:&lt;/em&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Rust is a systems programming language that runs blazingly &lt;strong&gt;fast&lt;/strong&gt;, &lt;strong&gt;prevents segfaults&lt;/strong&gt;, and &lt;strong&gt;guarantees thread safety&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;*: avez-vous remarqué le "agile stories meme" ? 😉&lt;/p&gt;
+&lt;h2&gt;Comment j'ai commencé à apprendre Rust&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://doc.rust-lang.org/stable/book/second-edition/"&gt;The Rust Programming Language (2nd edition)&lt;/a&gt; est un chouette un livre en ligne avec des exemples concrets de petits projets implémentés pas-à-pas (un outil en ligne de commande et un serveur web).&lt;/p&gt;
+&lt;p&gt;Après avoir lu partiellement ce livre, j'ai "porté" en Rust un projet personnel nommé &lt;a href="https://github.com/nicokosi/hubstats"&gt;hubstats&lt;/a&gt;. Hubstats est un outil en ligne de commande que j'ai écrit en Clojure, qui utilise une API REST GitHub pour afficher des informations sur les pull requests GitHub dans la sortie standard. J'ai baptisé le projet Rust &lt;a href="https://github.com/nicokosi/pullpito/"&gt;pullpito&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Ce portage a été une façon ludique et facile d'apprendre Rust car je n'ai eu ni à réfléchir au "quoi" (afficher des informations sur le pull requests GitHub), ni au "comment" (appeler l'API GitHub que j'avais déjà utilisée dans le projet existant) : je me suis uniquement foculisé sur l'implémentation en Rust.&lt;/p&gt;
+&lt;h2&gt;Mes premières impressions&lt;/h2&gt;
+&lt;p&gt;Le code Rust, ça &lt;strong&gt;dépote sévère&lt;/strong&gt; ! Comparons par exemple l'exécution des tests unitaires &lt;code&gt;pullpito&lt;/code&gt;, qui se lancent en une demi seconde :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;pullpito $&amp;gt; time (cargo test --quiet)
+
+running 8 tests
+# couic
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+( cargo test --quiet; )  0.43s user 0.21s system 96% cpu 0.665 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Alors que les tests unitaires de &lt;code&gt;hubstats&lt;/code&gt; se lancent en 10 secondes :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;hubstats $&amp;gt; time (lein test)
+# couic
+
+Ran 3 tests containing 20 assertions.
+0 failures, 0 errors.
+( lein test; )  10.86s user 0.70s system 129% cpu 8.923 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;em&gt;Note: la commande &lt;code&gt;cargo&lt;/code&gt; lance &lt;a href="https://github.com/rust-lang/cargo/"&gt;Cargo&lt;/a&gt;, l'outil de build de Rust ; la commande &lt;code&gt;lein&lt;/code&gt; lance &lt;a href="https://leiningen.org/"&gt;Leiningen&lt;/a&gt;, un des outils de build de Clojure.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Comparons désormais les temps d'exécutions des lignes de commande. &lt;code&gt;pullpito&lt;/code&gt; se lance en 20 millisecondes sur ma machine :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;pullpito $&amp;gt; time (cargo run --quiet python/peps)
+pull requests for &amp;quot;python/peps&amp;quot; -&amp;gt;
+  opened per author:
+    brainwane: 1
+  commented per author:
+    the-knights-who-say-ni: 1
+    stevendaprano: 2
+    pradyunsg: 2
+    gvanrossum: 1
+    6502: 1
+    Rosuav: 1
+    brainwane: 1
+  closed per author:
+    markshannon: 1
+
+( cargo run --quiet python/peps; )  0.22s user 0.09s system 20% cpu 1.524 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;...alors que &lt;code&gt;hubstats&lt;/code&gt; prend une dizaine de secondes (oups, un peu d'optimisation serait nécessaire 😇) :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;hubstats $&amp;gt; time (lein run --organization python --repository peps)
+pull requests for python/peps -&amp;gt;
+    since 2018-05-15T05:35:57Z
+        8 opened / 8 closed / 2 commented (15 comments)
+        opened per author:  {encukou 2, willingc 1, jdemeyer 1, gvanrossum 1, ethanhs 1, daxm 1, brainwane 1}
+        comments per author:  {tim-one 4, ethanhs 3, vlasovskikh 2, gvanrossum 2, JelleZijlstra 2, ilevkivskyi 1, Rosuav 1}
+        closed per author:  {brettcannon 4, markshannon 3, encukou 1}
+( lein run --organization python --repository peps; )  11.30s user 0.77s system 66% cpu 18.160 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Qu'en est-il de la &lt;strong&gt;compilation&lt;/strong&gt; ? La première compilation est plus lente car toutes les dépendances doivent également être compilées. Sur ma machine, &lt;code&gt;pullpito&lt;/code&gt; compile en 40 secondes :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;pullpito $&amp;gt; time (cargo clean &amp;amp;&amp;amp; cargo build)
+Compiling void v1.0.2
+   Compiling byteorder v1.2.2
+   Compiling serde v1.0.37
+   Compiling scoped-tls v0.1.
+# snip
+    Finished dev [unoptimized + debuginfo] target(s) in 41.53 secs
+( cargo clean &amp;amp;&amp;amp; cargo build; )  213.99s user 16.77s system 552% cpu 41.788 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Mais le compilateur Rust est incrémental, les compilations suivantes seront plus rapides voire immédiates si le code source ne change pas :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;pullpito $&amp;gt; cargo build
+    Finished dev [unoptimized + debuginfo] target(s) in 0.0 secs
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;De son côté, &lt;code&gt;hubstats&lt;/code&gt; compile en 40 secondes (ses dépendances ne sont pas compilées) :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;hubstats $&amp;gt; time (lein clean &amp;amp;&amp;amp; lein uberjar)
+# couic
+( lein clean &amp;amp;&amp;amp; lein uberjar; )  37.55s user 6.49s system 223% cpu 19.750 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;A propos de Rust, le langage&lt;/h2&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Ownership, gloups ! 😱&lt;/h3&gt;
+&lt;p&gt;Rust gère la mémoire de façon particulière. Au lieu d'utiliser un ramasse-miettes (&lt;em&gt;garbage collector&lt;/em&gt;) comme en Java ou une gestion manuelle comme en C/C++, la mémoire est automatiquement récupérée grâce aux &lt;a href="https://doc.rust-lang.org/book/second-edition/ch04-01-what-is-ownership.html"&gt;règles de d'&lt;em&gt;ownership&lt;/em&gt;&lt;/a&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;    Each value in Rust has a variable that’s called its owner.
+    There can only be one owner at a time.
+    When the owner goes out of scope, the value will be dropped.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Cela semble facile, mais ça l'est beaucoup moins en réalité.&lt;/p&gt;
+&lt;p&gt;N'ayant pas encore bien compris les implications du concept d'ownership, je n'irai pas plus loin sur ce sujet. Ma compréhension actuelle se limite à corriger toutes les erreurs de compilation liées aux violation des ces règles ! 😇&lt;/p&gt;
+&lt;p&gt;Pour plus de précisions, lire le chapitre &lt;a href="https://doc.rust-lang.org/book/second-edition/ch04-00-understanding-ownership.html"&gt;"Understanding Ownership"&lt;/a&gt; de "The Rust Programming Language".&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Immuable, par défaut 😎&lt;/h3&gt;
+&lt;p&gt;Les variables sont immuables, par défaut. Elles ne peuvent pas être ré-assignées à moins d'être explicitement déclarées &lt;em&gt;mutables&lt;/em&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;foo&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="c1"&gt;// name = &amp;quot;bar&amp;quot;; // Générerait l&amp;#39;erreur de compilation &amp;quot;error: re-assignment of immutable variable&amp;quot;&lt;/span&gt;
+
+&lt;span class="kd"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;mut&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;changing_name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;bar&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="n"&gt;changing_name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;baz&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Néanmoins, les variables immuables peut être surchargées (&lt;em&gt;shadowed&lt;/em&gt;) :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;foo&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="kd"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;bar&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;// &amp;quot;shadowed variable&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Inférence de type 😎&lt;/h3&gt;
+&lt;p&gt;L'inférence de type est bien sympathique et simplifie le code :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;// le type peut être inféré :&lt;/span&gt;
+&lt;span class="kd"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;foo&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;to_string&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="c1"&gt;// ou bien spécifié :&lt;/span&gt;
+&lt;span class="kd"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;foo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;: &lt;span class="nb"&gt;String&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;foo&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;to_string&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Filtrage par motif (&lt;em&gt;pattern matching&lt;/em&gt;) 😎&lt;/h3&gt;
+&lt;p&gt;On peut utiliser le pattern matching au lieu de if/else... et c'est cool !&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kd"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;body&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;match&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;body&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;Ok&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;body&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;body&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb"&gt;Err&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;_&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;default&amp;quot;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Par contre, le fait que les variables soient "empruntées" (&lt;em&gt;variable borrowing&lt;/em&gt;) semble rendre le pattern matching plus dur à utiliser que dans d'autres langages (comme Scala). Se référer à &lt;a href="https://stackoverflow.com/questions/29926724/matching-string-cannot-move-out-of-borrowed-content"&gt;ce fil Stack Overflow&lt;/a&gt;. Note personnelle : creuser ce sujet.&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Tuples, énumérations et structures 😎&lt;/h3&gt;
+&lt;p&gt;Rust permet d'utiliser des tuples, des énumérations et des structures de données :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#![allow(dead_code)]&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="cp"&gt;#[derive(Debug)]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;enum&lt;/span&gt; &lt;span class="nc"&gt;Suite&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;CLUB&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;DIAMOND&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;HEART&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;SPADE&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="cp"&gt;#[derive(Debug)]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;enum&lt;/span&gt; &lt;span class="nc"&gt;Rank&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;Ace&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;King&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Queen&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Jack&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+
+&lt;span class="cp"&gt;#[derive(Debug)]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;struct&lt;/span&gt; &lt;span class="nc"&gt;Card&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;suite&lt;/span&gt;: &lt;span class="nc"&gt;Suite&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;rank&lt;/span&gt;: &lt;span class="nc"&gt;Rank&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Testons cela avec le REPL &lt;code&gt;rusti&lt;/code&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;rusti&lt;/span&gt;&lt;span class="o"&gt;=&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Card&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;suite&lt;/span&gt;: &lt;span class="nc"&gt;Suite&lt;/span&gt;::&lt;span class="n"&gt;CLUB&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;rank&lt;/span&gt;: &lt;span class="nc"&gt;Rank&lt;/span&gt;::&lt;span class="n"&gt;King&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="n"&gt;Card&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;suite&lt;/span&gt;: &lt;span class="nc"&gt;CLUB&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;rank&lt;/span&gt;: &lt;span class="nc"&gt;King&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h2&gt;Outillage&lt;/h2&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Pas de REPL (avec un support complet de Rust) 😢&lt;/h3&gt;
+&lt;p&gt;Il n'y a pas de REPL (Read Eval Print Loop) officiel. C'est bien dommage !&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/murarth/rusti"&gt;rusti&lt;/a&gt; peut dépanner mais est limité et ne supporte pas toutes les évolutions récentes du langage.&lt;/p&gt;
+&lt;p&gt;Les REPL en ligne comme &lt;a href="https://repl.it/site/languages/rust"&gt;repl.it&lt;/a&gt; peuvent se révéler utiles, même s'ils sont limités (par exemple, on ne peut pas toujours y importer des dépendances externes appelées &lt;code&gt;crates&lt;/code&gt;).&lt;/p&gt;
+&lt;h3&gt;Gestion des dépendances (descripteur &lt;code&gt;Cargo.toml&lt;/code&gt;) avec gestion sémantique (&lt;em&gt;semantic versioning&lt;/em&gt;) 😎&lt;/h3&gt;
+&lt;p&gt;Chaque dépendance binaires (appelée &lt;code&gt;crate&lt;/code&gt;) :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;a un descripteur &lt;a href="https://semver.org/"&gt;versionné "sémantiquement"&lt;/a&gt;. Par exemple, la version de pullpito est 0.1.0, comme indiqué dans le descripteur &lt;code&gt;Cargo.toml&lt;/code&gt; :&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;pullpito $&amp;gt; grep &amp;quot;^version =&amp;quot; Cargo.toml
+version = &amp;quot;0.1.0&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;ul&gt;
+&lt;li&gt;déclare la version des ses dépendances :&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;pullpito $&amp;gt; grep -A 10 &amp;quot;dependencies&amp;quot; Cargo.toml
+[dependencies]
+log = &amp;quot;0.4&amp;quot;
+env_logger = &amp;quot;0.5&amp;quot;
+futures = &amp;quot;0.1&amp;quot;
+serde = &amp;quot;1.0&amp;quot;
+serde_json = &amp;quot;1.0&amp;quot;
+serde_derive = &amp;quot;1.0&amp;quot;
+chrono = { version = &amp;quot;0.4&amp;quot;, features = [&amp;quot;serde&amp;quot;] }
+reqwest = &amp;quot;0.8&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Cool et concis, non ?&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Formattage du code 😎&lt;/h3&gt;
+&lt;p&gt;&lt;a href="https://github.com/rust-lang-nursery/rustfmt"&gt;rustfmt&lt;/a&gt; est l'outil standard pour formater le code en utilisant un style par défaut :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;pullpito $&amp;gt; cat src/main.rs
+fn main() {
+  println! (&amp;quot;foo&amp;quot;);
+ let bar = &amp;quot;bar&amp;quot;;
+}
+
+pullpito $&amp;gt; cargo fmt
+
+pullpito $&amp;gt; cat src/main.rs
+fn main() {
+    println!(&amp;quot;foo&amp;quot;);
+    let bar = &amp;quot;bar&amp;quot;;
+}
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Plus de guerre du style "tabulation / espace" ! Cf. &lt;a href="https://xkcd.com/1285/"&gt;https://xkcd.com/1285/&lt;/a&gt;!&lt;/p&gt;
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Compilateur "user-friendly" (souvent) 😎&lt;/h3&gt;
+&lt;p&gt;En cas d'erreur, le compilateur Rust compiler fait souvent des suggestions "amicales". Par exemple :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="cp"&gt;#[derive(Debug)]&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;enum&lt;/span&gt; &lt;span class="nc"&gt;Suite&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;CLUB&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="k"&gt;fn&lt;/span&gt; &lt;span class="nf"&gt;main&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="n"&gt;println&lt;/span&gt;&lt;span class="o"&gt;!&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;{:?}&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Suite&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CLUB&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;génère l'erreur suivante :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;error[E0423]: expected value, found enum `Suite`
+ --&amp;gt; src/main.rs:5:22
+  |
+5 |     println!(&amp;quot;{:?}&amp;quot;, Suite.CLUB);
+  |                      ^^^^^
+  |
+  = note: did you mean to use one of the following variants?
+          - `Suite::CLUB`
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;br/&gt;&lt;/p&gt;
+&lt;h3&gt;Outillage multi-version 😎&lt;/h3&gt;
+&lt;p&gt;Rust a trois canaux de mise à jour (&lt;em&gt;release channels&lt;/em&gt;): stable, beta, et nightly. On peut en utiliser un ou plusieurs. Par exemple, si un projet nécessite le "stable toolchain", un autre peut avoir besoin du "nightly". Dans ce cas, on utilise la commande &lt;code&gt;rustup&lt;/code&gt; pour installer et utiliser ces deux versions.&lt;/p&gt;
+&lt;p&gt;Par exemple, installons le toolchain "nightly" :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$&amp;gt; rustup install nightly
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Il y a maintenant deux toolchains : &lt;code&gt;stable&lt;/code&gt; (celui par défaut) and &lt;code&gt;nightly&lt;/code&gt; :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$&amp;gt; rustup show
+Default host: x86_64-apple-darwin
+
+installed toolchains
+--------------------
+
+stable-x86_64-apple-darwin
+nightly-x86_64-apple-darwin
+
+active toolchain
+----------------
+
+stable-x86_64-apple-darwin (default)
+rustc 1.25.0 (84203cac6 2018-03-25)
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;On peut ensuite :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;changer le toolchain par défaut via &lt;code&gt;rustup default&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;activer un toolchain via &lt;code&gt;rustup set&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;utiliser un toolchain à la demande via &lt;code&gt;rustup run $toolchain $cmd&lt;/code&gt; (exemple : &lt;code&gt;rustup run nightly cargo build&lt;/code&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;etc.&lt;/p&gt;</content><category term="rust"></category></entry><entry><title>Du Clojure "natif" grâce à GraalVM</title><link href="https://nicokosi.github.io/clojure-goes-native-with-graalvm.html" rel="alternate"></link><published>2018-05-12T13:00:00+02:00</published><updated>2018-05-12T13:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2018-05-12:/clojure-goes-native-with-graalvm.html</id><summary type="html">&lt;p&gt;Générer un programme exécutable natif via GraalVM pour un projet Clojure, 'hubstats'&lt;/p&gt;</summary><content type="html">&lt;h2&gt;GraalVM, qu'est-ce que c'est ?&lt;/h2&gt;
 &lt;p&gt;&lt;a href="http://www.graalvm.org/"&gt;GraalVM&lt;/a&gt; est une machine virtuelle multi-langages : Java, autres langages de la machine virtuelle Java (Scala, Groovy, Kotlin etc.), JavaScript, LLVM, Ruby et R.&lt;/p&gt;
 &lt;p&gt;GraalVM permet également de générer des exécutables natifs à partir du code Java :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;For JVM-based languages, GraalVM offers a mechanism to create precompiled native images with instant start up and low memory footprint.
