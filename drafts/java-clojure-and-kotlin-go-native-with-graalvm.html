@@ -259,7 +259,7 @@ Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
 
 
 <p>Nous pourrions corriger ça en adaptant le code source. Par facilité, essayons le mode <code>fallback</code> ("solution de repli") de Native Image qui permet de contourner les limitations en embarquant une JVM classique :</p>
-<div class="highlight"><pre><span></span>$ <span class="c1"># Contruction de l&#39;exécutable avec GraalVM</span>
+<div class="highlight"><pre><span></span>$ <span class="c1"># Construction de l&#39;exécutable avec GraalVM</span>
 <span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
    --enable-https <span class="se">\</span>
    --force-fallback <span class="se">\</span>
