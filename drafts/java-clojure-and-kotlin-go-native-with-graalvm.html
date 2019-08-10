@@ -136,7 +136,7 @@
 </ul>
 <h2>Exécutable optimisé pour une application "WordCount" <code>Java</code></h2>
 <p>Notre "hello world" est un programme Java de 10 lignes qui compte le nombre de mots d'un fichier de texte : <a href="https://github.com/nicokosi/wordcount-with-java-stream">wordcount-with-java-stream</a>.</p>
-<p>Générons un JAR exécutable via Maven et OpenJDK, cela prend 2 secondes sur ma machine ⚡ :</p>
+<p>Générons un JAR exécutable via Maven et OpenJDK, cela prend 2 secondes sur ma machine :</p>
 <div class="highlight"><pre><span></span>$ sdk use java <span class="m">8</span>.0.222.hs-adpt
 Using java version <span class="m">8</span>.0.222.hs-adpt in this shell.
 $ <span class="nb">time</span> ./mvnw clean --quiet compile
@@ -144,7 +144,7 @@ $ <span class="nb">time</span> ./mvnw clean --quiet compile
 </pre></div>
 
 
-<p>Puis générons l'exécutable via GraalVM native-image, cela prendre 40 secondes sur ma machine 🐌 :</p>
+<p>Puis générons l'exécutable via GraalVM native-image, cela prend 40 secondes sur ma machine :</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
      --enable-https <span class="se">\</span>
      --no-fallback <span class="se">\</span>
@@ -155,7 +155,7 @@ $ <span class="nb">time</span> ./mvnw clean --quiet compile
 </pre></div>
 
 
-<p>Comparons les temps d'exécution pour un petit fichier d'entrée :</p>
+<p>Comparons les temps d'exécution pour un petit fichier d'entrée.</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">alias</span> <span class="nv">wordcount_java</span><span class="o">=</span><span class="s2">&quot; </span><span class="nv">$HOME</span><span class="s2">/.sdkman/candidates/java/8.0.222.hs-adpt/bin/java -cp target/classes org.nicokosi.WordCount&quot;</span>
 $ <span class="nb">time</span> wordcount_java /etc/hosts
 File /etc/hosts contains <span class="m">26</span> words
@@ -163,6 +163,7 @@ File /etc/hosts contains <span class="m">26</span> words
 </pre></div>
 
 
+<p>Note : le temps d'exécution indiqué par la commande <code>time</code> se trouve à la fin de la dernière ligne, en millisecondes : <code>0,118 total</code> signifie 118 millisecondes.</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">time</span> ./wordcount-with-java-stream /etc/hosts
 File /etc/hosts contains <span class="m">26</span> words
 ./wordcount-with-java-stream /etc/hosts  <span class="m">0</span>,00s user <span class="m">0</span>,01s system <span class="m">92</span>% cpu <span class="m">0</span>,007 total
@@ -189,8 +190,8 @@ File /etc/hosts contains <span class="m">26</span> words
 
 <p>Pour résumer, au prix d'un temps de compilation plus long (40 secondes au lieu de 2 secondes), GraalVM :</p>
 <ul>
-<li>accélère l'exécution "courte" (7 millisecondes au lieu de 118 millisecondes)</li>
-<li>réduit l'empreinte mémoire de notre application (10 kilooctets au lieu de 34 mégaoctets)</li>
+<li>accélère l'exécution "courte" : 7 millisecondes au lieu de 118 millisecondes ;</li>
+<li>réduit l'empreinte mémoire de notre application : 10 kilooctets au lieu de 34 mégaoctets.</li>
 </ul>
 <h2>Exécutable optimisé pour une application <code>Kotlin</code></h2>
 <p>Faisant la même chose pour une application <a href="https://kotlinlang.org/"><code>Kotlin</code></a> un peu plus complexe, <a href="https://github.com/nicokosi/pullpitoK/">pullpitoK</a> (200 lignes de codes avec des librairies tierces) qui consomme les API GitHub pour afficher des statistiques sur les pull requests GitHub.</p>
@@ -249,7 +250,7 @@ Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
 </pre></div>
 
 
-<p>La compilation native échoue 💥. Voici un extrait du message d'erreur :</p>
+<p>La compilation native échoue. Voici un extrait du message d'erreur :</p>
 <div class="highlight"><pre><span></span><span class="nv">Error</span>: <span class="nv">Unsupported</span> <span class="nv">features</span> <span class="nv">in</span> <span class="mi">4</span> <span class="nv">methods</span>
 <span class="nv">Detailed</span> <span class="nv">message</span>:
 <span class="nv">Error</span>: <span class="nv">Unsupported</span> <span class="nv">type</span> <span class="nv">java</span>.<span class="nv">lang</span>.<span class="nv">invoke</span>.<span class="nv">MemberName</span> <span class="nv">is</span> <span class="nv">reachable</span>: <span class="nv">All</span> <span class="nv">methods</span> <span class="nv">from</span> <span class="nv">java</span>.<span class="nv">lang</span>.<span class="nv">invoke</span> <span class="nv">should</span> <span class="nv">have</span> <span class="nv">been</span> <span class="nv">replaced</span> <span class="nv">during</span> <span class="nv">image</span> <span class="nv">building</span>.
