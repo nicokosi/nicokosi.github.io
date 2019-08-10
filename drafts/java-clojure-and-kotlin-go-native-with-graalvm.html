@@ -180,6 +180,7 @@ File /etc/hosts contains <span class="m">26</span> words
 </pre></div>
 
 
+<p>Note : la mémoire totale allouée est à la fin de la dernière ligne ; <code>406,386,571 bytes allocated</code> signifie que 406 mégaoctets ont été alloués.</p>
 <div class="highlight"><pre><span></span>$ valgrind ./wordcount-with-java-stream /etc/hosts
 
 <span class="o">==</span><span class="nv">23753</span><span class="o">==</span> HEAP SUMMARY:
@@ -230,6 +231,7 @@ Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
 <span class="o">==</span><span class="nv">27690</span><span class="o">==</span> HEAP SUMMARY:
 <span class="o">==</span><span class="nv">27690</span><span class="o">==</span>     in use at exit: <span class="m">228</span> bytes in <span class="m">1</span> <span class="nv">blocks</span>
 <span class="o">==</span><span class="nv">27690</span><span class="o">==</span>   total heap usage: <span class="m">6</span> allocs, <span class="m">5</span> frees, <span class="m">2</span>,196 bytes allocated
+...
 </pre></div>
 
 
