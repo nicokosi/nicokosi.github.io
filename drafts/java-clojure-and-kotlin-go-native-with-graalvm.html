@@ -144,8 +144,8 @@ $ <span class="nb">time</span> ./mvnw clean --quiet compile
 </pre></div>
 
 
-<p>Note : le temps d'exécution indiqué par la commande <code>time</code> se trouve à la fin de la dernière ligne, en millisecondes : <code>2.022 total</code> signifie 2002 millisecondes soit 2 secondes.</p>
-<p>Puis générons l'exécutable via GraalVM native-image, cela prend 42 secondes sur ma machine :</p>
+<p>Note : le temps d'exécution indiqué par la commande <code>time</code> se trouve à la fin de la dernière ligne, en millisecondes : <code>2.022 total</code> signifie 2,002 millisecondes.</p>
+<p>Puis générons l'exécutable via GraalVM native-image, cela prend 40 secondes sur ma machine :</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
      --enable-https <span class="se">\</span>
      --no-fallback <span class="se">\</span>
@@ -192,7 +192,7 @@ File /etc/hosts contains <span class="m">26</span> words
 <p>Pour résumer, au prix d'un temps de compilation plus long (40 secondes au lieu de 2 secondes), GraalVM :</p>
 <ul>
 <li>accélère l'exécution "courte" : 7 millisecondes au lieu de 118 millisecondes ;</li>
-<li>réduit l'empreinte mémoire de notre application : 12 kilooctets au lieu de 34 mégaoctets.</li>
+<li>réduit l'empreinte mémoire de notre application : 10 kilooctets au lieu de 34 mégaoctets.</li>
 </ul>
 <h2>Exécutable optimisé pour une application <code>Kotlin</code></h2>
 <p>Faisant la même chose pour une application <a href="https://kotlinlang.org/">Kotlin</a> un peu plus complexe, <a href="https://github.com/nicokosi/pullpitoK/">pullpitoK</a> (200 lignes de codes avec des librairies tierces) qui consomme les API GitHub pour afficher des statistiques sur les pull requests GitHub.</p>
@@ -235,7 +235,7 @@ Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
 </pre></div>
 
 
-<p>Soit 2 kilooctets avec la version native contre 33 mégaoctets pour la version JVM.</p>
+<p>Soit 12 kilooctets avec la version native contre 32 mégaoctets pour la version JVM.</p>
 <h2>Exécutable <em>moins optimisé</em> pour une application <code>Clojure</code></h2>
 <p>Dans mon billet <a href="https://nicokosi.github.io/clojure-goes-native-with-graalvm.html">Du Clojure "natif" grâce à GraalVM</a>, je me suis heurté à deux problèmes :</p>
 <ul>
@@ -316,12 +316,7 @@ Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
 
 
 <h2>Conclusion</h2>
-<p>Au travers de ces trois petites applications utilisant des langages différents (Java, Kotlin et Clojure), nous avons pu vérifier les bénéfices des exécutables "images natives GraalVM" :</p>
-<ul>
-<li>avoir un <strong>exécutable compact</strong> déployable sans <em>Java Virtual Machine</em></li>
-<li>une <strong>consommation mémoire réduite</strong></li>
-<li>un <strong>démarrage rapide</strong> (parfois !)</li>
-</ul>
+<p>Au travers de ces trois petites applications utilisant des langages différents (Java, Kotlin et Clojure), nous avons pu vérifier le double intérêt des images natives : avoir un <strong>exécutable compact</strong> déployable sans Java Virtual Machine et bénéficier d'une <strong>consommation mémoire réduite</strong> et (parfois !) d'un <strong>démarrage rapide</strong>.</p>
 <p>De plus, on pressent l'intérêt qu'aura GraalVM pour moderniser Java, en particulier pour un usage en <strong><em>cloud-computing</em></strong> et pour les <strong>microservices</strong>. Se référencer aux frameworks tels <a href="https://quarkus.io/">Quarkus</a> et <a href="https://micronaut.io/">Micronaut</a>.</p>
 <p>A tester ultérieurement :</p>
 <ul>
