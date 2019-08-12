@@ -144,8 +144,8 @@ $ <span class="nb">time</span> ./mvnw clean --quiet compile
 </pre></div>
 
 
-<p>Note : le temps d'exécution indiqué par la commande <code>time</code> se trouve à la fin de la dernière ligne, en millisecondes : <code>2.022 total</code> signifie 2,002 millisecondes.</p>
-<p>Puis générons l'exécutable via GraalVM native-image, cela prend 40 secondes sur ma machine :</p>
+<p>Note : le temps d'exécution indiqué par la commande <code>time</code> se trouve à la fin de la dernière ligne, en millisecondes : <code>2.022 total</code> signifie 2002 millisecondes soit 2 secondes.</p>
+<p>Puis générons l'exécutable via GraalVM native-image, cela prend 42 secondes sur ma machine :</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
      --enable-https <span class="se">\</span>
      --no-fallback <span class="se">\</span>
@@ -192,7 +192,7 @@ File /etc/hosts contains <span class="m">26</span> words
 <p>Pour résumer, au prix d'un temps de compilation plus long (40 secondes au lieu de 2 secondes), GraalVM :</p>
 <ul>
 <li>accélère l'exécution "courte" : 7 millisecondes au lieu de 118 millisecondes ;</li>
-<li>réduit l'empreinte mémoire de notre application : 10 kilooctets au lieu de 34 mégaoctets.</li>
+<li>réduit l'empreinte mémoire de notre application : 12 kilooctets au lieu de 34 mégaoctets.</li>
 </ul>
 <h2>Exécutable optimisé pour une application <code>Kotlin</code></h2>
 <p>Faisant la même chose pour une application <a href="https://kotlinlang.org/">Kotlin</a> un peu plus complexe, <a href="https://github.com/nicokosi/pullpitoK/">pullpitoK</a> (200 lignes de codes avec des librairies tierces) qui consomme les API GitHub pour afficher des statistiques sur les pull requests GitHub.</p>
