@@ -125,7 +125,7 @@
 <li>Conclusion</li>
 </ol>
 <h2>Introduction</h2>
-<p>Suite à mes premiers essais infructueux l'an dernier (lire mon article précédent <a href="https://nicokosi.github.io/clojure-goes-native-with-graalvm.html">Du Clojure "natif" grâce à GraalVM</a>), voici un compte rendu plus positif de mes expérimentations avec les versions <em>release</em> de <a href="https://www.graalvm.org/">GraalVM</a> sorties à partir de mai 2019 (cf. les <a href="https://www.graalvm.org/docs/release-notes/"><em>release notes</em></a>).</p>
+<p>Suite à mes premiers essais infructueux l'an dernier (lire mon article précédent <a href="https://nicokosi.github.io/clojure-goes-native-with-graalvm.html">Du Clojure "natif" grâce à GraalVM</a>), voici un compte rendu plus positif de mes expérimentations avec les versions <em>release</em> de <a href="https://www.graalvm.org/">GraalVM</a> sorties à partir de mai 2019 (cf. les <a href="https://www.graalvm.org/docs/release-notes/"><em>release notes</em></a>), en utilisant des applications en ligne de commandes implémentée en <a href="https://go.java/">Java</a>, <a href="https://kotlinlang.org/">Kotlin</a> et <a href="https://clojure.org/">Clojure</a>.</p>
 <h2>Outillage</h2>
 <p>Nous utiliserons les outils suivants :</p>
 <ul>
@@ -195,7 +195,7 @@ File /etc/hosts contains <span class="m">26</span> words
 <li>réduit l'empreinte mémoire de notre application : 10 kilooctets au lieu de 34 mégaoctets.</li>
 </ul>
 <h2>Exécutable optimisé pour une application <code>Kotlin</code></h2>
-<p>Faisant la même chose pour une application <a href="https://kotlinlang.org/"><code>Kotlin</code></a> un peu plus complexe, <a href="https://github.com/nicokosi/pullpitoK/">pullpitoK</a> (200 lignes de codes avec des librairies tierces) qui consomme les API GitHub pour afficher des statistiques sur les pull requests GitHub.</p>
+<p>Faisant la même chose pour une application <a href="https://kotlinlang.org/">Kotlin</a> un peu plus complexe, <a href="https://github.com/nicokosi/pullpitoK/">pullpitoK</a> (200 lignes de codes avec des librairies tierces) qui consomme les API GitHub pour afficher des statistiques sur les pull requests GitHub.</p>
 <p>La différence de temps de construction étant similaire au paragraphe précédent, concentrons-nous sur la comparaison du temps de démarrage pour une exécution rapide (affichage de l'aide souvent appelée <a href="https://en.wikipedia.org/wiki/Usage_message">"usage message"</a>) :</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt/bin:<span class="nv">$PATH</span>
 $ <span class="nb">time</span> <span class="o">(</span>java -jar ./build/libs/pullpitoK-all.jar <span class="p">|</span> head -1<span class="o">)</span>
@@ -316,12 +316,12 @@ Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
 
 
 <h2>Conclusion</h2>
-<p>Au travers de ces trois petites applications utilisant des langages différents (<code>Java</code>, <code>Kotlin</code>, <code>Clojure</code>), nous avons pu vérifier le double intérêt des images natives : avoir un <strong>exécutable compact</strong> déployable sans Java Virtual Machine et bénéficier d'une <strong>consommation mémoire réduite</strong> et (parfois !) d'un <strong>démarrage rapide</strong>.</p>
+<p>Au travers de ces trois petites applications utilisant des langages différents (Java, Kotlin et Clojure), nous avons pu vérifier le double intérêt des images natives : avoir un <strong>exécutable compact</strong> déployable sans Java Virtual Machine et bénéficier d'une <strong>consommation mémoire réduite</strong> et (parfois !) d'un <strong>démarrage rapide</strong>.</p>
 <p>De plus, on pressent l'intérêt qu'aura GraalVM pour moderniser Java, en particulier pour un usage en <strong><em>cloud-computing</em></strong> et pour les <strong>microservices</strong>. Se référencer aux frameworks tels <a href="https://quarkus.io/">Quarkus</a> et <a href="https://micronaut.io/">Micronaut</a>.</p>
 <p>A  tester ultérieurement :</p>
 <ul>
 <li>la gestion de la mémoire par le ramasse-miettes (<em>garbage collector</em>)</li>
-<li>la différence entre la version gratuite et les versions <em>Community Edition</em> et <em>Enterprise Edition</em>.</li>
+<li>la différence entre les versions <em>Community Edition</em> et <em>Enterprise Edition</em>.</li>
 </ul>
     </article>
 
