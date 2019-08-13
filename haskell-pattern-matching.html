@@ -102,8 +102,8 @@
                                 <a href="https://nicokosi.github.io/author/nicolas-kosinski.html">Nicolas Kosinski</a>
                              on 2016-09-27
                         </span>
-                        Translations: 
-<a href="https://nicokosi.github.io/haskell-pattern-matching-en.html">en</a>
+                        Translations:
+<a href="https://nicokosi.github.io/haskell-pattern-matching-en.html" hreflang="en">en</a>
 
                     </div>
                 </div>
@@ -210,8 +210,8 @@ Remarque : le compilateur sait détecter un pattern matching non exhaustif. Par 
 
 
 <p>Exemple d'appel :</p>
-<div class="highlight"><pre><span></span>*Main&gt; couleur(Coeur)
-&quot;rouge&quot;
+<div class="highlight"><pre><span></span><span class="o">*</span><span class="n">Main</span><span class="o">&gt;</span> <span class="n">couleur</span><span class="p">(</span><span class="n">Coeur</span><span class="p">)</span>
+<span class="ss">&quot;rouge&quot;</span>
 </pre></div>
 
 
@@ -240,18 +240,18 @@ Remarque : le compilateur sait détecter un pattern matching non exhaustif. Par 
 
 
 <p>Exemples d'appel :</p>
-<div class="highlight"><pre><span></span>*Main&gt; :{
-*Main| mêmeEnseigne (
-*Main|     Carte {rang=R1, enseigne=Carreau},
-*Main|     Carte {rang=R1, enseigne=Coeur} )
-*Main| :}
-False
-*Main&gt; :{
-*Main| mêmeEnseigne (
-*Main|     Carte {rang=Valet, enseigne=Coeur},
-*Main|     Carte {rang=R1, enseigne=Coeur} )
-*Main| :}
-True
+<div class="highlight"><pre><span></span><span class="o">*</span><span class="n">Main</span><span class="o">&gt;</span> <span class="p">:</span><span class="err">{</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span> <span class="n">m</span><span class="err">ê</span><span class="n">meEnseigne</span> <span class="p">(</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span>     <span class="n">Carte</span> <span class="err">{</span><span class="n">rang</span><span class="o">=</span><span class="n">R1</span><span class="p">,</span> <span class="n">enseigne</span><span class="o">=</span><span class="n">Carreau</span><span class="err">}</span><span class="p">,</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span>     <span class="n">Carte</span> <span class="err">{</span><span class="n">rang</span><span class="o">=</span><span class="n">R1</span><span class="p">,</span> <span class="n">enseigne</span><span class="o">=</span><span class="n">Coeur</span><span class="err">}</span> <span class="p">)</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span> <span class="p">:</span><span class="err">}</span>
+<span class="k">False</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">&gt;</span> <span class="p">:</span><span class="err">{</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span> <span class="n">m</span><span class="err">ê</span><span class="n">meEnseigne</span> <span class="p">(</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span>     <span class="n">Carte</span> <span class="err">{</span><span class="n">rang</span><span class="o">=</span><span class="n">Valet</span><span class="p">,</span> <span class="n">enseigne</span><span class="o">=</span><span class="n">Coeur</span><span class="err">}</span><span class="p">,</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span>     <span class="n">Carte</span> <span class="err">{</span><span class="n">rang</span><span class="o">=</span><span class="n">R1</span><span class="p">,</span> <span class="n">enseigne</span><span class="o">=</span><span class="n">Coeur</span><span class="err">}</span> <span class="p">)</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span> <span class="p">:</span><span class="err">}</span>
+<span class="k">True</span>
 </pre></div>
 
 

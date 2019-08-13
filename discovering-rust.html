@@ -101,8 +101,8 @@
                                 <a href="https://nicokosi.github.io/author/nicolas-kosinski.html">Nicolas Kosinski</a>
                              on 2018-06-10
                         </span>
-                        Translations: 
-<a href="https://nicokosi.github.io/discovering-rust-en.html">en</a>
+                        Translations:
+<a href="https://nicokosi.github.io/discovering-rust-en.html" hreflang="en">en</a>
 
                     </div>
                 </div>
@@ -210,9 +210,9 @@ Compiling void v1.0.2
 <p><br/></p>
 <h3>Ownership, gloups ! 😱</h3>
 <p>Rust gère la mémoire de façon particulière. Au lieu d'utiliser un ramasse-miettes (<em>garbage collector</em>) comme en Java ou une gestion manuelle comme en C/C++, la mémoire est automatiquement récupérée grâce aux <a href="https://doc.rust-lang.org/book/second-edition/ch04-01-what-is-ownership.html">règles d'<em>ownership</em></a> :</p>
-<div class="highlight"><pre><span></span>    Each value in Rust has a variable that’s called its owner.
-    There can only be one owner at a time.
-    When the owner goes out of scope, the value will be dropped.
+<div class="highlight"><pre><span></span>    <span class="k">Each</span> <span class="n">value</span> <span class="k">in</span> <span class="n">Rust</span> <span class="n">has</span> <span class="n">a</span> <span class="k">variable</span> <span class="n">that</span><span class="err">’</span><span class="n">s</span> <span class="k">called</span> <span class="n">its</span> <span class="k">owner</span><span class="p">.</span>
+    <span class="n">There</span> <span class="n">can</span> <span class="k">only</span> <span class="n">be</span> <span class="n">one</span> <span class="k">owner</span> <span class="k">at</span> <span class="n">a</span> <span class="n">time</span><span class="p">.</span>
+    <span class="k">When</span> <span class="n">the</span> <span class="k">owner</span> <span class="n">goes</span> <span class="k">out</span> <span class="k">of</span> <span class="k">scope</span><span class="p">,</span> <span class="n">the</span> <span class="n">value</span> <span class="n">will</span> <span class="n">be</span> <span class="n">dropped</span><span class="p">.</span>
 </pre></div>
 
 

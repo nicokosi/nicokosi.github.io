@@ -101,8 +101,8 @@
                                 <a href="https://nicokosi.github.io/author/nicolas-kosinski.html">Nicolas Kosinski</a>
                              on 2017-04-14
                         </span>
-                        Translations: 
-<a href="https://nicokosi.github.io/creating-strava-charts-with-r.html">fr</a>
+                        Translations:
+<a href="https://nicokosi.github.io/creating-strava-charts-with-r.html" hreflang="fr">fr</a>
 
                     </div>
                 </div>
@@ -127,32 +127,32 @@
 </ol>
 <p><br/>
 R has many additional libraries that are available on "CRAN repository". The following statements import the libraries I have selected:</p>
-<div class="highlight"><pre><span></span><span class="kn">library</span><span class="p">(</span>rjson<span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>httr<span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>scales<span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">rjson</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">httr</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">ggplot2</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">scales</span><span class="p">)</span>
 </pre></div>
 
 
 <p><br/></p>
 <h3>1. Retrieve data via Strava API</h3>
 <p>The following code calls the <a href="http://strava.github.io/api/v3/activities/">Strava API for activities</a> with an authorization token to retrieve the 200 last activities (run/ride/swim), as a JSON string (<code>characters</code>):</p>
-<div class="highlight"><pre><span></span>token <span class="o">&lt;-</span> <span class="kp">readline</span><span class="p">(</span>prompt<span class="o">=</span><span class="s">&quot;Enter Strava access token: &quot;</span><span class="p">)</span>
-activities <span class="o">&lt;-</span> GET<span class="p">(</span><span class="s">&quot;https://www.strava.com/&quot;</span><span class="p">,</span> path <span class="o">=</span> <span class="s">&quot;api/v3/activities&quot;</span><span class="p">,</span>
-                  query <span class="o">=</span> <span class="kt">list</span><span class="p">(</span>access_token <span class="o">=</span> token<span class="p">,</span> per_page <span class="o">=</span> <span class="m">200</span><span class="p">))</span>
-activities <span class="o">&lt;-</span> content<span class="p">(</span>activities<span class="p">,</span> <span class="s">&quot;text&quot;</span><span class="p">)</span> <span class="c1"># Retrieve JSON content as string</span>
+<div class="highlight"><pre><span></span><span class="n">token</span> <span class="o">&lt;-</span> <span class="nf">readline</span><span class="p">(</span><span class="n">prompt</span><span class="o">=</span><span class="s">&quot;Enter Strava access token: &quot;</span><span class="p">)</span>
+<span class="n">activities</span> <span class="o">&lt;-</span> <span class="nf">GET</span><span class="p">(</span><span class="s">&quot;https://www.strava.com/&quot;</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="s">&quot;api/v3/activities&quot;</span><span class="p">,</span>
+                  <span class="n">query</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">access_token</span> <span class="o">=</span> <span class="n">token</span><span class="p">,</span> <span class="n">per_page</span> <span class="o">=</span> <span class="m">200</span><span class="p">))</span>
+<span class="n">activities</span> <span class="o">&lt;-</span> <span class="nf">content</span><span class="p">(</span><span class="n">activities</span><span class="p">,</span> <span class="s">&quot;text&quot;</span><span class="p">)</span> <span class="c1"># Retrieve JSON content as string</span>
 </pre></div>
 
 
 <p><br/></p>
 <h3>2. Transform data</h3>
 <p>We then need to transform our JSON content into tabular data, called <code>dataframes</code>:</p>
-<div class="highlight"><pre><span></span>activities <span class="o">&lt;-</span> fromJSON<span class="p">(</span>activities<span class="p">)</span>      <span class="c1"># Transform JSON content into lists</span>
-activities <span class="o">&lt;-</span> <span class="kp">lapply</span><span class="p">(</span>activities<span class="p">,</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">)</span> <span class="p">{</span>      <span class="c1"># Apply an anonymous function on each list elements</span>
-  x<span class="p">[</span><span class="kp">sapply</span><span class="p">(</span>x<span class="p">,</span> <span class="kp">is.null</span><span class="p">)]</span> <span class="o">&lt;-</span> <span class="kc">NA</span>           <span class="c1"># Replace nulls by &quot;missing&quot; (N/A)</span>
-  <span class="kp">unlist</span><span class="p">(</span>x<span class="p">)</span>
+<div class="highlight"><pre><span></span><span class="n">activities</span> <span class="o">&lt;-</span> <span class="nf">fromJSON</span><span class="p">(</span><span class="n">activities</span><span class="p">)</span>      <span class="c1"># Transform JSON content into lists</span>
+<span class="n">activities</span> <span class="o">&lt;-</span> <span class="nf">lapply</span><span class="p">(</span><span class="n">activities</span><span class="p">,</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span>      <span class="c1"># Apply an anonymous function on each list elements</span>
+  <span class="n">x</span><span class="nf">[sapply</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">is.null</span><span class="p">)</span><span class="n">]</span> <span class="o">&lt;-</span> <span class="kc">NA</span>           <span class="c1"># Replace nulls by &quot;missing&quot; (N/A)</span>
+  <span class="nf">unlist</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 <span class="p">})</span>
-df <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p">(</span><span class="kp">do.call</span><span class="p">(</span><span class="s">&quot;rbind&quot;</span><span class="p">,</span> activities<span class="p">))</span>
+<span class="n">df</span> <span class="o">&lt;-</span> <span class="nf">data.frame</span><span class="p">(</span><span class="nf">do.call</span><span class="p">(</span><span class="s">&quot;rbind&quot;</span><span class="p">,</span> <span class="n">activities</span><span class="p">))</span>
 </pre></div>
 
 
@@ -164,10 +164,10 @@ df <span class="o">&lt;-</span> <span class="kt">data.frame</span><span class="p
 </ul>
 <p>Distances and durations can be converted:</p>
 <div class="highlight"><pre><span></span><span class="c1"># Convert durations into minutes (Strava API returns seconds):</span>
-df<span class="o">$</span>moving_time <span class="o">&lt;-</span> <span class="kp">as.numeric</span><span class="p">(</span><span class="kp">as.character</span><span class="p">(</span>df<span class="o">$</span>moving_time<span class="p">))</span> <span class="o">/</span> <span class="m">60</span>
+<span class="n">df</span><span class="o">$</span><span class="n">moving_time</span> <span class="o">&lt;-</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="nf">as.character</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">moving_time</span><span class="p">))</span> <span class="o">/</span> <span class="m">60</span>
 
 <span class="c1"># Convert distances into kilometers (Strava API returns meters):</span>
-df<span class="o">$</span>distance <span class="o">&lt;-</span> <span class="kp">as.numeric</span><span class="p">(</span><span class="kp">as.character</span><span class="p">(</span>df<span class="o">$</span>distance<span class="p">))</span> <span class="o">/</span> <span class="m">1000</span>
+<span class="n">df</span><span class="o">$</span><span class="n">distance</span> <span class="o">&lt;-</span> <span class="nf">as.numeric</span><span class="p">(</span><span class="nf">as.character</span><span class="p">(</span><span class="n">df</span><span class="o">$</span><span class="n">distance</span><span class="p">))</span> <span class="o">/</span> <span class="m">1000</span>
 </pre></div>
 
 
@@ -175,12 +175,12 @@ df<span class="o">$</span>distance <span class="o">&lt;-</span> <span class="kp"
 <p><br/></p>
 <h3>3. Display a chart</h3>
 <p>The final step consists in using the <code>ggplot2</code> library to display a chart for "distance and moving time" and export it as a PNG image:</p>
-<div class="highlight"><pre><span></span>  ggplot<span class="p">(</span>df<span class="p">,</span> aes<span class="p">(</span>x<span class="o">=</span>distance<span class="p">,</span> y<span class="o">=</span>moving_time<span class="p">))</span> <span class="o">+</span>
-    geom_point<span class="p">(</span>size<span class="o">=</span><span class="m">1</span><span class="p">,</span> colour<span class="o">=</span><span class="s">&quot;#CC0000&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="c1"># red points</span>
-    geom_smooth<span class="p">(</span>method<span class="o">=</span>lm<span class="p">)</span> <span class="o">+</span> <span class="c1"># add a line for linear regression</span>
-    xlab<span class="p">(</span><span class="s">&quot;distance per activity (kilometers)&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="c1"># X label</span>
-    ylab<span class="p">(</span><span class="s">&quot;moving time (minutes)&quot;</span><span class="p">)</span> <span class="c1"># Y label</span>
-  ggsave<span class="p">(</span><span class="s">&quot;/tmp/moving-time.png&quot;</span><span class="p">)</span> <span class="c1"># save in a PNG file</span>
+<div class="highlight"><pre><span></span>  <span class="nf">ggplot</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">distance</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">moving_time</span><span class="p">))</span> <span class="o">+</span>
+    <span class="nf">geom_point</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="m">1</span><span class="p">,</span> <span class="n">colour</span><span class="o">=</span><span class="s">&quot;#CC0000&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="c1"># red points</span>
+    <span class="nf">geom_smooth</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="n">lm</span><span class="p">)</span> <span class="o">+</span> <span class="c1"># add a line for linear regression</span>
+    <span class="nf">xlab</span><span class="p">(</span><span class="s">&quot;distance per activity (kilometers)&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="c1"># X label</span>
+    <span class="nf">ylab</span><span class="p">(</span><span class="s">&quot;moving time (minutes)&quot;</span><span class="p">)</span> <span class="c1"># Y label</span>
+  <span class="nf">ggsave</span><span class="p">(</span><span class="s">&quot;/tmp/moving-time.png&quot;</span><span class="p">)</span> <span class="c1"># save in a PNG file</span>
 </pre></div>
 
 

@@ -1,5 +1,223 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog - Nicolas Kosinski</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/nicolas-kosinski.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2018-06-10T15:00:00+02:00</updated><entry><title>Découvrons Rust</title><link href="https://nicokosi.github.io/discovering-rust.html" rel="alternate"></link><published>2018-06-10T15:00:00+02:00</published><updated>2018-06-10T15:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2018-06-10:/discovering-rust.html</id><summary type="html">&lt;p&gt;Découvrons le langage de programmation Rust en développant un petit projet personnel&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;En tant que développeur.se Java, je veux découvrir Rust, de façon à bien comprendre la phrase suivante citée de &lt;a href="https://www.rust-lang.org"&gt;rust-lang.org&lt;/a&gt;*:&lt;/em&gt;&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog - Nicolas Kosinski</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/nicolas-kosinski.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2019-08-13T00:00:00+02:00</updated><subtitle>#SoftwareDevelopment #WhatElse?;-)</subtitle><entry><title>Du code Java/Kotlin/Clojure "natif" grâce à GraalVM</title><link href="https://nicokosi.github.io/java-clojure-and-kotlin-go-native-with-graalvm.html" rel="alternate"></link><published>2019-08-13T00:00:00+02:00</published><updated>2019-08-13T00:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2019-08-13:/java-clojure-and-kotlin-go-native-with-graalvm.html</id><summary type="html">&lt;p&gt;Générer des exécutables natifs via GraalVM pour des outils en ligne de commande implémentés en Java, Kotlin ou Clojure&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="https://v4.chriskrycho.com/2018/assumed-audiences.html"&gt;Audience présumée&lt;/a&gt; : développeurs.euses intéressés.ées par l'écosystème Java et plus particulièrement sur l'amélioration des performances et la génération d'exécutables.&lt;/p&gt;
+&lt;p&gt;Plan :&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Introduction&lt;/li&gt;
+&lt;li&gt;Outils utilisés&lt;/li&gt;
+&lt;li&gt;Exécutable optimisé pour une application "WordCount" &lt;code&gt;Java&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Exécutable optimisé pour une application &lt;code&gt;Kotlin&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Exécutable moins optimisé pour une application &lt;code&gt;Clojure&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Conclusion&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;Suite à mes premiers essais infructueux l'an dernier (lire mon article précédent &lt;a href="https://nicokosi.github.io/clojure-goes-native-with-graalvm.html"&gt;Du Clojure "natif" grâce à GraalVM&lt;/a&gt;), voici un compte rendu plus positif de mes expérimentations avec les versions &lt;em&gt;release&lt;/em&gt; de &lt;a href="https://www.graalvm.org/"&gt;GraalVM&lt;/a&gt; sorties à partir de mai 2019 (cf. les &lt;a href="https://www.graalvm.org/docs/release-notes/"&gt;&lt;em&gt;release notes&lt;/em&gt;&lt;/a&gt;), en utilisant des applications en ligne de commandes implémentée en &lt;a href="https://go.java/"&gt;Java&lt;/a&gt;, &lt;a href="https://kotlinlang.org/"&gt;Kotlin&lt;/a&gt; et &lt;a href="https://clojure.org/"&gt;Clojure&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Outillage&lt;/h2&gt;
+&lt;p&gt;Nous utiliserons les outils suivants :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://www.graalvm.org/downloads/"&gt;GraalVM Community Edition&lt;/a&gt; ("&lt;em&gt;a High-performance polyglot VM&lt;/em&gt;") et plus particulièrement la fonctionnalité &lt;a href="https://www.graalvm.org/docs/getting-started/#native-images"&gt;Native Image&lt;/a&gt; via la commande &lt;code&gt;native-image&lt;/code&gt; pour générer des exécutables à partir de &lt;em&gt;bytecode&lt;/em&gt; JVM.&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://sdkman.io/"&gt;SDKMAN!&lt;/a&gt; ("&lt;em&gt;The Software Development Kit Manager&lt;/em&gt;") pour installer / utiliser des versions différentes du &lt;em&gt;Java Development Kit&lt;/em&gt; / &lt;em&gt;Java Runtime Environment&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://manpages.ubuntu.com/manpages/cosmic/en/man1/time.1.html"&gt;time&lt;/a&gt; ("&lt;em&gt;run programs and summarize system resource usage&lt;/em&gt;") pour mesurer le temps d'exécution&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://valgrind.org/"&gt;valgrind&lt;/a&gt; ("&lt;em&gt;tool for memory debugging, memory leak detection, and profiling&lt;/em&gt;") pour évaluer l'empreinte mémoire des processus&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Exécutable optimisé pour une application "WordCount" &lt;code&gt;Java&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;Notre "hello world" est un programme Java de 10 lignes qui compte le nombre de mots d'un fichier de texte : &lt;a href="https://github.com/nicokosi/wordcount-with-java-stream"&gt;wordcount-with-java-stream&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Générons un JAR exécutable via Maven et OpenJDK, cela prend 2 secondes sur ma machine :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ sdk use java &lt;span class="m"&gt;8&lt;/span&gt;.0.222.hs-adpt
+Using java version &lt;span class="m"&gt;8&lt;/span&gt;.0.222.hs-adpt in this shell.
+$ &lt;span class="nb"&gt;time&lt;/span&gt; ./mvnw clean --quiet compile
+./mvnw clean --quiet compile  &lt;span class="m"&gt;6&lt;/span&gt;.24s user &lt;span class="m"&gt;0&lt;/span&gt;.31s system &lt;span class="m"&gt;323&lt;/span&gt;% cpu &lt;span class="m"&gt;2&lt;/span&gt;.022 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note : le temps d'exécution indiqué par la commande &lt;code&gt;time&lt;/code&gt; se trouve à la fin de la dernière ligne, en secondes : &lt;code&gt;2.022 total&lt;/code&gt; pour 2,022 secondes.&lt;/p&gt;
+&lt;p&gt;Puis générons l'exécutable via GraalVM native-image, cela prend 42 secondes sur ma machine :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;time&lt;/span&gt; &lt;span class="nv"&gt;$HOME&lt;/span&gt;/.sdkman/candidates/java/19.1.1-grl/bin/native-image &lt;span class="se"&gt;\&lt;/span&gt;
+     --enable-https &lt;span class="se"&gt;\&lt;/span&gt;
+     --no-fallback &lt;span class="se"&gt;\&lt;/span&gt;
+     --no-server &lt;span class="se"&gt;\&lt;/span&gt;
+     -cp target/classes org.nicokosi.WordCount &lt;span class="se"&gt;\&lt;/span&gt;
+     wordcount-with-java-stream
+&lt;span class="nv"&gt;$HOME&lt;/span&gt;/.sdkman/candidates/java/19.1.1-grl/bin/native-image --enable-https   -c  &lt;span class="m"&gt;236&lt;/span&gt;,70s user &lt;span class="m"&gt;2&lt;/span&gt;,75s system &lt;span class="m"&gt;566&lt;/span&gt;% cpu &lt;span class="m"&gt;42&lt;/span&gt;,285 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Comparons les temps d'exécution pour un petit fichier d'entrée.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;alias&lt;/span&gt; &lt;span class="nv"&gt;wordcount_java&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot; &lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;&lt;span class="s2"&gt;/.sdkman/candidates/java/8.0.222.hs-adpt/bin/java -cp target/classes org.nicokosi.WordCount&amp;quot;&lt;/span&gt;
+$ &lt;span class="nb"&gt;time&lt;/span&gt; wordcount_java /etc/hosts
+File /etc/hosts contains &lt;span class="m"&gt;26&lt;/span&gt; words
+/home/nkosinski/.sdkman/candidates/java/8.0.222.hs-adpt/bin/java -cp     &lt;span class="m"&gt;0&lt;/span&gt;,16s user &lt;span class="m"&gt;0&lt;/span&gt;,02s system &lt;span class="m"&gt;152&lt;/span&gt;% cpu &lt;span class="m"&gt;0&lt;/span&gt;,118 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;time&lt;/span&gt; ./wordcount-with-java-stream /etc/hosts
+File /etc/hosts contains &lt;span class="m"&gt;26&lt;/span&gt; words
+./wordcount-with-java-stream /etc/hosts  &lt;span class="m"&gt;0&lt;/span&gt;,00s user &lt;span class="m"&gt;0&lt;/span&gt;,01s system &lt;span class="m"&gt;92&lt;/span&gt;% cpu &lt;span class="m"&gt;0&lt;/span&gt;,007 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Puis comparons l'empreinte mémoire :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nv"&gt;JAVA_HOME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;/.sdkman/candidates/java/8.0.222.hs-adpt &lt;span class="se"&gt;\&lt;/span&gt;
+  valgrind java -cp target/classes org.nicokosi.WordCount /etc/hosts
+
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;23352&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt; HEAP SUMMARY:
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;23352&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;     in use at exit: &lt;span class="m"&gt;34&lt;/span&gt;,892,297 bytes in &lt;span class="m"&gt;6&lt;/span&gt;,155 &lt;span class="nv"&gt;blocks&lt;/span&gt;
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;23352&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;   total heap usage: &lt;span class="m"&gt;14&lt;/span&gt;,555 allocs, &lt;span class="m"&gt;8&lt;/span&gt;,400 frees, &lt;span class="m"&gt;49&lt;/span&gt;,960,719 bytes allocated  **
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Note : la mémoire totale allouée est à la fin de la dernière ligne ; &lt;code&gt;49,960,719 bytes allocated&lt;/code&gt; signifie qu'environ 50 mégaoctets ont été alloués.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ valgrind ./wordcount-with-java-stream /etc/hosts
+
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;23753&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt; HEAP SUMMARY:
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;23753&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;     in use at exit: &lt;span class="m"&gt;10&lt;/span&gt;,468 bytes in &lt;span class="m"&gt;3&lt;/span&gt; &lt;span class="nv"&gt;blocks&lt;/span&gt;
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;23753&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;   total heap usage: &lt;span class="m"&gt;8&lt;/span&gt; allocs, &lt;span class="m"&gt;5&lt;/span&gt; frees, &lt;span class="m"&gt;12&lt;/span&gt;,436 bytes allocated**
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Pour résumer, au prix d'un temps de compilation plus long (42 secondes au lieu de 2 secondes), GraalVM :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;accélère l'exécution "courte" : 7 millisecondes au lieu de 118 millisecondes ;&lt;/li&gt;
+&lt;li&gt;réduit l'empreinte mémoire de notre application : 12 kilooctets au lieu de 50 mégaoctets.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Exécutable optimisé pour une application &lt;code&gt;Kotlin&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;Faisons la même chose pour une application &lt;a href="https://kotlinlang.org/"&gt;Kotlin&lt;/a&gt; un peu plus complexe, &lt;a href="https://github.com/nicokosi/pullpitoK/"&gt;pullpitoK&lt;/a&gt; (200 lignes de codes avec des librairies tierces) qui consomme les API GitHub pour afficher des statistiques sur les pull requests GitHub.&lt;/p&gt;
+&lt;p&gt;La différence de temps de construction étant similaire au paragraphe précédent, concentrons-nous sur la comparaison du temps de démarrage pour une exécution rapide (affichage de l'aide souvent appelée &lt;a href="https://en.wikipedia.org/wiki/Usage_message"&gt;"usage message"&lt;/a&gt;) :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;/.sdkman/candidates/java/8.0.222.hs-adpt/bin:&lt;span class="nv"&gt;$PATH&lt;/span&gt;
+$ &lt;span class="nb"&gt;time&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;java -jar ./build/libs/pullpitoK-all.jar &lt;span class="p"&gt;|&lt;/span&gt; head -1&lt;span class="o"&gt;)&lt;/span&gt;
+Usage: pullpitoK &amp;lt;repository&amp;gt; &amp;lt;token&amp;gt;
+&lt;span class="o"&gt;(&lt;/span&gt; java -jar ./build/libs/pullpitoK-all.jar &lt;span class="p"&gt;|&lt;/span&gt; head -1&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;)&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;.08s user &lt;span class="m"&gt;0&lt;/span&gt;.02s system &lt;span class="m"&gt;108&lt;/span&gt;% cpu &lt;span class="m"&gt;0&lt;/span&gt;.093 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;alias&lt;/span&gt; &lt;span class="nv"&gt;pullpitoK&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;PULLPITOK_LIBSUNEC=&lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;&lt;span class="s2"&gt;/.sdkman/candidates/java/19.1.1-grl/jre/lib ./pullpitoK&amp;quot;&lt;/span&gt;
+$ &lt;span class="nb"&gt;time&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;pullpitoK --help &lt;span class="p"&gt;|&lt;/span&gt; head -1&lt;span class="o"&gt;)&lt;/span&gt;
+Usage: pullpitoK &amp;lt;repository&amp;gt; &amp;lt;token&amp;gt;
+&lt;span class="o"&gt;(&lt;/span&gt; &lt;span class="nv"&gt;PULLPITOK_LIBSUNEC&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;/Users/nicolas/.sdkman/candidates/java/19.1.1-grl/jre/li&lt;span class="o"&gt;)&lt;/span&gt;  &lt;span class="m"&gt;0&lt;/span&gt;.00s user &lt;span class="m"&gt;0&lt;/span&gt;.00s system &lt;span class="m"&gt;88&lt;/span&gt;% cpu &lt;span class="m"&gt;0&lt;/span&gt;.009 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Soit 9 millisecondes avec la version native contre 93 millisecondes pour la version JVM.&lt;/p&gt;
+&lt;p&gt;Comparons maintenant l'empreinte mémoire :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ valgrind java -jar ./build/libs/pullpitoK-all.jar
+...
+Usage: pullpitoK &amp;lt;repository&amp;gt; &amp;lt;token&amp;gt;
+...
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;26273&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt; HEAP SUMMARY:
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;26273&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;     in use at exit: &lt;span class="m"&gt;32&lt;/span&gt;,181,758 bytes in &lt;span class="m"&gt;2&lt;/span&gt;,134 &lt;span class="nv"&gt;blocks&lt;/span&gt;
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;26273&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;   total heap usage: &lt;span class="m"&gt;5&lt;/span&gt;,725 allocs, &lt;span class="m"&gt;3&lt;/span&gt;,591 frees, &lt;span class="m"&gt;33&lt;/span&gt;,187,784 bytes allocated
+...
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ valgrind pullpitoK &lt;span class="p"&gt;|&lt;/span&gt; head -1
+...
+Usage: pullpitoK &amp;lt;repository&amp;gt; &amp;lt;token&amp;gt;
+...
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;27690&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt; HEAP SUMMARY:
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;27690&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;     in use at exit: &lt;span class="m"&gt;228&lt;/span&gt; bytes in &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="nv"&gt;blocks&lt;/span&gt;
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;27690&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;   total heap usage: &lt;span class="m"&gt;6&lt;/span&gt; allocs, &lt;span class="m"&gt;5&lt;/span&gt; frees, &lt;span class="m"&gt;2&lt;/span&gt;,196 bytes allocated
+...
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Soit 2 kilooctets avec la version native contre 33 mégaoctets pour la version JVM.&lt;/p&gt;
+&lt;h2&gt;Exécutable &lt;em&gt;moins optimisé&lt;/em&gt; pour une application &lt;code&gt;Clojure&lt;/code&gt;&lt;/h2&gt;
+&lt;p&gt;Dans mon billet &lt;a href="https://nicokosi.github.io/clojure-goes-native-with-graalvm.html"&gt;Du Clojure "natif" grâce à GraalVM&lt;/a&gt;, je me suis heurté à deux problèmes :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;GraalVM était encore expérimental (&lt;em&gt;release candidates&lt;/em&gt;) à l'époque&lt;/li&gt;
+&lt;li&gt;l'outil Native Image possède des &lt;a href="https://github.com/oracle/graal/blob/master/substratevm/LIMITATIONS.md"&gt;limitations&lt;/a&gt; qui concernent notamment le chargement de classes dynamiques, l'utilisation de la réflexion (API java.lang.reflect) etc.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Essayons de refaire l'essai avec une version &lt;em&gt;release&lt;/em&gt; de GraalVM pour l'application &lt;a href="https://github.com/nicokosi/hubstats/"&gt;hubstats&lt;/a&gt; (200 lignes de codes, utilisation de librairies tierces pour appeler les API HTTP GitHub).&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;time&lt;/span&gt; &lt;span class="nv"&gt;$HOME&lt;/span&gt;/.sdkman/candidates/java/19.1.1-grl/bin/native-image &lt;span class="se"&gt;\&lt;/span&gt;
+   --enable-https &lt;span class="se"&gt;\&lt;/span&gt;
+   --no-fallback &lt;span class="se"&gt;\&lt;/span&gt;
+   --no-server &lt;span class="se"&gt;\&lt;/span&gt;
+   -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar &lt;span class="se"&gt;\&lt;/span&gt;
+   hubstats
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;La compilation native échoue. Voici un extrait du message d'erreur :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;Error&lt;/span&gt;: &lt;span class="nv"&gt;Unsupported&lt;/span&gt; &lt;span class="nv"&gt;features&lt;/span&gt; &lt;span class="nv"&gt;in&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt; &lt;span class="nv"&gt;methods&lt;/span&gt;
+&lt;span class="nv"&gt;Detailed&lt;/span&gt; &lt;span class="nv"&gt;message&lt;/span&gt;:
+&lt;span class="nv"&gt;Error&lt;/span&gt;: &lt;span class="nv"&gt;Unsupported&lt;/span&gt; &lt;span class="nv"&gt;type&lt;/span&gt; &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;lang&lt;/span&gt;.&lt;span class="nv"&gt;invoke&lt;/span&gt;.&lt;span class="nv"&gt;MemberName&lt;/span&gt; &lt;span class="nv"&gt;is&lt;/span&gt; &lt;span class="nv"&gt;reachable&lt;/span&gt;: &lt;span class="nv"&gt;All&lt;/span&gt; &lt;span class="nv"&gt;methods&lt;/span&gt; &lt;span class="nv"&gt;from&lt;/span&gt; &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;lang&lt;/span&gt;.&lt;span class="nv"&gt;invoke&lt;/span&gt; &lt;span class="nv"&gt;should&lt;/span&gt; &lt;span class="nv"&gt;have&lt;/span&gt; &lt;span class="nv"&gt;been&lt;/span&gt; &lt;span class="nv"&gt;replaced&lt;/span&gt; &lt;span class="nv"&gt;during&lt;/span&gt; &lt;span class="nv"&gt;image&lt;/span&gt; &lt;span class="nv"&gt;building&lt;/span&gt;.
+&lt;span class="nv"&gt;To&lt;/span&gt; &lt;span class="nv"&gt;diagnose&lt;/span&gt; &lt;span class="nv"&gt;the&lt;/span&gt; &lt;span class="nv"&gt;issue&lt;/span&gt;, &lt;span class="nv"&gt;you&lt;/span&gt; &lt;span class="nv"&gt;can&lt;/span&gt; &lt;span class="nv"&gt;add&lt;/span&gt; &lt;span class="nv"&gt;the&lt;/span&gt; &lt;span class="nv"&gt;option&lt;/span&gt; &lt;span class="o"&gt;--&lt;/span&gt;&lt;span class="nv"&gt;report&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;unsupported&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;elements&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;at&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;runtime&lt;/span&gt;. &lt;span class="nv"&gt;The&lt;/span&gt; &lt;span class="nv"&gt;unsupported&lt;/span&gt; &lt;span class="nv"&gt;element&lt;/span&gt; &lt;span class="nv"&gt;is&lt;/span&gt; &lt;span class="k"&gt;then&lt;/span&gt; &lt;span class="nv"&gt;reported&lt;/span&gt; &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;run&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt; &lt;span class="nv"&gt;when&lt;/span&gt; &lt;span class="nv"&gt;it&lt;/span&gt; &lt;span class="nv"&gt;is&lt;/span&gt; &lt;span class="nv"&gt;accessed&lt;/span&gt; &lt;span class="nv"&gt;the&lt;/span&gt; &lt;span class="nv"&gt;first&lt;/span&gt; &lt;span class="nv"&gt;time&lt;/span&gt;.
+...
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Nous pourrions corriger ça en adaptant le code source. Par facilité, essayons le mode &lt;code&gt;fallback&lt;/code&gt; ("solution de repli") de Native Image qui permet de contourner les limitations en embarquant une JVM classique :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="c1"&gt;# Construction de l&amp;#39;exécutable avec GraalVM&lt;/span&gt;
+&lt;span class="nb"&gt;time&lt;/span&gt; &lt;span class="nv"&gt;$HOME&lt;/span&gt;/.sdkman/candidates/java/19.1.1-grl/bin/native-image &lt;span class="se"&gt;\&lt;/span&gt;
+   --enable-https &lt;span class="se"&gt;\&lt;/span&gt;
+   --force-fallback &lt;span class="se"&gt;\&lt;/span&gt;
+   --no-server &lt;span class="se"&gt;\&lt;/span&gt;
+   -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar &lt;span class="se"&gt;\&lt;/span&gt;
+   hubstats
+...
+&lt;span class="o"&gt;[&lt;/span&gt;hubstats:31661&lt;span class="o"&gt;]&lt;/span&gt;      &lt;span class="o"&gt;[&lt;/span&gt;total&lt;span class="o"&gt;]&lt;/span&gt;:  &lt;span class="m"&gt;14&lt;/span&gt;,663.95 ms
+Warning: Image &lt;span class="s1"&gt;&amp;#39;hubstats&amp;#39;&lt;/span&gt; is a fallback image that requires a JDK &lt;span class="k"&gt;for&lt;/span&gt; execution &lt;span class="o"&gt;(&lt;/span&gt;use --no-fallback to suppress fallback image generation&lt;span class="o"&gt;)&lt;/span&gt;.
+&lt;span class="nv"&gt;$HOME&lt;/span&gt;/.sdkman/candidates/java/19.1.1-grl/bin/native-image --enable-https       &lt;span class="m"&gt;78&lt;/span&gt;,73s user &lt;span class="m"&gt;1&lt;/span&gt;,31s system &lt;span class="m"&gt;536&lt;/span&gt;% cpu &lt;span class="m"&gt;14&lt;/span&gt;,926 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Etant donné que le mode fallback est utilisé, les temps de démarrage sont maintenant similaires :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;/.sdkman/candidates/java/8.0.222.hs-adpt/bin:&lt;span class="nv"&gt;$PATH&lt;/span&gt;
+$ &lt;span class="nb"&gt;time&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;java -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar &lt;span class="p"&gt;|&lt;/span&gt; head -1&lt;span class="o"&gt;)&lt;/span&gt;
+Display statistics &lt;span class="k"&gt;for&lt;/span&gt; GitHub pull requests.
+&lt;span class="o"&gt;(&lt;/span&gt; java -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar &lt;span class="p"&gt;|&lt;/span&gt; head -1&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;)&lt;/span&gt;  &lt;span class="m"&gt;3&lt;/span&gt;,36s user &lt;span class="m"&gt;0&lt;/span&gt;,10s system &lt;span class="m"&gt;262&lt;/span&gt;% cpu &lt;span class="m"&gt;1&lt;/span&gt;,318 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;time&lt;/span&gt; &lt;span class="o"&gt;(&lt;/span&gt;./hubstats &lt;span class="p"&gt;|&lt;/span&gt; head -1&lt;span class="o"&gt;)&lt;/span&gt;
+
+Display statistics &lt;span class="k"&gt;for&lt;/span&gt; GitHub pull requests.
+&lt;span class="o"&gt;(&lt;/span&gt; ./hubstats &lt;span class="p"&gt;|&lt;/span&gt; head -1&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="o"&gt;)&lt;/span&gt;  &lt;span class="m"&gt;2&lt;/span&gt;,86s user &lt;span class="m"&gt;0&lt;/span&gt;,14s system &lt;span class="m"&gt;236&lt;/span&gt;% cpu &lt;span class="m"&gt;1&lt;/span&gt;,272 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;mais l'empreinte mémoire est énormément réduite :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;export&lt;/span&gt; &lt;span class="nv"&gt;PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;/.sdkman/candidates/java/8.0.222.hs-adpt/bin:&lt;span class="nv"&gt;$PATH&lt;/span&gt;
+$ valgrind java -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar
+...
+Display statistics &lt;span class="k"&gt;for&lt;/span&gt; GitHub pull requests.
+...
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;2690&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt; HEAP SUMMARY:
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;2690&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;     in use at exit: &lt;span class="m"&gt;38&lt;/span&gt;,656,326 bytes in &lt;span class="m"&gt;34&lt;/span&gt;,800 &lt;span class="nv"&gt;blocks&lt;/span&gt;
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;2690&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;   total heap usage: &lt;span class="m"&gt;170&lt;/span&gt;,569 allocs, &lt;span class="m"&gt;135&lt;/span&gt;,769 frees, &lt;span class="m"&gt;406&lt;/span&gt;,386,571 bytes allocated
+...
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ valgrind pullpitoK
+...
+Usage: pullpitoK &amp;lt;repository&amp;gt; &amp;lt;token&amp;gt;
+...
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;5747&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt; HEAP SUMMARY:
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;5747&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;     in use at exit: &lt;span class="m"&gt;228&lt;/span&gt; bytes in &lt;span class="m"&gt;1&lt;/span&gt; &lt;span class="nv"&gt;blocks&lt;/span&gt;
+&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="nv"&gt;5747&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;   total heap usage: &lt;span class="m"&gt;6&lt;/span&gt; allocs, &lt;span class="m"&gt;5&lt;/span&gt; frees, &lt;span class="m"&gt;2&lt;/span&gt;,196 bytes allocated
+...
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;Au travers de ces trois petites applications utilisant des langages différents (Java, Kotlin et Clojure), nous avons pu vérifier les bénéfices des exécutables "images natives GraalVM" :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;avoir un &lt;strong&gt;exécutable compact&lt;/strong&gt; déployable sans &lt;em&gt;Java Virtual Machine&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;une &lt;strong&gt;consommation mémoire réduite&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;un &lt;strong&gt;démarrage rapide&lt;/strong&gt; (parfois !)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;De plus, on pressent l'intérêt qu'aura GraalVM pour moderniser Java, en particulier pour un usage en &lt;strong&gt;&lt;em&gt;cloud-computing&lt;/em&gt;&lt;/strong&gt; et pour les &lt;strong&gt;microservices&lt;/strong&gt;. Se référencer aux frameworks tels &lt;a href="https://quarkus.io/"&gt;Quarkus&lt;/a&gt; et &lt;a href="https://micronaut.io/"&gt;Micronaut&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;A tester ultérieurement :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;la gestion de la mémoire par le ramasse-miettes (&lt;em&gt;garbage collector&lt;/em&gt;)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;la différence entre les versions &lt;em&gt;Community Edition&lt;/em&gt; et &lt;em&gt;Enterprise Edition&lt;/em&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;PS : merci à mes collègues de &lt;a href="http://www.vidalfrance.com/"&gt;Vidal&lt;/a&gt;, notamment à Viviane, Marc et Jean-Christophe pour les échanges intéressants sur GraalVM et à Stéphane pour la relecture de cet article.&lt;/p&gt;</content><category term="java clojure kotlin native graalvm jvm"></category></entry><entry><title>Découvrons Rust</title><link href="https://nicokosi.github.io/discovering-rust.html" rel="alternate"></link><published>2018-06-10T15:00:00+02:00</published><updated>2018-06-10T15:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2018-06-10:/discovering-rust.html</id><summary type="html">&lt;p&gt;Découvrons le langage de programmation Rust en développant un petit projet personnel&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;En tant que développeur.se Java, je veux découvrir Rust, de façon à bien comprendre la phrase suivante citée de &lt;a href="https://www.rust-lang.org"&gt;rust-lang.org&lt;/a&gt;*:&lt;/em&gt;&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Rust is a systems programming language that runs blazingly &lt;strong&gt;fast&lt;/strong&gt;, &lt;strong&gt;prevents segfaults&lt;/strong&gt;, and &lt;strong&gt;guarantees thread safety&lt;/strong&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -93,9 +311,9 @@ Compiling void v1.0.2
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h3&gt;Ownership, gloups ! 😱&lt;/h3&gt;
 &lt;p&gt;Rust gère la mémoire de façon particulière. Au lieu d'utiliser un ramasse-miettes (&lt;em&gt;garbage collector&lt;/em&gt;) comme en Java ou une gestion manuelle comme en C/C++, la mémoire est automatiquement récupérée grâce aux &lt;a href="https://doc.rust-lang.org/book/second-edition/ch04-01-what-is-ownership.html"&gt;règles d'&lt;em&gt;ownership&lt;/em&gt;&lt;/a&gt; :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;    Each value in Rust has a variable that’s called its owner.
-    There can only be one owner at a time.
-    When the owner goes out of scope, the value will be dropped.
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;    &lt;span class="k"&gt;Each&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="n"&gt;Rust&lt;/span&gt; &lt;span class="n"&gt;has&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="k"&gt;variable&lt;/span&gt; &lt;span class="n"&gt;that&lt;/span&gt;&lt;span class="err"&gt;’&lt;/span&gt;&lt;span class="n"&gt;s&lt;/span&gt; &lt;span class="k"&gt;called&lt;/span&gt; &lt;span class="n"&gt;its&lt;/span&gt; &lt;span class="k"&gt;owner&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+    &lt;span class="n"&gt;There&lt;/span&gt; &lt;span class="n"&gt;can&lt;/span&gt; &lt;span class="k"&gt;only&lt;/span&gt; &lt;span class="n"&gt;be&lt;/span&gt; &lt;span class="n"&gt;one&lt;/span&gt; &lt;span class="k"&gt;owner&lt;/span&gt; &lt;span class="k"&gt;at&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="n"&gt;time&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
+    &lt;span class="k"&gt;When&lt;/span&gt; &lt;span class="n"&gt;the&lt;/span&gt; &lt;span class="k"&gt;owner&lt;/span&gt; &lt;span class="n"&gt;goes&lt;/span&gt; &lt;span class="k"&gt;out&lt;/span&gt; &lt;span class="k"&gt;of&lt;/span&gt; &lt;span class="k"&gt;scope&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;the&lt;/span&gt; &lt;span class="n"&gt;value&lt;/span&gt; &lt;span class="n"&gt;will&lt;/span&gt; &lt;span class="n"&gt;be&lt;/span&gt; &lt;span class="n"&gt;dropped&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -277,7 +495,7 @@ rustc 1.25.0 (84203cac6 2018-03-25)
 &lt;p&gt;etc.&lt;/p&gt;</content><category term="rust"></category></entry><entry><title>Du Clojure "natif" grâce à GraalVM</title><link href="https://nicokosi.github.io/clojure-goes-native-with-graalvm.html" rel="alternate"></link><published>2018-05-12T13:00:00+02:00</published><updated>2018-05-12T13:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2018-05-12:/clojure-goes-native-with-graalvm.html</id><summary type="html">&lt;p&gt;Générer un programme exécutable natif via GraalVM pour un projet Clojure, 'hubstats'&lt;/p&gt;</summary><content type="html">&lt;h2&gt;GraalVM, qu'est-ce que c'est ?&lt;/h2&gt;
 &lt;p&gt;&lt;a href="http://www.graalvm.org/"&gt;GraalVM&lt;/a&gt; est une machine virtuelle multi-langages : Java, autres langages de la machine virtuelle Java (Scala, Groovy, Kotlin etc.), JavaScript, LLVM, Ruby et R.&lt;/p&gt;
 &lt;p&gt;GraalVM permet également de générer des exécutables natifs à partir du code Java :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;For JVM-based languages, GraalVM offers a mechanism to create precompiled native images with instant start up and low memory footprint.
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;For&lt;/span&gt; &lt;span class="nv"&gt;JVM&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;based&lt;/span&gt; &lt;span class="nv"&gt;languages&lt;/span&gt;, &lt;span class="nv"&gt;GraalVM&lt;/span&gt; &lt;span class="nv"&gt;offers&lt;/span&gt; &lt;span class="nv"&gt;a&lt;/span&gt; &lt;span class="nv"&gt;mechanism&lt;/span&gt; &lt;span class="nv"&gt;to&lt;/span&gt; &lt;span class="nv"&gt;create&lt;/span&gt; &lt;span class="nv"&gt;precompiled&lt;/span&gt; &lt;span class="nv"&gt;native&lt;/span&gt; &lt;span class="nv"&gt;images&lt;/span&gt; &lt;span class="nv"&gt;with&lt;/span&gt; &lt;span class="nv"&gt;instant&lt;/span&gt; &lt;span class="nv"&gt;start&lt;/span&gt; &lt;span class="nv"&gt;up&lt;/span&gt; &lt;span class="nv"&gt;and&lt;/span&gt; &lt;span class="nv"&gt;low&lt;/span&gt; &lt;span class="nv"&gt;memory&lt;/span&gt; &lt;span class="nv"&gt;footprint&lt;/span&gt;.
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -304,48 +522,48 @@ rustc 1.25.0 (84203cac6 2018-03-25)
 
 &lt;p&gt;(cf. &lt;a href="https://github.com/nicokosi/hubstats/pull/12/files"&gt;tous les détails&lt;/a&gt;)&lt;/p&gt;
 &lt;p&gt;Pas de chance, la génération de l'exécutable échoue :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Step 4/15 : RUN native-image   -jar hubstats-0.1.0-SNAPSHOT-standalone.jar   -H:+ReportUnsupportedElementsAtRuntime   hubstats.core
- ---&amp;gt; Running in e7f911774bd4
-Build on Server(pid: 11, port: 26681)*
-   classlist:   3,159.26 ms
-       (cap):   1,485.02 ms
-       setup:   2,563.80 ms
-    analysis:  10,109.06 ms
-fatal error: java.lang.NullPointerException
-    at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
-    at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
-    at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
-    at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
-    at java.util.concurrent.ForkJoinTask.getThrowableException(ForkJoinTask.java:598)
-    at java.util.concurrent.ForkJoinTask.get(ForkJoinTask.java:1005)
-    at com.oracle.svm.hosted.NativeImageGenerator.run(NativeImageGenerator.java:398)
-    at com.oracle.svm.hosted.NativeImageGeneratorRunner.buildImage(NativeImageGeneratorRunner.java:240)
-    at com.oracle.svm.hosted.NativeImageGeneratorRunner.build(NativeImageGeneratorRunner.java:337)
-    at com.oracle.svm.hosted.server.NativeImageBuildServer.executeCompilation(NativeImageBuildServer.java:378)
-    at com.oracle.svm.hosted.server.NativeImageBuildServer.lambda$processCommand$8(NativeImageBuildServer.java:315)
-    at com.oracle.svm.hosted.server.NativeImageBuildServer.withJVMContext(NativeImageBuildServer.java:396)
-    at com.oracle.svm.hosted.server.NativeImageBuildServer.processCommand(NativeImageBuildServer.java:312)
-    at com.oracle.svm.hosted.server.NativeImageBuildServer.processRequest(NativeImageBuildServer.java:256)
-    at com.oracle.svm.hosted.server.NativeImageBuildServer.lambda$serve$7(NativeImageBuildServer.java:216)
-    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-    at java.lang.Thread.run(Thread.java:748)
-Caused by: java.lang.NullPointerException
-    at com.oracle.graal.pointsto.ObjectScanner.scanField(ObjectScanner.java:113)
-    at com.oracle.graal.pointsto.ObjectScanner.doScan(ObjectScanner.java:263)
-    at com.oracle.graal.pointsto.ObjectScanner.finish(ObjectScanner.java:307)
-    at com.oracle.graal.pointsto.ObjectScanner.scanBootImageHeapRoots(ObjectScanner.java:78)
-    at com.oracle.graal.pointsto.ObjectScanner.scanBootImageHeapRoots(ObjectScanner.java:60)
-    at com.oracle.graal.pointsto.BigBang.checkObjectGraph(BigBang.java:581)
-    at com.oracle.graal.pointsto.BigBang.finish(BigBang.java:552)
-    at com.oracle.svm.hosted.NativeImageGenerator.doRun(NativeImageGenerator.java:653)
-    at com.oracle.svm.hosted.NativeImageGenerator.lambda$run$0(NativeImageGenerator.java:381)
-    at java.util.concurrent.ForkJoinTask$AdaptedRunnableAction.exec(ForkJoinTask.java:1386)
-    at java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:289)
-    at java.util.concurrent.ForkJoinPool$WorkQueue.runTask(ForkJoinPool.java:1056)
-    at java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1692)
-    at java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:157)
-Error: Processing image build request failed
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nv"&gt;Step&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;15&lt;/span&gt; : &lt;span class="nv"&gt;RUN&lt;/span&gt; &lt;span class="nv"&gt;native&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;image&lt;/span&gt;   &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;jar&lt;/span&gt; &lt;span class="nv"&gt;hubstats&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;.&lt;span class="mi"&gt;1&lt;/span&gt;.&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;SNAPSHOT&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;standalone&lt;/span&gt;.&lt;span class="nv"&gt;jar&lt;/span&gt;   &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="nv"&gt;H&lt;/span&gt;:&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="nv"&gt;ReportUnsupportedElementsAtRuntime&lt;/span&gt;   &lt;span class="nv"&gt;hubstats&lt;/span&gt;.&lt;span class="nv"&gt;core&lt;/span&gt;
+ &lt;span class="o"&gt;---&amp;gt;&lt;/span&gt; &lt;span class="nv"&gt;Running&lt;/span&gt; &lt;span class="nv"&gt;in&lt;/span&gt; &lt;span class="nv"&gt;e7f911774bd4&lt;/span&gt;
+&lt;span class="nv"&gt;Build&lt;/span&gt; &lt;span class="nv"&gt;on&lt;/span&gt; &lt;span class="nv"&gt;Server&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;pid&lt;/span&gt;: &lt;span class="mi"&gt;11&lt;/span&gt;, &lt;span class="nv"&gt;port&lt;/span&gt;: &lt;span class="mi"&gt;26681&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;
+   &lt;span class="nv"&gt;classlist&lt;/span&gt;:   &lt;span class="mi"&gt;3&lt;/span&gt;,&lt;span class="mi"&gt;159&lt;/span&gt;.&lt;span class="mi"&gt;26&lt;/span&gt; &lt;span class="nv"&gt;ms&lt;/span&gt;
+       &lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;cap&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;:   &lt;span class="mi"&gt;1&lt;/span&gt;,&lt;span class="mi"&gt;485&lt;/span&gt;.&lt;span class="mi"&gt;02&lt;/span&gt; &lt;span class="nv"&gt;ms&lt;/span&gt;
+       &lt;span class="nv"&gt;setup&lt;/span&gt;:   &lt;span class="mi"&gt;2&lt;/span&gt;,&lt;span class="mi"&gt;563&lt;/span&gt;.&lt;span class="mi"&gt;80&lt;/span&gt; &lt;span class="nv"&gt;ms&lt;/span&gt;
+    &lt;span class="nv"&gt;analysis&lt;/span&gt;:  &lt;span class="mi"&gt;10&lt;/span&gt;,&lt;span class="mi"&gt;109&lt;/span&gt;.&lt;span class="mi"&gt;06&lt;/span&gt; &lt;span class="nv"&gt;ms&lt;/span&gt;
+&lt;span class="nv"&gt;fatal&lt;/span&gt; &lt;span class="nv"&gt;error&lt;/span&gt;: &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;lang&lt;/span&gt;.&lt;span class="nv"&gt;NullPointerException&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;sun&lt;/span&gt;.&lt;span class="nv"&gt;reflect&lt;/span&gt;.&lt;span class="nv"&gt;NativeConstructorAccessorImpl&lt;/span&gt;.&lt;span class="nv"&gt;newInstance0&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;Native&lt;/span&gt; &lt;span class="nv"&gt;Method&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;sun&lt;/span&gt;.&lt;span class="nv"&gt;reflect&lt;/span&gt;.&lt;span class="nv"&gt;NativeConstructorAccessorImpl&lt;/span&gt;.&lt;span class="nv"&gt;newInstance&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;NativeConstructorAccessorImpl&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;62&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;sun&lt;/span&gt;.&lt;span class="nv"&gt;reflect&lt;/span&gt;.&lt;span class="nv"&gt;DelegatingConstructorAccessorImpl&lt;/span&gt;.&lt;span class="nv"&gt;newInstance&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;DelegatingConstructorAccessorImpl&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;45&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;lang&lt;/span&gt;.&lt;span class="nv"&gt;reflect&lt;/span&gt;.&lt;span class="nv"&gt;Constructor&lt;/span&gt;.&lt;span class="nv"&gt;newInstance&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;Constructor&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;423&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;util&lt;/span&gt;.&lt;span class="nv"&gt;concurrent&lt;/span&gt;.&lt;span class="nv"&gt;ForkJoinTask&lt;/span&gt;.&lt;span class="nv"&gt;getThrowableException&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ForkJoinTask&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;598&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;util&lt;/span&gt;.&lt;span class="nv"&gt;concurrent&lt;/span&gt;.&lt;span class="nv"&gt;ForkJoinTask&lt;/span&gt;.&lt;span class="nv"&gt;get&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ForkJoinTask&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;1005&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;svm&lt;/span&gt;.&lt;span class="nv"&gt;hosted&lt;/span&gt;.&lt;span class="nv"&gt;NativeImageGenerator&lt;/span&gt;.&lt;span class="nv"&gt;run&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;NativeImageGenerator&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;398&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;svm&lt;/span&gt;.&lt;span class="nv"&gt;hosted&lt;/span&gt;.&lt;span class="nv"&gt;NativeImageGeneratorRunner&lt;/span&gt;.&lt;span class="nv"&gt;buildImage&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;NativeImageGeneratorRunner&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;240&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;svm&lt;/span&gt;.&lt;span class="nv"&gt;hosted&lt;/span&gt;.&lt;span class="nv"&gt;NativeImageGeneratorRunner&lt;/span&gt;.&lt;span class="nv"&gt;build&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;NativeImageGeneratorRunner&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;337&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;svm&lt;/span&gt;.&lt;span class="nv"&gt;hosted&lt;/span&gt;.&lt;span class="nv"&gt;server&lt;/span&gt;.&lt;span class="nv"&gt;NativeImageBuildServer&lt;/span&gt;.&lt;span class="nv"&gt;executeCompilation&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;NativeImageBuildServer&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;378&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;svm&lt;/span&gt;.&lt;span class="nv"&gt;hosted&lt;/span&gt;.&lt;span class="nv"&gt;server&lt;/span&gt;.&lt;span class="nv"&gt;NativeImageBuildServer&lt;/span&gt;.&lt;span class="nv"&gt;lambda&lt;/span&gt;$&lt;span class="nv"&gt;processCommand&lt;/span&gt;&lt;span class="mh"&gt;$8&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;NativeImageBuildServer&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;315&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;svm&lt;/span&gt;.&lt;span class="nv"&gt;hosted&lt;/span&gt;.&lt;span class="nv"&gt;server&lt;/span&gt;.&lt;span class="nv"&gt;NativeImageBuildServer&lt;/span&gt;.&lt;span class="nv"&gt;withJVMContext&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;NativeImageBuildServer&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;396&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;svm&lt;/span&gt;.&lt;span class="nv"&gt;hosted&lt;/span&gt;.&lt;span class="nv"&gt;server&lt;/span&gt;.&lt;span class="nv"&gt;NativeImageBuildServer&lt;/span&gt;.&lt;span class="nv"&gt;processCommand&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;NativeImageBuildServer&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;312&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;svm&lt;/span&gt;.&lt;span class="nv"&gt;hosted&lt;/span&gt;.&lt;span class="nv"&gt;server&lt;/span&gt;.&lt;span class="nv"&gt;NativeImageBuildServer&lt;/span&gt;.&lt;span class="nv"&gt;processRequest&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;NativeImageBuildServer&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;256&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;svm&lt;/span&gt;.&lt;span class="nv"&gt;hosted&lt;/span&gt;.&lt;span class="nv"&gt;server&lt;/span&gt;.&lt;span class="nv"&gt;NativeImageBuildServer&lt;/span&gt;.&lt;span class="nv"&gt;lambda&lt;/span&gt;$&lt;span class="nv"&gt;serve&lt;/span&gt;&lt;span class="mh"&gt;$7&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;NativeImageBuildServer&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;216&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;util&lt;/span&gt;.&lt;span class="nv"&gt;concurrent&lt;/span&gt;.&lt;span class="nv"&gt;ThreadPoolExecutor&lt;/span&gt;.&lt;span class="nv"&gt;runWorker&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ThreadPoolExecutor&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;1149&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;util&lt;/span&gt;.&lt;span class="nv"&gt;concurrent&lt;/span&gt;.&lt;span class="nv"&gt;ThreadPoolExecutor&lt;/span&gt;$&lt;span class="nv"&gt;Worker&lt;/span&gt;.&lt;span class="nv"&gt;run&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ThreadPoolExecutor&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;624&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;lang&lt;/span&gt;.&lt;span class="nv"&gt;Thread&lt;/span&gt;.&lt;span class="nv"&gt;run&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;Thread&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;748&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;Caused&lt;/span&gt; &lt;span class="nv"&gt;by&lt;/span&gt;: &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;lang&lt;/span&gt;.&lt;span class="nv"&gt;NullPointerException&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;graal&lt;/span&gt;.&lt;span class="nv"&gt;pointsto&lt;/span&gt;.&lt;span class="nv"&gt;ObjectScanner&lt;/span&gt;.&lt;span class="nv"&gt;scanField&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ObjectScanner&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;113&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;graal&lt;/span&gt;.&lt;span class="nv"&gt;pointsto&lt;/span&gt;.&lt;span class="nv"&gt;ObjectScanner&lt;/span&gt;.&lt;span class="nv"&gt;doScan&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ObjectScanner&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;263&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;graal&lt;/span&gt;.&lt;span class="nv"&gt;pointsto&lt;/span&gt;.&lt;span class="nv"&gt;ObjectScanner&lt;/span&gt;.&lt;span class="nv"&gt;finish&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ObjectScanner&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;307&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;graal&lt;/span&gt;.&lt;span class="nv"&gt;pointsto&lt;/span&gt;.&lt;span class="nv"&gt;ObjectScanner&lt;/span&gt;.&lt;span class="nv"&gt;scanBootImageHeapRoots&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ObjectScanner&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;78&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;graal&lt;/span&gt;.&lt;span class="nv"&gt;pointsto&lt;/span&gt;.&lt;span class="nv"&gt;ObjectScanner&lt;/span&gt;.&lt;span class="nv"&gt;scanBootImageHeapRoots&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ObjectScanner&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;60&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;graal&lt;/span&gt;.&lt;span class="nv"&gt;pointsto&lt;/span&gt;.&lt;span class="nv"&gt;BigBang&lt;/span&gt;.&lt;span class="nv"&gt;checkObjectGraph&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;BigBang&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;581&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;graal&lt;/span&gt;.&lt;span class="nv"&gt;pointsto&lt;/span&gt;.&lt;span class="nv"&gt;BigBang&lt;/span&gt;.&lt;span class="nv"&gt;finish&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;BigBang&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;552&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;svm&lt;/span&gt;.&lt;span class="nv"&gt;hosted&lt;/span&gt;.&lt;span class="nv"&gt;NativeImageGenerator&lt;/span&gt;.&lt;span class="nv"&gt;doRun&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;NativeImageGenerator&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;653&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;com&lt;/span&gt;.&lt;span class="nv"&gt;oracle&lt;/span&gt;.&lt;span class="nv"&gt;svm&lt;/span&gt;.&lt;span class="nv"&gt;hosted&lt;/span&gt;.&lt;span class="nv"&gt;NativeImageGenerator&lt;/span&gt;.&lt;span class="nv"&gt;lambda&lt;/span&gt;$&lt;span class="nv"&gt;run&lt;/span&gt;&lt;span class="mh"&gt;$0&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;NativeImageGenerator&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;381&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;util&lt;/span&gt;.&lt;span class="nv"&gt;concurrent&lt;/span&gt;.&lt;span class="nv"&gt;ForkJoinTask&lt;/span&gt;&lt;span class="mh"&gt;$Ada&lt;/span&gt;&lt;span class="nv"&gt;ptedRunnableAction&lt;/span&gt;.&lt;span class="k"&gt;exec&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ForkJoinTask&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;1386&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;util&lt;/span&gt;.&lt;span class="nv"&gt;concurrent&lt;/span&gt;.&lt;span class="nv"&gt;ForkJoinTask&lt;/span&gt;.&lt;span class="nv"&gt;doExec&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ForkJoinTask&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;289&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;util&lt;/span&gt;.&lt;span class="nv"&gt;concurrent&lt;/span&gt;.&lt;span class="nv"&gt;ForkJoinPool&lt;/span&gt;$&lt;span class="nv"&gt;WorkQueue&lt;/span&gt;.&lt;span class="nv"&gt;runTask&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ForkJoinPool&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;1056&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;util&lt;/span&gt;.&lt;span class="nv"&gt;concurrent&lt;/span&gt;.&lt;span class="nv"&gt;ForkJoinPool&lt;/span&gt;.&lt;span class="nv"&gt;runWorker&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ForkJoinPool&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;1692&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+    &lt;span class="nv"&gt;at&lt;/span&gt; &lt;span class="nv"&gt;java&lt;/span&gt;.&lt;span class="nv"&gt;util&lt;/span&gt;.&lt;span class="nv"&gt;concurrent&lt;/span&gt;.&lt;span class="nv"&gt;ForkJoinWorkerThread&lt;/span&gt;.&lt;span class="nv"&gt;run&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ForkJoinWorkerThread&lt;/span&gt;.&lt;span class="nv"&gt;java&lt;/span&gt;:&lt;span class="mi"&gt;157&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;
+&lt;span class="nv"&gt;Error&lt;/span&gt;: &lt;span class="nv"&gt;Processing&lt;/span&gt; &lt;span class="nv"&gt;image&lt;/span&gt; &lt;span class="nv"&gt;build&lt;/span&gt; &lt;span class="nv"&gt;request&lt;/span&gt; &lt;span class="nv"&gt;failed&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -365,11 +583,11 @@ Error: Processing image build request failed
 
 
 &lt;p&gt;J'ai ensuite lancé la commande 'native-image' qui est malheuresement restée "coincée" :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$&amp;gt; JAVA_HOME=~/Downloads/labsjdk1.8.0_161-jvmci-0.42/Contents/Home ../graal/substratevm/native-image -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar hubstats.core
-Build on Server(pid: 18933, port: 55103)*
-   classlist:   2,744.32 ms
-       (cap):   1,531.16 ms
-       setup:   2,401.40 ms
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="err"&gt;$&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;JAVA_HOME&lt;/span&gt;&lt;span class="o"&gt;=~/&lt;/span&gt;&lt;span class="n"&gt;Downloads&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;labsjdk1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;8&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="n"&gt;_161&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;jvmci&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;42&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;Contents&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;Home&lt;/span&gt; &lt;span class="p"&gt;..&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;graal&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;substratevm&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;native&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;image&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;jar&lt;/span&gt; &lt;span class="n"&gt;target&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;hubstats&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;SNAPSHOT&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;standalone&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;jar&lt;/span&gt; &lt;span class="n"&gt;hubstats&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;core&lt;/span&gt;
+&lt;span class="n"&gt;Build&lt;/span&gt; &lt;span class="k"&gt;on&lt;/span&gt; &lt;span class="n"&gt;Server&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pid&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;18933&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;port&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;55103&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;
+   &lt;span class="n"&gt;classlist&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;   &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;744&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;32&lt;/span&gt; &lt;span class="n"&gt;ms&lt;/span&gt;
+       &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;cap&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;   &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;531&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;16&lt;/span&gt; &lt;span class="n"&gt;ms&lt;/span&gt;
+       &lt;span class="n"&gt;setup&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;   &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;401&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="mi"&gt;40&lt;/span&gt; &lt;span class="n"&gt;ms&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -388,32 +606,32 @@ Build on Server(pid: 18933, port: 55103)*
 &lt;p&gt;C'est parti !&lt;/p&gt;
 &lt;p&gt;&lt;br/&gt;
 R bénéficie de très nombreuses bibliothèques additionnelles qui sont publiques et téléchargeables automatiquement ("CRAN repository"). Voici les instructions d'import correspondant à celles que j'ai utilisées :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;rjson&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;httr&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;ggplot2&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="kn"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;scales&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;rjson&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;httr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ggplot2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nf"&gt;library&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;scales&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h3&gt;1. Récupérer les données Strava&lt;/h3&gt;
 &lt;p&gt;Le code suivant appelle l'&lt;a href="http://strava.github.io/api/v3/activities/"&gt;API Strava "activities"&lt;/a&gt; avec un jeton d'autorisation (access token) et récupère les 200 dernières sorties ("activities" = activité de course à pied, vélo ou natation) sous forme d'une chaîne de caractères (&lt;code&gt;characters&lt;/code&gt;) :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;token &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;readline&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;prompt&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Enter Strava access token: &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-activities &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; GET&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;https://www.strava.com/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; path &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;api/v3/activities&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-                  query &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="kt"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;access_token &lt;span class="o"&gt;=&lt;/span&gt; token&lt;span class="p"&gt;,&lt;/span&gt; per_page &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;200&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-activities &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; content&lt;span class="p"&gt;(&lt;/span&gt;activities&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;text&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# Retrieve JSON content as string&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;token&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;readline&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;prompt&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;Enter Strava access token: &amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;activities&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;GET&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;https://www.strava.com/&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;path&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;api/v3/activities&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+                  &lt;span class="n"&gt;query&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nf"&gt;list&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;access_token&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;token&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;per_page&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="m"&gt;200&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="n"&gt;activities&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;content&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;activities&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;text&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# Retrieve JSON content as string&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h3&gt;2. Transformer les données&lt;/h3&gt;
 &lt;p&gt;Il faut ensuite transformer ces données en données tabulaires, appelées &lt;code&gt;dataframes&lt;/code&gt;. Petite subtilité, il faut itérer sur les éléments des listes pour remplacer les valeurs vides (&lt;code&gt;null&lt;/code&gt;) par des valeurs manquantes (&lt;code&gt;NA&lt;/code&gt;, pour "not available") :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;activities &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; fromJSON&lt;span class="p"&gt;(&lt;/span&gt;activities&lt;span class="p"&gt;)&lt;/span&gt;      &lt;span class="c1"&gt;# Transformer le contenu JSON en liste&lt;/span&gt;
-activities &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;activities&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kr"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;      &lt;span class="c1"&gt;# appliquer une fonction anonyme à chaque élément de la liste&lt;/span&gt;
-  x&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="kp"&gt;sapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kp"&gt;is.null&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kc"&gt;NA&lt;/span&gt;           &lt;span class="c1"&gt;# remplacer les valeurs nulles en &amp;quot;N/A&amp;quot;&lt;/span&gt;
-  &lt;span class="kp"&gt;unlist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;activities&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;fromJSON&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;activities&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;      &lt;span class="c1"&gt;# Transformer le contenu JSON en liste&lt;/span&gt;
+&lt;span class="n"&gt;activities&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;lapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;activities&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;      &lt;span class="c1"&gt;# appliquer une fonction anonyme à chaque élément de la liste&lt;/span&gt;
+  &lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="nf"&gt;[sapply&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;is.null&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="n"&gt;]&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kc"&gt;NA&lt;/span&gt;           &lt;span class="c1"&gt;# remplacer les valeurs nulles en &amp;quot;N/A&amp;quot;&lt;/span&gt;
+  &lt;span class="nf"&gt;unlist&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
 &lt;span class="p"&gt;})&lt;/span&gt;
-df &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;do.call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;rbind&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; activities&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="c1"&gt;# transformer les listes de listes en dataframe&lt;/span&gt;
+&lt;span class="n"&gt;df&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;data.frame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;do.call&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;rbind&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;activities&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="c1"&gt;# transformer les listes de listes en dataframe&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -421,10 +639,10 @@ df &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kt"&gt;data.fram
 &lt;p&gt;On peut en tout cas remarquer que les variables ne sont pas typées - R est un language dynamique - et peuvent être ré-affectées. Par exemple, &lt;code&gt;activities&lt;/code&gt; est une variable de type &lt;code&gt;character&lt;/code&gt; (chaîne de caractères, contenant les données JSON) qui devient ensuite une variable de type &lt;code&gt;list&lt;/code&gt;.&lt;/p&gt;
 &lt;p&gt;Il m'a fallu convertir les distances et les durées pour utiliser des unités plus appriopriées :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Convertir les durées en minutes (l&amp;#39;API Strava API retourne des secondes) :&lt;/span&gt;
-df&lt;span class="o"&gt;$&lt;/span&gt;moving_time &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;as.numeric&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="o"&gt;$&lt;/span&gt;moving_time&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;60&lt;/span&gt;
+&lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;moving_time&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;as.numeric&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;moving_time&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;60&lt;/span&gt;
 
 &lt;span class="c1"&gt;# Convertir les distances en kilomètres (l&amp;#39;API Strava API retourne des mètres) :&lt;/span&gt;
-df&lt;span class="o"&gt;$&lt;/span&gt;distance &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="kp"&gt;as.numeric&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kp"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="o"&gt;$&lt;/span&gt;distance&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;1000&lt;/span&gt;
+&lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;distance&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;-&lt;/span&gt; &lt;span class="nf"&gt;as.numeric&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nf"&gt;as.character&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="o"&gt;$&lt;/span&gt;&lt;span class="n"&gt;distance&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;/&lt;/span&gt; &lt;span class="m"&gt;1000&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -432,12 +650,12 @@ df&lt;span class="o"&gt;$&lt;/span&gt;distance &lt;span class="o"&gt;&amp;lt;-&l
 &lt;p&gt;&lt;br/&gt;&lt;/p&gt;
 &lt;h3&gt;3. Affichage d'un graphique&lt;/h3&gt;
 &lt;p&gt;La dernière étape consiste à utiliser l'une des fonctions de la librairie &lt;code&gt;ggplot2&lt;/code&gt; pour afficher et sauvegarder un graphique. Le code suivant affiche le temps en mouvement en fonction de la distance parcourue :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  ggplot&lt;span class="p"&gt;(&lt;/span&gt;df&lt;span class="p"&gt;,&lt;/span&gt; aes&lt;span class="p"&gt;(&lt;/span&gt;x&lt;span class="o"&gt;=&lt;/span&gt;distance&lt;span class="p"&gt;,&lt;/span&gt; y&lt;span class="o"&gt;=&lt;/span&gt;moving_time&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="c1"&gt;# à partir du dataframe, afficher les données &amp;#39;distance&amp;#39; en fonction de &amp;#39;moving_time`&lt;/span&gt;
-    geom_point&lt;span class="p"&gt;(&lt;/span&gt;size&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; colour&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;#CC0000&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="c1"&gt;# afficher les points en rouge&lt;/span&gt;
-    geom_smooth&lt;span class="p"&gt;(&lt;/span&gt;method&lt;span class="o"&gt;=&lt;/span&gt;lm&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# ajout d&amp;#39;une courbe de régression linéaire +&lt;/span&gt;
-    xlab&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;distance per activity (kilometers)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# libellé de l&amp;#39;axe X +&lt;/span&gt;
-    ylab&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;moving time (minutes)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# libellé de l&amp;#39;axe Y&lt;/span&gt;
-  ggsave&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/tmp/moving-time.png&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# sauvegarder dans un fichier PNG&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;  &lt;span class="nf"&gt;ggplot&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;df&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nf"&gt;aes&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;distance&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;moving_time&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="c1"&gt;# à partir du dataframe, afficher les données &amp;#39;distance&amp;#39; en fonction de &amp;#39;moving_time`&lt;/span&gt;
+    &lt;span class="nf"&gt;geom_point&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;size&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;colour&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;#CC0000&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="c1"&gt;# afficher les points en rouge&lt;/span&gt;
+    &lt;span class="nf"&gt;geom_smooth&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;method&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;lm&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# ajout d&amp;#39;une courbe de régression linéaire +&lt;/span&gt;
+    &lt;span class="nf"&gt;xlab&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;distance per activity (kilometers)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# libellé de l&amp;#39;axe X +&lt;/span&gt;
+    &lt;span class="nf"&gt;ylab&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;moving time (minutes)&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# libellé de l&amp;#39;axe Y&lt;/span&gt;
+  &lt;span class="nf"&gt;ggsave&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;/tmp/moving-time.png&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# sauvegarder dans un fichier PNG&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -682,8 +900,8 @@ Remarque : le compilateur sait détecter un pattern matching non exhaustif. Par 
 
 
 &lt;p&gt;Exemple d'appel :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;*Main&amp;gt; couleur(Coeur)
-&amp;quot;rouge&amp;quot;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;couleur&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Coeur&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="ss"&gt;&amp;quot;rouge&amp;quot;&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 
@@ -712,18 +930,18 @@ Remarque : le compilateur sait détecter un pattern matching non exhaustif. Par 
 
 
 &lt;p&gt;Exemples d'appel :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;*Main&amp;gt; :{
-*Main| mêmeEnseigne (
-*Main|     Carte {rang=R1, enseigne=Carreau},
-*Main|     Carte {rang=R1, enseigne=Coeur} )
-*Main| :}
-False
-*Main&amp;gt; :{
-*Main| mêmeEnseigne (
-*Main|     Carte {rang=Valet, enseigne=Coeur},
-*Main|     Carte {rang=R1, enseigne=Coeur} )
-*Main| :}
-True
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="err"&gt;{&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="err"&gt;ê&lt;/span&gt;&lt;span class="n"&gt;meEnseigne&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;     &lt;span class="n"&gt;Carte&lt;/span&gt; &lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="n"&gt;rang&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;R1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;Carreau&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;     &lt;span class="n"&gt;Carte&lt;/span&gt; &lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="n"&gt;rang&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;R1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;Coeur&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;False&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="err"&gt;{&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;m&lt;/span&gt;&lt;span class="err"&gt;ê&lt;/span&gt;&lt;span class="n"&gt;meEnseigne&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;     &lt;span class="n"&gt;Carte&lt;/span&gt; &lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="n"&gt;rang&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;Valet&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;Coeur&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt;     &lt;span class="n"&gt;Carte&lt;/span&gt; &lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="n"&gt;rang&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;R1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;enseigne&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;Coeur&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt; &lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;Main&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt;
+&lt;span class="k"&gt;True&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 
 

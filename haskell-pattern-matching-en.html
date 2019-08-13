@@ -102,8 +102,8 @@
                                 <a href="https://nicokosi.github.io/author/nicolas-kosinski.html">Nicolas Kosinski</a>
                              on 2016-09-27
                         </span>
-                        Translations: 
-<a href="https://nicokosi.github.io/haskell-pattern-matching.html">fr</a>
+                        Translations:
+<a href="https://nicokosi.github.io/haskell-pattern-matching.html" hreflang="fr">fr</a>
 
                     </div>
                 </div>
@@ -214,8 +214,8 @@ Morevover, the Haskell compiler can detect a non-exhaustive pattern matching. Fo
 
 
 <p>Let's evaluate it:</p>
-<div class="highlight"><pre><span></span>*Main&gt; color Heart
-&quot;red&quot;
+<div class="highlight"><pre><span></span><span class="o">*</span><span class="n">Main</span><span class="o">&gt;</span> <span class="n">color</span> <span class="n">Heart</span>
+<span class="ss">&quot;red&quot;</span>
 </pre></div>
 
 
@@ -245,18 +245,18 @@ For instance, the following function determines if two cards have the same suite
 
 
 <p>Call examples:</p>
-<div class="highlight"><pre><span></span>*Main&gt; :{
-*Main| sameSuite (
-*Main|        Card {rank=R1, suite=Diamond},
-*Main|        Card {rank=R1, suite=Heart} )
-*Main| :}
-False
-*Main&gt; :{
-*Main| sameSuite (
-*Main|      Card {rank=Jack, suite=Heart},
-*Main|      Card {rank=R1, suite=Diamond} )
-*Main| :}
-False
+<div class="highlight"><pre><span></span><span class="o">*</span><span class="n">Main</span><span class="o">&gt;</span> <span class="p">:</span><span class="err">{</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span> <span class="n">sameSuite</span> <span class="p">(</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span>        <span class="n">Card</span> <span class="err">{</span><span class="n">rank</span><span class="o">=</span><span class="n">R1</span><span class="p">,</span> <span class="n">suite</span><span class="o">=</span><span class="n">Diamond</span><span class="err">}</span><span class="p">,</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span>        <span class="n">Card</span> <span class="err">{</span><span class="n">rank</span><span class="o">=</span><span class="n">R1</span><span class="p">,</span> <span class="n">suite</span><span class="o">=</span><span class="n">Heart</span><span class="err">}</span> <span class="p">)</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span> <span class="p">:</span><span class="err">}</span>
+<span class="k">False</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">&gt;</span> <span class="p">:</span><span class="err">{</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span> <span class="n">sameSuite</span> <span class="p">(</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span>      <span class="n">Card</span> <span class="err">{</span><span class="n">rank</span><span class="o">=</span><span class="n">Jack</span><span class="p">,</span> <span class="n">suite</span><span class="o">=</span><span class="n">Heart</span><span class="err">}</span><span class="p">,</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span>      <span class="n">Card</span> <span class="err">{</span><span class="n">rank</span><span class="o">=</span><span class="n">R1</span><span class="p">,</span> <span class="n">suite</span><span class="o">=</span><span class="n">Diamond</span><span class="err">}</span> <span class="p">)</span>
+<span class="o">*</span><span class="n">Main</span><span class="o">|</span> <span class="p">:</span><span class="err">}</span>
+<span class="k">False</span>
 </pre></div>
 
 
