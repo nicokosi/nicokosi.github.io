@@ -10,7 +10,7 @@
 &lt;li&gt;Conclusion&lt;/li&gt;
 &lt;/ol&gt;
 &lt;h2&gt;Introduction&lt;/h2&gt;
-&lt;p&gt;In wrote about failures in my previous blog post &lt;a href="https://nicokosi.github.io/clojure-goes-native-with-graalvm-en.html"&gt;Clojure goes native with GraalVM&lt;/a&gt;. This post is about successful attempts to generate executables from small CLI tools, implemented in &lt;a href="https://go.java/"&gt;Java&lt;/a&gt;, &lt;a href="https://kotlinlang.org/"&gt;Kotlin&lt;/a&gt; and &lt;a href="https://clojure.org/"&gt;Clojure&lt;/a&gt;, using &lt;a href="https://www.graalvm.org/"&gt;GraalVM&lt;/a&gt; release (see the &lt;a href="https://www.graalvm.org/docs/release-notes/"&gt;release notes&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;I wrote about failures in my previous blog post &lt;a href="https://nicokosi.github.io/clojure-goes-native-with-graalvm-en.html"&gt;Clojure goes native with GraalVM&lt;/a&gt;. This post is about successful attempts to generate executables from small CLI tools, implemented in &lt;a href="https://go.java/"&gt;Java&lt;/a&gt;, &lt;a href="https://kotlinlang.org/"&gt;Kotlin&lt;/a&gt; and &lt;a href="https://clojure.org/"&gt;Clojure&lt;/a&gt;, using &lt;a href="https://www.graalvm.org/"&gt;GraalVM&lt;/a&gt; release (see the &lt;a href="https://www.graalvm.org/docs/release-notes/"&gt;release notes&lt;/a&gt;).&lt;/p&gt;
 &lt;h2&gt;Tools&lt;/h2&gt;
 &lt;p&gt;We will use the following applications:&lt;/p&gt;
 &lt;ul&gt;
@@ -29,7 +29,7 @@ $ &lt;span class="nb"&gt;time&lt;/span&gt; ./mvnw clean --quiet compile
 &lt;/pre&gt;&lt;/div&gt;
 
 
-&lt;p&gt;Note that the ellapsed time is at the end of the last line, in seconds: &lt;code&gt;2.022 total&lt;/code&gt; means 2.002 seconds.&lt;/p&gt;
+&lt;p&gt;Note that the ellapsed time is at the end of the last line, in seconds: &lt;code&gt;2.022 total&lt;/code&gt; means 2.022 seconds.&lt;/p&gt;
 &lt;p&gt;Now generate an executable via GraalVM native-image. It takes 42 seconds on my machine:&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ &lt;span class="nb"&gt;time&lt;/span&gt; &lt;span class="nv"&gt;$HOME&lt;/span&gt;/.sdkman/candidates/java/19.1.1-grl/bin/native-image &lt;span class="se"&gt;\&lt;/span&gt;
      --enable-https &lt;span class="se"&gt;\&lt;/span&gt;

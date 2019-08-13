@@ -127,7 +127,7 @@
 <li>Conclusion</li>
 </ol>
 <h2>Introduction</h2>
-<p>In wrote about failures in my previous blog post <a href="https://nicokosi.github.io/clojure-goes-native-with-graalvm-en.html">Clojure goes native with GraalVM</a>. This post is about successful attempts to generate executables from small CLI tools, implemented in <a href="https://go.java/">Java</a>, <a href="https://kotlinlang.org/">Kotlin</a> and <a href="https://clojure.org/">Clojure</a>, using <a href="https://www.graalvm.org/">GraalVM</a> release (see the <a href="https://www.graalvm.org/docs/release-notes/">release notes</a>).</p>
+<p>I wrote about failures in my previous blog post <a href="https://nicokosi.github.io/clojure-goes-native-with-graalvm-en.html">Clojure goes native with GraalVM</a>. This post is about successful attempts to generate executables from small CLI tools, implemented in <a href="https://go.java/">Java</a>, <a href="https://kotlinlang.org/">Kotlin</a> and <a href="https://clojure.org/">Clojure</a>, using <a href="https://www.graalvm.org/">GraalVM</a> release (see the <a href="https://www.graalvm.org/docs/release-notes/">release notes</a>).</p>
 <h2>Tools</h2>
 <p>We will use the following applications:</p>
 <ul>
@@ -146,7 +146,7 @@ $ <span class="nb">time</span> ./mvnw clean --quiet compile
 </pre></div>
 
 
-<p>Note that the ellapsed time is at the end of the last line, in seconds: <code>2.022 total</code> means 2.002 seconds.</p>
+<p>Note that the ellapsed time is at the end of the last line, in seconds: <code>2.022 total</code> means 2.022 seconds.</p>
 <p>Now generate an executable via GraalVM native-image. It takes 42 seconds on my machine:</p>
 <div class="highlight"><pre><span></span>$ <span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
      --enable-https <span class="se">\</span>
