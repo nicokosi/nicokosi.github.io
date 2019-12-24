@@ -1,5 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all-en.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2019-08-13T00:00:00+02:00</updated><subtitle>#SoftwareDevelopment #WhatElse?;-)</subtitle><entry><title>Java, Kotlin and Clojure go native with GraalVM</title><link href="https://nicokosi.github.io/java-clojure-and-kotlin-go-native-with-graalvm-en.html" rel="alternate"></link><published>2019-08-13T00:00:00+02:00</published><updated>2019-08-13T00:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2019-08-13:/java-clojure-and-kotlin-go-native-with-graalvm-en.html</id><summary type="html">&lt;p&gt;Generate native executables via GraalVM for Java, Kotlin and Clojure CLI tools&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="https://v4.chriskrycho.com/2018/assumed-audiences.html"&gt;Presumed audience&lt;/a&gt; : developers interested in the Java ecosystem and more specifically on deploying executable programs that are fast and efficient.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all-en.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2019-12-24T07:00:00+01:00</updated><subtitle>#SoftwareDevelopment #WhatElse?;-)</subtitle><entry><title>Rediscovering Golang with "pullpigo", a small hobby-project</title><link href="https://nicokosi.github.io/rediscovering-Golang-with-pullpigo-en.html" rel="alternate"></link><published>2019-12-24T07:00:00+01:00</published><updated>2019-12-24T07:00:00+01:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2019-12-24:/rediscovering-Golang-with-pullpigo-en.html</id><summary type="html">&lt;p&gt;Learn basics of the Go programming language coding a CLI tool, "pullpigo"&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Rediscovering Golang with "pullpigo", a small hobby-project&lt;/h1&gt;
+&lt;p&gt;I wanted to &lt;strong&gt;learn &lt;a href="https://golang.org/"&gt;Go (the programming language)&lt;/a&gt;&lt;/strong&gt;. My plan was to implement a &lt;strong&gt;CLI tool&lt;/strong&gt; for displaying information on GitHub pull requests. I thus created a small project in GitHub: &lt;a href="https://github.com/nicokosi/pullpigo"&gt;pullpigo&lt;/a&gt;, in order to display event counters about GitHub pull requests via GitHub's public API.&lt;/p&gt;
+&lt;p&gt;Note that I have already implemented this CLI tool in other programming languages that I wanted to learn: in &lt;strong&gt;Clojure&lt;/strong&gt; (see &lt;a href="https://github.com/nicokosi/hubstats"&gt;hubstats&lt;/a&gt;), &lt;strong&gt;Kotlin&lt;/strong&gt; (see &lt;a href="https://github.com/nicokosi/pullpitoK"&gt;pullpitoK&lt;/a&gt;) and &lt;strong&gt;Rust&lt;/strong&gt; (see &lt;a href="https://github.com/nicokosi/pullpito"&gt;pullpito&lt;/a&gt;).&lt;/p&gt;
+&lt;h2&gt;Native executables are fast 🚀&lt;/h2&gt;
+&lt;p&gt;Let's compile pullpigo:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ go clean
+$ &lt;span class="nb"&gt;time&lt;/span&gt; go build
+go build  &lt;span class="m"&gt;1&lt;/span&gt;.05s user &lt;span class="m"&gt;0&lt;/span&gt;.58s system &lt;span class="m"&gt;105&lt;/span&gt;% cpu &lt;span class="m"&gt;1&lt;/span&gt;.559 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then run it:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;time&lt;/span&gt; ./pullpigo -repo&lt;span class="o"&gt;=&lt;/span&gt;vidal-community/atom-jaxb
+GitHub repository &lt;span class="s1"&gt;&amp;#39;vidal-community/atom-jaxb&amp;#39;&lt;/span&gt;
+  &lt;span class="m"&gt;2&lt;/span&gt; events created by amairi
+  &lt;span class="m"&gt;1&lt;/span&gt; events created by fchetouani
+  &lt;span class="m"&gt;6&lt;/span&gt; events created by AElMehdiVidal
+  &lt;span class="m"&gt;3&lt;/span&gt; events created by jcgay
+./pullpigo -repo&lt;span class="o"&gt;=&lt;/span&gt;vidal-community/atom-jaxb  &lt;span class="m"&gt;0&lt;/span&gt;.07s user &lt;span class="m"&gt;0&lt;/span&gt;.03s system &lt;span class="m"&gt;20&lt;/span&gt;% cpu &lt;span class="m"&gt;0&lt;/span&gt;.482 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now compare these build &amp;amp; run times with a similar Kotlin project (&lt;a href="https://github.com/nicokosi/pullpitoK/"&gt;pullpitoK&lt;/a&gt;):&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ ./gradlew clean
+$ &lt;span class="nb"&gt;time&lt;/span&gt; ./gradlew build --quiet
+./gradlew build --quiet  &lt;span class="m"&gt;1&lt;/span&gt;.37s user &lt;span class="m"&gt;0&lt;/span&gt;.17s system &lt;span class="m"&gt;39&lt;/span&gt;% cpu &lt;span class="m"&gt;3&lt;/span&gt;.932 total
+$ &lt;span class="nb"&gt;time&lt;/span&gt; ./gradlew run --quiet --args &lt;span class="s2"&gt;&amp;quot;vidal-community/atom-jaxb&amp;quot;&lt;/span&gt;
+
+pull requests &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;vidal-community/atom-jaxb&amp;quot;&lt;/span&gt; -&amp;gt;
+            opened per author
+                amairi: &lt;span class="m"&gt;1&lt;/span&gt;
+            commented per author
+                AElMehdiVidal: &lt;span class="m"&gt;1&lt;/span&gt;
+                jcgay: &lt;span class="m"&gt;1&lt;/span&gt;
+            closed per author
+
+./gradlew run --quiet --args &lt;span class="s2"&gt;&amp;quot;vidal-community/atom-jaxb&amp;quot;&lt;/span&gt;  &lt;span class="m"&gt;1&lt;/span&gt;.37s user &lt;span class="m"&gt;0&lt;/span&gt;.18s system &lt;span class="m"&gt;62&lt;/span&gt;% cpu &lt;span class="m"&gt;2&lt;/span&gt;.473 total
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Fast compilation + fast runtime = ❤️&lt;/p&gt;
+&lt;h2&gt;Golang SDK already includes many common utilities 📦&lt;/h2&gt;
+&lt;p&gt;In order to call &lt;a href="https://developer.github.com/v3/activity/events/"&gt;GitHub's REST API v3 'events' API&lt;/a&gt;, all I needed was: a HTTP client, a JSON parser and a test framework. Good news, all are included in the Golang SDK: &lt;a href="https://golang.org/pkg/testing/"&gt;testing&lt;/a&gt;, &lt;a href="https://golang.org/pkg/net/http/"&gt;HTTP client&lt;/a&gt; and &lt;a href="https://golang.org/pkg/encoding/json/"&gt;JSON parsing&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;As a consequence, I implemented my project with zero dependencies!&lt;/p&gt;
+&lt;p&gt;Other goodies have I appreciated from by Java background:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;code formatting&lt;/strong&gt; is included! Its' simple as &lt;code&gt;go fmt&lt;/code&gt;. No need to find and configure an external code formatting tools.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;code linter&lt;/strong&gt; is included! Just install &lt;a href="[golang/linttype"&gt;https://github.com/golang/linttype&lt;/a&gt; and run the &lt;code&gt;golint&lt;/code&gt; command. No need to find and configure an external code formatting tools. (to be honest, the linter did not help when coding pullpigo but it's so cool that code linter is provided).&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2&gt;Other opportunities 😎&lt;/h2&gt;
+&lt;p&gt;Coding this small hobby project has also been an opportunity to &lt;strong&gt;try and learn other tools&lt;/strong&gt;. In my case, I could:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Use &lt;a href="https://code.visualstudio.com/"&gt;Visual Studio Code&lt;/a&gt;, an Integrated Development Environment that I don't use at work.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Use &lt;a href="https://github.com/features/actions"&gt;GitHub Actions&lt;/a&gt; for Continuous Integration: every git commit pushed on GitHub triggers a compilation &amp;amp; test check. It was the first time I used GitHub Actions, it was very easy (it only took a few minutes) to use it for my needs, and it's free. &lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The last positive thing about learning a programming language is that you can &lt;strong&gt;discuss and learn with people&lt;/strong&gt; you know.&lt;/p&gt;
+&lt;p&gt;In my case, my "Golang friends" have been:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://github.com/jcgay/"&gt;Jean-Christophe&lt;/a&gt; who helped me fixing my JSON parsing issues. 😅&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://github.com/fbiville"&gt;Florent&lt;/a&gt; who gave me pointers on cool libraries: &lt;a href="https://golang.org/pkg/testing/quick/"&gt;testing/quick&lt;/a&gt; for property-based testing, &lt;a href="https://github.com/onsi/ginkgo"&gt;ginkgo&lt;/a&gt; for BDD-style tests and &lt;a href="https://github.com/onsi/gomega"&gt;gomega&lt;/a&gt; for test assertions. I have to try them out! 😎&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;What's next? 🔮&lt;/h3&gt;
+&lt;p&gt;Some ideas:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Make pullpigo's output more useful. For example, I could make it display counters for events like "pull request created", "pull request merged" etc.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Retrieve data from &lt;a href="https://developer.github.com/v4/"&gt;GitHub's GraphQL API v4&lt;/a&gt; in order to by-pass the limitation of number of events (GitHub's REST API v3 'events' API only returns the last 300 events).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Use some dependencies for testing (easier assertions, property-based-testing etc.) and take this opportunity to discover dependencies in Golang.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We'll see!&lt;/p&gt;</content><category term="golang native"></category></entry><entry><title>Java, Kotlin and Clojure go native with GraalVM</title><link href="https://nicokosi.github.io/java-clojure-and-kotlin-go-native-with-graalvm-en.html" rel="alternate"></link><published>2019-08-13T00:00:00+02:00</published><updated>2019-08-13T00:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2019-08-13:/java-clojure-and-kotlin-go-native-with-graalvm-en.html</id><summary type="html">&lt;p&gt;Generate native executables via GraalVM for Java, Kotlin and Clojure CLI tools&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;a href="https://v4.chriskrycho.com/2018/assumed-audiences.html"&gt;Presumed audience&lt;/a&gt; : developers interested in the Java ecosystem and more specifically on deploying executable programs that are fast and efficient.&lt;/p&gt;
 &lt;p&gt;Plan :&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;Introduction&lt;/li&gt;

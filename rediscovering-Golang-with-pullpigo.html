@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+            <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+            <meta name="google-site-verification" content="DJHKjkpGljcaLi1uAkfR27mqILGCLLKjX_EKY4C4nxk">
+
+        <title>Re-découvrons le langage Go avec "pullpigo", un petit projet d'expérimentation</title>
+
+        <link href="https://nicokosi.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Nicokosi's blog Full Atom Feed" />
+        <!-- Bootstrap Core CSS -->
+        <link href="https://nicokosi.github.io/theme/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- Custom CSS -->
+        <link href="https://nicokosi.github.io/theme/css/clean-blog.min.css" rel="stylesheet">
+
+        <!-- Code highlight color scheme -->
+            <link href="https://nicokosi.github.io/theme/css/code_blocks/darkly.css" rel="stylesheet">
+
+            <!-- CSS specified by the user -->
+            <link href="https://nicokosi.github.io/css/nicokosi.css" rel="stylesheet">
+
+        <!-- Custom Fonts -->
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+
+
+        <meta name="description" content="(Re)découvrir le langage de programmation Go avec un petit outil en ligne de commande, "pullpigo"">
+
+        <meta name="author" content="Nicolas Kosinski">
+
+        <meta name="tags" content="golang native">
+
+	                <meta property="og:locale" content="">
+		<meta property="og:site_name" content="Nicokosi's blog">
+
+	<meta property="og:type" content="article">
+            <meta property="article:author" content="https://nicokosi.github.io/author/nicolas-kosinski.html">
+	<meta property="og:url" content="https://nicokosi.github.io/rediscovering-Golang-with-pullpigo.html">
+	<meta property="og:title" content="Re-découvrons le langage Go avec "pullpigo", un petit projet d'expérimentation">
+	<meta property="article:published_time" content="2019-12-24 07:00:00+01:00">
+            <meta property="og:description" content="(Re)découvrir le langage de programmation Go avec un petit outil en ligne de commande, "pullpigo"">
+
+            <meta property="og:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@nicokosi">
+        <meta name="twitter:title" content="Re-découvrons le langage Go avec "pullpigo", un petit projet d'expérimentation">
+
+            <meta name="twitter:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
+
+            <meta name="twitter:description" content="(Re)découvrir le langage de programmation Go avec un petit outil en ligne de commande, "pullpigo"">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="https://nicokosi.github.io/">Nicokosi's blog</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Header -->
+        <header class="intro-header" style="background-color: PowderBlue">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="post-heading">
+                        <h1>Re-découvrons le langage Go avec "pullpigo", un petit projet d'expérimentation</h1>
+                        <span class="meta">Posted by
+                                <a href="https://nicokosi.github.io/author/nicolas-kosinski.html">Nicolas Kosinski</a>
+                             on 2019-12-24
+                        </span>
+                        Translations:
+<a href="https://nicokosi.github.io/rediscovering-Golang-with-pullpigo-en.html" hreflang="en">en</a>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+    <!-- Post Content -->
+    <article>
+        <h1>Re-découvrons le langage Go avec "pullpigo", un petit projet d'expérimentation</h1>
+<p>Développant au quotidien en Java, j'avais envie d'apprendre quelques rudiments du langage de programmation <strong><a href="https://golang.org/">Go</a></strong>.
+Pour ce faire, j'ai implémenté un petit outil en <strong>ligne de commande (<em>CLI</em>)</strong> afin d'afficher des informations sur les pull requests GitHub.
+J'ai créé ainsi un petit projet, versionné dans GitHub, <a href="https://github.com/nicokosi/pullpigo">pullpigo</a>. Son but 
+est d'afficher le nombre d'événements du type "tant d'événements créés par tel auteur GitHub (<em>commiter</em>)" en utilisant une API publique de GitHub.</p>
+<p>Notez que j'ai déjà implémenter un outil similaire dans d'autres langages (que je voulais aussi découvrir ou approfondir) : en <strong>Clojure</strong> (cf. <a href="https://github.com/nicokosi/hubstats">hubstats</a>), <strong>Kotlin</strong> (cf. <a href="https://github.com/nicokosi/pullpitoK">pullpitoK</a>) et <strong>Rust</strong> (cf. <a href="https://github.com/nicokosi/pullpito">pullpito</a>).</p>
+<h2>Les exécutables natifs sont rapides 🚀</h2>
+<p>Compilons pullpigo :</p>
+<div class="highlight"><pre><span></span>$ go clean
+$ <span class="nb">time</span> go build
+go build  <span class="m">1</span>.05s user <span class="m">0</span>.58s system <span class="m">105</span>% cpu <span class="m">1</span>.559 total
+</pre></div>
+
+
+<p>Puis lançons le :</p>
+<div class="highlight"><pre><span></span><span class="nb">time</span> ./pullpigo -repo<span class="o">=</span>vidal-community/atom-jaxb
+GitHub repository <span class="s1">&#39;vidal-community/atom-jaxb&#39;</span>
+  <span class="m">2</span> events created by amairi
+  <span class="m">1</span> events created by fchetouani
+  <span class="m">6</span> events created by AElMehdiVidal
+  <span class="m">3</span> events created by jcgay
+./pullpigo -repo<span class="o">=</span>vidal-community/atom-jaxb  <span class="m">0</span>.07s user <span class="m">0</span>.03s system <span class="m">20</span>% cpu <span class="m">0</span>.482 total
+</pre></div>
+
+
+<p>Comparons ces temps avec ceux d'un projet similaire implémenté en Kotlin, (<a href="https://github.com/nicokosi/pullpitoK/">pullpitoK</a>) :</p>
+<div class="highlight"><pre><span></span>$ ./gradlew clean
+$ <span class="nb">time</span> ./gradlew build --quiet
+./gradlew build --quiet  <span class="m">1</span>.37s user <span class="m">0</span>.17s system <span class="m">39</span>% cpu <span class="m">3</span>.932 total
+$ <span class="nb">time</span> ./gradlew run --quiet --args <span class="s2">&quot;vidal-community/atom-jaxb&quot;</span>
+
+pull requests <span class="k">for</span> <span class="s2">&quot;vidal-community/atom-jaxb&quot;</span> -&gt;
+            opened per author
+                amairi: <span class="m">1</span>
+            commented per author
+                AElMehdiVidal: <span class="m">1</span>
+                jcgay: <span class="m">1</span>
+            closed per author
+
+./gradlew run --quiet --args <span class="s2">&quot;vidal-community/atom-jaxb&quot;</span>  <span class="m">1</span>.37s user <span class="m">0</span>.18s system <span class="m">62</span>% cpu <span class="m">2</span>.473 total
+</pre></div>
+
+
+<p>Compilation rapide + exécution rapide = ❤️</p>
+<h2>Les librairies et l'outillage standards de Go sont complets 📦</h2>
+<p>Pour appeler l'<a href="https://developer.github.com/v3/activity/events/">API REST v3 'events' de GitHub</a>, j'avais besoin de : un client HTTP, un <em>parser</em> JSON ainsi qu'un <em>framework</em> de test. C'est cool, tout est présent dans les librairies de base : <a href="https://golang.org/pkg/testing/">testing</a>, <a href="https://golang.org/pkg/net/http/">HTTP client</a> et <a href="https://golang.org/pkg/encoding/json/">JSON parsing</a>.</p>
+<p>J'ai donc pu implémenter mon outil sans utiliser une seule librairie tierce !</p>
+<p>J'ai également apprécié l'outillage (notez mon <em>background</em> Java) :</p>
+<ul>
+<li>
+<p>pour <strong>formatter le code</strong>, il sufffit de lancer la commande <code>go fmt</code>, sans aucune configuration.</p>
+</li>
+<li>
+<p>pour analyser statiquement son code, un <strong>code linter</strong> est également inclus. Il suffit d'installer <a href="[golang/linttype">https://github.com/golang/linttype</a> et de lancer la commande <code>golint</code>, sans configuration (pour être franc, ce <em>linter</em> ne m'a pas aidé pour coder pullpigo mais je trouve ça génial que cet outil existe).</p>
+</li>
+</ul>
+<h2>Opportunités "annexes" 😎</h2>
+<p>En dehors du langage et des libraries, ce petit projet a aussi été l'occasion d'<strong>essayer et d'apprendre de nouveaux outils</strong>. En l’occurrence :</p>
+<ul>
+<li>
+<p><a href="https://code.visualstudio.com/">Visual Studio Code</a>, un environnement de développement (<em>Integrated Development Environment</em>) que je n'utilise pas professionnellement.</p>
+</li>
+<li>
+<p><a href="https://github.com/features/actions">GitHub Actions</a>, une plate-forme pour l'intégration continue : chaque commit git GitHub déclenche la compilation et les tests unitaires. Bien que je n'avais jamaais utilisé GitHub Actions, ça a été rapide à mettre en place (quelques minutes). En en plus, c'est gratuit ! </p>
+</li>
+</ul>
+<p>Un autre point bonus, j'ai apprécié de <strong>discuter et d'échanger</strong> avec des gens que je connais (et pas uniquement de "googler").</p>
+<p>Dans mon cas, mes "amis Golang" ont été :</p>
+<ul>
+<li>
+<p><a href="https://github.com/jcgay/">Jean-Christophe</a> qui m'a motivé et m'a aidé à corriger un problème de <em>parsing</em> JSON. 😅</p>
+</li>
+<li>
+<p><a href="https://github.com/fbiville">Florent</a> qui m'a donné des pointeurs sympas vers des librairies : <a href="https://golang.org/pkg/testing/quick/">testing/quick</a> pour le <em>property-based testing</em>, <a href="https://github.com/onsi/ginkgo">ginkgo</a> pour les test style <em>BDD</em> et <a href="https://github.com/onsi/gomega">gomega</a> pour les assertions de test. A essayer ! 😎</p>
+</li>
+</ul>
+<h3>La suite ? 🔮</h3>
+<p>Quelques pistes :</p>
+<ul>
+<li>
+<p>Améliorer les messages en sortie. Par exemple, afficher les compteurs par type d'événements ("pull requests créés", "pull requests fusionnées" etc.)</p>
+</li>
+<li>
+<p>Récupérer les données de l'API <code>GraphQL</code> de GitHub (<a href="https://developer.github.com/v4/">GitHub's GraphQL API v4</a>) de façon à ne pas être limité aux 300 derniers événements (c'est une limitation de l'API GitHub REST).</p>
+</li>
+<li>
+<p>Utiliser des dépendances pour les tests (assertions plus faciles, property-based testing etc.) et en profiter pour découvrir la gestion des dépendances en Go.</p>
+</li>
+</ul>
+<p>A suivre !</p>
+    </article>
+
+        <div class="tags">
+            <p>tags: <a href="https://nicokosi.github.io/tag/golang-native.html">golang native</a></p>
+        </div>
+
+    <hr>
+
+        <div class="comments">
+            <h2>Comments !</h2>
+            <div id="disqus_thread"></div>
+            <script type="text/javascript">
+                var disqus_shortname = 'nicokosi-blog';
+                var disqus_identifier = 'rediscovering-Golang-with-pullpigo.html';
+                var disqus_url = 'https://nicokosi.github.io/rediscovering-Golang-with-pullpigo.html';
+                (function() {
+                    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                    dsq.src = '//nicokosi-blog.disqus.com/embed.js';
+                    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the comments.</noscript>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                            <li>
+                                <a href="http://twitter.com/nicokosi">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="http://github.com/nicokosi">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.linkedin.com/in/nicolas-kosinski-95184811">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://nicokosi.github.io/feeds/all.atom.xml">
+                                    <span class="fa-stack fa-lg">
+                                        <i class="fa fa-circle fa-stack-2x"></i>
+                                        <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                                    </span>
+                                </a>
+                            </li>
+                    </ul>
+<p class="copyright text-muted">
+    Generated by <a href="http://getpelican.com">Pelican</a> with <a href="https://github.com/gilsondev/pelican-clean-blog">pelican-clean-blog</a> theme
+</p>                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery -->
+    <script src="https://nicokosi.github.io/theme/js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="https://nicokosi.github.io/theme/js/bootstrap.min.js"></script>
+
+        <!-- Custom Theme JavaScript -->
+        <script src="https://nicokosi.github.io/theme/js/clean-blog.min.js"></script>
+
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-11930016-2']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+<script type="text/javascript">
+    var disqus_shortname = 'nicokosi-blog';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
+</script>
+</body>
+
+</html>
