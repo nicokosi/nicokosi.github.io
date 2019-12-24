@@ -4,7 +4,7 @@
 Pour ce faire, j'ai implémenté un petit outil en &lt;strong&gt;ligne de commande (&lt;em&gt;CLI&lt;/em&gt;)&lt;/strong&gt; afin d'afficher des informations sur les pull requests GitHub.
 J'ai créé ainsi un petit projet, versionné dans GitHub, &lt;a href="https://github.com/nicokosi/pullpigo"&gt;pullpigo&lt;/a&gt;. Son but 
 est d'afficher le nombre d'événements du type "tant d'événements créés par tel auteur GitHub (&lt;em&gt;commiter&lt;/em&gt;)" en utilisant une API publique de GitHub.&lt;/p&gt;
-&lt;p&gt;Notez que j'ai déjà implémenter un outil similaire dans d'autres langages (que je voulais aussi découvrir ou approfondir) : en &lt;strong&gt;Clojure&lt;/strong&gt; (cf. &lt;a href="https://github.com/nicokosi/hubstats"&gt;hubstats&lt;/a&gt;), &lt;strong&gt;Kotlin&lt;/strong&gt; (cf. &lt;a href="https://github.com/nicokosi/pullpitoK"&gt;pullpitoK&lt;/a&gt;) et &lt;strong&gt;Rust&lt;/strong&gt; (cf. &lt;a href="https://github.com/nicokosi/pullpito"&gt;pullpito&lt;/a&gt;).&lt;/p&gt;
+&lt;p&gt;Notez que j'ai déjà implémenté un outil similaire dans d'autres langages (que je voulais aussi découvrir ou approfondir) : en &lt;strong&gt;Clojure&lt;/strong&gt; (cf. &lt;a href="https://github.com/nicokosi/hubstats"&gt;hubstats&lt;/a&gt;), &lt;strong&gt;Kotlin&lt;/strong&gt; (cf. &lt;a href="https://github.com/nicokosi/pullpitoK"&gt;pullpitoK&lt;/a&gt;) et &lt;strong&gt;Rust&lt;/strong&gt; (cf. &lt;a href="https://github.com/nicokosi/pullpito"&gt;pullpito&lt;/a&gt;).&lt;/p&gt;
 &lt;h2&gt;Les exécutables natifs sont rapides 🚀&lt;/h2&gt;
 &lt;p&gt;Compilons pullpigo :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;$ go clean
