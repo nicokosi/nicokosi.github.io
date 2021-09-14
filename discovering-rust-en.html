@@ -126,29 +126,27 @@
 <p>Porting existing code was an enjoyable way to learn Rust since I did not had to think about the "what" (display pull requests information) and the "how" (call the GitHub API): I just had to focus on Rust coding!</p>
 <h2>My first impressions</h2>
 <p>Rust code runs <strong>fast</strong>! For instance, let's compare running a few <code>pullpito</code>'s unit tests that run in half a second:</p>
-<div class="highlight"><pre><span></span>pullpito $&gt; time (cargo test --quiet)
+<div class="highlight"><pre><span></span><code>pullpito $&gt; time (cargo test --quiet)
 
 running 8 tests
 # snip
 test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
 
 ( cargo test --quiet; )  0.43s user 0.21s system 96% cpu 0.665 total
-</pre></div>
-
+</code></pre></div>
 
 <p>On the other hand, <code>hubstats</code>' tests run in 10 seconds:</p>
-<div class="highlight"><pre><span></span>hubstats $&gt; time (lein test)
+<div class="highlight"><pre><span></span><code>hubstats $&gt; time (lein test)
 # snip
 
 Ran 3 tests containing 20 assertions.
 0 failures, 0 errors.
 ( lein test; )  10.86s user 0.70s system 129% cpu 8.923 total
-</pre></div>
-
+</code></pre></div>
 
 <p><em>Note: the <code>cargo</code> command launches <a href="https://github.com/rust-lang/cargo/">Cargo</a> which is Rust's build tool ; the <code>lein</code> command launches <a href="https://leiningen.org/">Leiningen</a> which is Clojure's build tool</em>.</p>
 <p>Now let's compare the CLI tool executions. <code>pullpito</code> runs in 20 milliseconds:</p>
-<div class="highlight"><pre><span></span>pullpito $&gt; time (cargo run --quiet python/peps)
+<div class="highlight"><pre><span></span><code>pullpito $&gt; time (cargo run --quiet python/peps)
 pull requests for &quot;python/peps&quot; -&gt;
   opened per author:
     brainwane: 1
@@ -164,11 +162,10 @@ pull requests for &quot;python/peps&quot; -&gt;
     markshannon: 1
 
 ( cargo run --quiet python/peps; )  0.22s user 0.09s system 20% cpu 1.524 total
-</pre></div>
-
+</code></pre></div>
 
 <p>...whereas <code>hubstats</code> runs in 11 seconds (it should probably be optimized 😇):</p>
-<div class="highlight"><pre><span></span>hubstats $&gt; time (lein run --organization python --repository peps)
+<div class="highlight"><pre><span></span><code>hubstats $&gt; time (lein run --organization python --repository peps)
 pull requests for python/peps -&gt;
     since 2018-05-15T05:35:57Z
         8 opened / 8 closed / 2 commented (15 comments)
@@ -176,11 +173,10 @@ pull requests for python/peps -&gt;
         comments per author:  {tim-one 4, ethanhs 3, vlasovskikh 2, gvanrossum 2, JelleZijlstra 2, ilevkivskyi 1, Rosuav 1}
         closed per author:  {brettcannon 4, markshannon 3, encukou 1}
 ( lein run --organization python --repository peps; )  11.30s user 0.77s system 66% cpu 18.160 total
-</pre></div>
-
+</code></pre></div>
 
 <p>What about <strong>compilation</strong>? The first compilation is slow because all dependencies have to be compiled. For instance, <code>pullpito</code> initially compiles in 40 seconds, on my machine:</p>
-<div class="highlight"><pre><span></span>pullpito $&gt; time (cargo clean &amp;&amp; cargo build)
+<div class="highlight"><pre><span></span><code>pullpito $&gt; time (cargo clean &amp;&amp; cargo build)
 Compiling void v1.0.2
    Compiling byteorder v1.2.2
    Compiling serde v1.0.37
@@ -188,32 +184,28 @@ Compiling void v1.0.2
 # snip
     Finished dev [unoptimized + debuginfo] target(s) in 41.53 secs
 ( cargo clean &amp;&amp; cargo build; )  213.99s user 16.77s system 552% cpu 41.788 total
-</pre></div>
-
+</code></pre></div>
 
 <p>But Rust has an incremental compiler, so subsequent compilations will be immediate if code does not change:</p>
-<div class="highlight"><pre><span></span>pullpito $&gt; cargo build
+<div class="highlight"><pre><span></span><code>pullpito $&gt; cargo build
     Finished dev [unoptimized + debuginfo] target(s) in 0.0 secs
-</pre></div>
-
+</code></pre></div>
 
 <p>On the other hand, <code>hubstats</code> compiles in 40 seconds (dependencies are not compiled):</p>
-<div class="highlight"><pre><span></span>hubstats $&gt; time (lein clean &amp;&amp; lein uberjar)
+<div class="highlight"><pre><span></span><code>hubstats $&gt; time (lein clean &amp;&amp; lein uberjar)
 # snip
 ( lein clean &amp;&amp; lein uberjar; )  37.55s user 6.49s system 223% cpu 19.750 total
-</pre></div>
-
+</code></pre></div>
 
 <p><br/></p>
 <h2>About Rust, the language</h2>
 <p><br/></p>
 <h3>Ownership, OMG! 😱</h3>
 <p>Rust has a particular way to manage memory. Instead of using a garbage collector like Java or manual management like C/C++, allocated memory is automatically cleaned using the <a href="https://doc.rust-lang.org/book/second-edition/ch04-01-what-is-ownership.html">"ownership" rules</a>:</p>
-<div class="highlight"><pre><span></span>    <span class="k">Each</span> <span class="n">value</span> <span class="k">in</span> <span class="n">Rust</span> <span class="n">has</span> <span class="n">a</span> <span class="k">variable</span> <span class="n">that</span><span class="err">’</span><span class="n">s</span> <span class="k">called</span> <span class="n">its</span> <span class="k">owner</span><span class="p">.</span>
-    <span class="n">There</span> <span class="n">can</span> <span class="k">only</span> <span class="n">be</span> <span class="n">one</span> <span class="k">owner</span> <span class="k">at</span> <span class="n">a</span> <span class="n">time</span><span class="p">.</span>
-    <span class="k">When</span> <span class="n">the</span> <span class="k">owner</span> <span class="n">goes</span> <span class="k">out</span> <span class="k">of</span> <span class="k">scope</span><span class="p">,</span> <span class="n">the</span> <span class="n">value</span> <span class="n">will</span> <span class="n">be</span> <span class="n">dropped</span><span class="p">.</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>    <span class="n">Each</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">Rust</span> <span class="n">has</span> <span class="n">a</span> <span class="n">variable</span> <span class="n">that</span><span class="err">’</span><span class="n">s</span> <span class="n">called</span> <span class="n">its</span> <span class="n">owner</span><span class="o">.</span>
+    <span class="n">There</span> <span class="n">can</span> <span class="n">only</span> <span class="n">be</span> <span class="n">one</span> <span class="n">owner</span> <span class="n">at</span> <span class="n">a</span> <span class="n">time</span><span class="o">.</span>
+    <span class="n">When</span> <span class="n">the</span> <span class="n">owner</span> <span class="n">goes</span> <span class="n">out</span> <span class="n">of</span> <span class="n">scope</span><span class="p">,</span> <span class="n">the</span> <span class="n">value</span> <span class="n">will</span> <span class="n">be</span> <span class="n">dropped</span><span class="o">.</span>
+</code></pre></div>
 
 <p>It seems easy, but in reality, all the implications are hard to understand!</p>
 <p>Since I have not fully understood the ownership implications, I will not go any further on this topic. My current status is: fix all the compilation errors! 😇</p>
@@ -221,45 +213,41 @@ Compiling void v1.0.2
 <p><br/></p>
 <h3>Immutability by default 😎</h3>
 <p>A variable is immutable, by default. It cannot be re-assigned unless explicitly declared mutable:</p>
-<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="p">;</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="p">;</span><span class="w"></span>
 <span class="c1">// name = &quot;bar&quot;; // Would trigger this compilation error: &quot;error: re-assignment of immutable variable&quot;</span>
 
 <span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">changing_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;bar&quot;</span><span class="p">;</span><span class="w"></span>
 <span class="n">changing_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;baz&quot;</span><span class="p">;</span><span class="w"></span>
-</pre></div>
-
+</code></pre></div>
 
 <p>However, immutable variables can be shadowed:</p>
-<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="p">;</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="p">;</span><span class="w"></span>
 <span class="kd">let</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;bar&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// shadowed variable</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><br/></p>
 <h3>Type inference 😎</h3>
 <p>Type inference is great for conciseness:</p>
-<div class="highlight"><pre><span></span><span class="c1">// Type can be inferred:</span>
+<div class="highlight"><pre><span></span><code><span class="c1">// Type can be inferred:</span>
 <span class="kd">let</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="p">.</span><span class="n">to_string</span><span class="p">();</span><span class="w"></span>
 <span class="c1">// or set explicitly:</span>
 <span class="kd">let</span><span class="w"> </span><span class="n">foo</span><span class="w"> </span>: <span class="nb">String</span> <span class="o">=</span><span class="w"> </span><span class="s">&quot;foo&quot;</span><span class="p">.</span><span class="n">to_string</span><span class="p">();</span><span class="w"></span>
-</pre></div>
-
+</code></pre></div>
 
 <p><br/></p>
 <h3>Pattern matching 😎</h3>
 <p>Rust has pattern matching... and it's cool!</p>
-<div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="kd">let</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">  </span><span class="nb">Ok</span><span class="p">(</span><span class="n">body</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"></span>
 <span class="w">  </span><span class="nb">Err</span><span class="p">(</span><span class="n">_</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s">&quot;default&quot;</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
-</pre></div>
-
+</code></pre></div>
 
 <p>As far as I understand, variable borrowing makes pattern matching harder to use, as seen in the <a href="https://stackoverflow.com/questions/29926724/matching-string-cannot-move-out-of-borrowed-content">Stack Overflow</a>. Note to self: try this out.</p>
 <p><br/></p>
 <h3>Tuples, enums and structures 😎</h3>
 <p>Rust has enums, tuples, and structures:</p>
-<div class="highlight"><pre><span></span><span class="cp">#![allow(dead_code)]</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="cp">#![allow(dead_code)]</span><span class="w"></span>
 
 <span class="cp">#[derive(Debug)]</span><span class="w"> </span><span class="k">enum</span> <span class="nc">Suite</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">  </span><span class="n">CLUB</span><span class="p">,</span><span class="w"> </span><span class="n">DIAMOND</span><span class="p">,</span><span class="w"> </span><span class="n">HEART</span><span class="p">,</span><span class="w"> </span><span class="n">SPADE</span><span class="w"></span>
@@ -273,14 +261,12 @@ Compiling void v1.0.2
 <span class="w">  </span><span class="n">suite</span>: <span class="nc">Suite</span><span class="p">,</span><span class="w"></span>
 <span class="w">  </span><span class="n">rank</span>: <span class="nc">Rank</span><span class="p">,</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Let's test it via the <code>rusti</code> REPL:</p>
-<div class="highlight"><pre><span></span><span class="n">rusti</span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Card</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">suite</span>: <span class="nc">Suite</span>::<span class="n">CLUB</span><span class="p">,</span><span class="w"> </span><span class="n">rank</span>: <span class="nc">Rank</span>::<span class="n">King</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">rusti</span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Card</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">suite</span>: <span class="nc">Suite</span>::<span class="n">CLUB</span><span class="p">,</span><span class="w"> </span><span class="n">rank</span>: <span class="nc">Rank</span>::<span class="n">King</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
 <span class="n">Card</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">suite</span>: <span class="nc">CLUB</span><span class="p">,</span><span class="w"> </span><span class="n">rank</span>: <span class="nc">King</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
-</pre></div>
-
+</code></pre></div>
 
 <p><br/></p>
 <h2>Rust tooling</h2>
@@ -294,15 +280,14 @@ Compiling void v1.0.2
 <ul>
 <li>has a descriptor with a <a href="https://semver.org/">semantic version</a>. For instance, pullpito's version is 0.1.0, as declared in its <code>Cargo.toml</code> descriptor:</li>
 </ul>
-<div class="highlight"><pre><span></span>pullpito $&gt; grep &quot;^version =&quot; Cargo.toml
+<div class="highlight"><pre><span></span><code>pullpito $&gt; grep &quot;^version =&quot; Cargo.toml
 version = &quot;0.1.0&quot;
-</pre></div>
-
+</code></pre></div>
 
 <ul>
 <li>declares the versions of its own dependencies:</li>
 </ul>
-<div class="highlight"><pre><span></span>pullpito $&gt; grep -A 10 &quot;dependencies&quot; Cargo.toml
+<div class="highlight"><pre><span></span><code>pullpito $&gt; grep -A 10 &quot;dependencies&quot; Cargo.toml
 [dependencies]
 log = &quot;0.4&quot;
 env_logger = &quot;0.5&quot;
@@ -312,14 +297,13 @@ serde_json = &quot;1.0&quot;
 serde_derive = &quot;1.0&quot;
 chrono = { version = &quot;0.4&quot;, features = [&quot;serde&quot;] }
 reqwest = &quot;0.8&quot;
-</pre></div>
-
+</code></pre></div>
 
 <p>Cool and concise, isn't it?</p>
 <p><br/></p>
 <h3>Standard code format 😎</h3>
 <p><a href="https://github.com/rust-lang-nursery/rustfmt">rustfmt</a> can be used as a command-line tool to format code using a default style:</p>
-<div class="highlight"><pre><span></span>pullpito $&gt; cat src/main.rs
+<div class="highlight"><pre><span></span><code>pullpito $&gt; cat src/main.rs
 fn main() {
   println! (&quot;foo&quot;);
  let bar = &quot;bar&quot;;
@@ -332,22 +316,20 @@ fn main() {
     println!(&quot;foo&quot;);
     let bar = &quot;bar&quot;;
 }
-</pre></div>
-
+</code></pre></div>
 
 <p>No more "tabs vs space vs ..." flame war! Cf. <a href="https://xkcd.com/1285/">https://xkcd.com/1285/</a>!</p>
 <p><br/></p>
 <h3>User-friendly compiler (mostly) 😎</h3>
 <p>The Rust compiler often makes useful suggestions in case of compilation error. Example:</p>
-<div class="highlight"><pre><span></span><span class="cp">#[derive(Debug)]</span><span class="w"> </span><span class="k">enum</span> <span class="nc">Suite</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">CLUB</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="cp">#[derive(Debug)]</span><span class="w"> </span><span class="k">enum</span> <span class="nc">Suite</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">CLUB</span><span class="w"> </span><span class="p">}</span><span class="w"></span>
 <span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">println</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;{:?}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Suite</span><span class="p">.</span><span class="n">CLUB</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&quot;{:?}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Suite</span><span class="p">.</span><span class="n">CLUB</span><span class="p">);</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
-</pre></div>
-
+</code></pre></div>
 
 <p>will fail compiling:</p>
-<div class="highlight"><pre><span></span>error[E0423]: expected value, found enum `Suite`
+<div class="highlight"><pre><span></span><code>error[E0423]: expected value, found enum `Suite`
  --&gt; src/main.rs:5:22
   |
 5 |     println!(&quot;{:?}&quot;, Suite.CLUB);
@@ -355,19 +337,17 @@ fn main() {
   |
   = note: did you mean to use one of the following variants?
           - `Suite::CLUB`
-</pre></div>
-
+</code></pre></div>
 
 <p><br/></p>
 <h3>A multi-version toolchain: <code>rustup</code> 😎</h3>
 <p>Rust has three release channels: stable, beta, and nightly. You can natively install and use one, some or all of them. Indeed, some libraries or tools may only work on the "stable" toolchain, and others may require the "nightly" one. In that case, use the <code>rustup</code> command to install and use both toolchains.</p>
 <p>For instance, I can install the <code>nightly</code> toolchain:</p>
-<div class="highlight"><pre><span></span>$&gt; rustup install nightly
-</pre></div>
-
+<div class="highlight"><pre><span></span><code>$&gt; rustup install nightly
+</code></pre></div>
 
 <p>There are now two toolchains: <code>stable</code> and <code>nightly</code>:</p>
-<div class="highlight"><pre><span></span>$&gt; rustup show
+<div class="highlight"><pre><span></span><code>$&gt; rustup show
 Default host: x86_64-apple-darwin
 
 installed toolchains
@@ -381,8 +361,7 @@ active toolchain
 
 stable-x86_64-apple-darwin (default)
 rustc 1.25.0 (84203cac6 2018-03-25)
-</pre></div>
-
+</code></pre></div>
 
 <p>I can then:</p>
 <ul>

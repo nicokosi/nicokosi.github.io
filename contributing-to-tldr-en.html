@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-        <title>Versionner sa configuration système via des "dotfiles"</title>
+        <title>Contributing to TLDR (collaborative cheatsheets for console commands)</title>
 
         <link href="https://nicokosi.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Nicokosi's blog Full Atom Feed" />
         <!-- Bootstrap Core CSS -->
@@ -36,30 +36,30 @@
 
 
 
-        <meta name="description" content="pourquoi et comment versionner sa configuration système (système d'exploitation, shell et applications).">
+        <meta name="description" content="my recent contributions to the open-source project 'tldr' (good/bad parts)">
 
         <meta name="author" content="Nicolas Kosinski">
 
-        <meta name="tags" content="tools">
+        <meta name="tags" content="OSS cli">
 
 	                <meta property="og:locale" content="">
 		<meta property="og:site_name" content="Nicokosi's blog">
 
 	<meta property="og:type" content="article">
             <meta property="article:author" content="https://nicokosi.github.io/author/nicolas-kosinski.html">
-	<meta property="og:url" content="https://nicokosi.github.io/dotfiles.html">
-	<meta property="og:title" content="Versionner sa configuration système via des "dotfiles"">
-	<meta property="article:published_time" content="2016-08-17 00:00:00+02:00">
-            <meta property="og:description" content="pourquoi et comment versionner sa configuration système (système d'exploitation, shell et applications).">
+	<meta property="og:url" content="https://nicokosi.github.io/contributing-to-tldr-en.html">
+	<meta property="og:title" content="Contributing to TLDR (collaborative cheatsheets for console commands)">
+	<meta property="article:published_time" content="2021-09-14 08:00:00+02:00">
+            <meta property="og:description" content="my recent contributions to the open-source project 'tldr' (good/bad parts)">
 
             <meta property="og:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:site" content="@nicokosi">
-        <meta name="twitter:title" content="Versionner sa configuration système via des "dotfiles"">
+        <meta name="twitter:title" content="Contributing to TLDR (collaborative cheatsheets for console commands)">
 
             <meta name="twitter:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
 
-            <meta name="twitter:description" content="pourquoi et comment versionner sa configuration système (système d'exploitation, shell et applications).">
+            <meta name="twitter:description" content="my recent contributions to the open-source project 'tldr' (good/bad parts)">
 </head>
 
 <body>
@@ -95,12 +95,14 @@
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                     <div class="post-heading">
-                        <h1>Versionner sa configuration système via des "dotfiles"</h1>
+                        <h1>Contributing to TLDR (collaborative cheatsheets for console commands)</h1>
                         <span class="meta">Posted by
                                 <a href="https://nicokosi.github.io/author/nicolas-kosinski.html">Nicolas Kosinski</a>
-                             on 2016-08-17
+                             on 2021-09-14
                         </span>
-                        
+                        Translations:
+<a href="https://nicokosi.github.io/contributing-to-tldr.html" hreflang="fr">fr</a>
+
                     </div>
                 </div>
             </div>
@@ -113,72 +115,88 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
     <!-- Post Content -->
     <article>
-        <h2>Introduction : la puissance du shell, avec ou sans maîtrise ?</h2>
-<p>Cela fait environ deux ans que je développe sur un poste "*nix" (Linux et Mac) après avoir développé de nombreuses années sur un poste Windows. La puissance du shell est indéniable : combiner des lignes de commandes simples, bénéficier de l'historique des commandes lancées, etc. Pourquoi ne pas en profiter pour maîtriser davantage son système en <strong>versionnant sa configuration</strong> ?</p>
-<h2>Présentation : Dotfiles, quezako ?</h2>
-<p>Pour un système *nix (Linux, Mac, etc.), la configuration du shell et des applications est généralement centralisée dans les "dotfiles", des fichiers / répertoires dont le nom commence par un point ("dot" en anglais) et qui sont chargés en début de session interactive ou au lancement d'applications. En utilisant un gestionnaire de sources et des liens symboliques, on peut facilement <strong>historiser</strong> et <strong>synchroniser</strong> l'évolution de ces dotfiles afin de :</p>
-<ul>
-<li>
-<p><strong>personnaliser le système d'exploitation</strong>  : options d'affichage (exemple : choisir de masquer automatiquement la barre des applications), audio, etc.</p>
-</li>
-<li>
-<p><strong>personnaliser son shell</strong> :</p>
-<ul>
-<li>
-<p>positionnement de variables d'environnement (exemples : <code>PATH</code>, <code>JAVA_HOME</code>, <code>MVN_OPTIONS</code> etc.)</p>
-</li>
-<li>
-<p>création d'alias pour les commandes fréquemment utilisées et/ou dures à mémoriser (exemple : <code>alias mcist="mvn clean install -DskipTests"</code>)</p>
-</li>
-<li>
-<p>utilisation d'un shell "sur-vitaminé" du type <a href="https://github.com/robbyrussell/oh-my-zsh">Oh My Zsh</a></p>
-</li>
-</ul>
-</li>
-<li>
-<p><strong>gérér les applications installées</strong>, à condition d'utiliser un gestionnaire de paquets du type <code>homebrew</code> (ou <code>apt</code>, <code>OneGet</code> etc.).</p>
-</li>
-</ul>
-<h2>Comment ? Un exemple d'utilisation du mini-framework "holman/dotfiles"</h2>
-<p>On peut créer son propre environnement ou bien utiliser un framework "dotfiles" prêt à l'emploi car il existe de nombreux frameworks "dotfiles", en voici une liste non-exhaustive : <a href="https://dotfiles.github.io/">https://dotfiles.github.io/</a>.</p>
-<p>J'ai pour ma part utilisé <a href="https://github.com/holman/dotfiles">https://github.com/holman/dotfiles</a> qui permet de gérer sa configuration <code>ZSH</code> en proposant les fonctionnalités suivantes :</p>
-<ul>
-<li>
-<p>chargement automatique des fichiers nommés <code>*.zsh</code>, quel que soit leur répertoire, favorisant ainsi une structure thématique. Par exemple, on peut distinguer la configuration du compilateur Java, dans le script <code>java/env.zsh</code>, de la configuration du compilateur Go, dans le script <code>golang/env.zsh</code>. Cette approche thématique remplace avantageusement l'utilisation d'un script monolithique.</p>
-</li>
-<li>
-<p>création de liens symboliques ("symlinks") pointant vers les scripts de démarrage du shell (exemple : le fichier <code>$HOME/.zshrc</code> pour le shell <code>ZSH</code>).</p>
-</li>
-</ul>
-<p>Après avoir "forké" <a href="https://github.com/holman/dotfile">https://github.com/holman/dotfiles</a>, j'ai créé deux branches :</p>
-<ul>
-<li>
-<p>une pour mon ordinateur personnel sous Mac : <a href="https://github.com/nicokosi/dotfiles">https://github.com/nicokosi/dotfiles</a></p>
-</li>
-<li>
-<p>une autre pour mon ordinateur professionnel sous Linux : <a href="https://github.com/nicokosi/dotfiles/tree/vidal">https://github.com/nicokosi/dotfiles/tree/vidal</a>
-Ces branches me permettent d'avoir deux configurations bien distinctes même si elles partagent certaines similitudes.</p>
-</li>
-</ul>
-<h2>Conclusion : <em>Dotfiles all the things</em>!</h2>
-<p>Même si la mise en place et la maintenance de ses dotfiles prend du temps, l'investissement vaut le coup pour notamment :</p>
-<ul>
-<li>
-<p><strong>la résolution de problèmes</strong> (exemples : identifier ce qui a été récemment modifié, revenir à une configuration précédente, etc.) ;</p>
-</li>
-<li>
-<p><strong>synchroniser</strong> des changements entre plusieurs machines (exemple : PC sous Linux au travail et Mac perso), chacune ayant  une configuration distincte ;</p>
-</li>
-<li>
-<p><strong>partager</strong> sa configuration avec d'autres développeurs ("Voici le dernier réglage que j'ai utilisé pour ...").
-:</p>
-</li>
-</ul>
-<p>PS : merci à Jean-Christophe Gay pour l'inspiration et les "bons tuyaux". Voici son blog : <a href="https://jeanchristophegay.com/">https://jeanchristophegay.com/</a>.</p>
+        <p>Assumed audience: developers interested in Command-Line Interface tools and in contributing to Open Source Projects.</p>
+<h1>My first contributions to the <code>tldr</code> open-source project</h1>
+<p>Since a few months, I occasionally contribute to <a href="https://github.com/tldr-pages/tldr"><code>tldr</code></a> (also known as <code>tldr-pages</code>) which describes as:</p>
+<blockquote>
+<p>Collaborative cheat-sheets for console commands</p>
+</blockquote>
+<p>See my <a href="https://github.com/tldr-pages/tldr/pulls?q=is%3Apr+author%3Anicokosi">contributions</a>).</p>
+<p>This blog post lists the good and bad parts of these contributions.</p>
+<h2>The good parts 👍</h2>
+<h3>Share my "local knowledge" 🎁</h3>
+<p>Many commands that were only in my Unix shell history or in my head are now shared to all <code>tldr</code> users... and to my-self!</p>
+<p>I can now retrieve my favorite commands typing <code>tldr &lt;command_name&gt;</code>, i.e. <code>tldr espanso</code> since <a href="https://github.com/tldr-pages/tldr/pull/5662">my contribution #5662</a> :</p>
+<div class="highlight"><pre><span></span><code>$ tldr espanso
+
+espanso
+
+Cross-platform Text Expander written <span class="k">in</span> Rust.
+More information: &lt;https://espanso.org&gt;.
+
+- Check status:
+    espanso status
+
+- Edit the configuration:
+    espanso edit config
+
+- Install a package from the hub store <span class="o">(</span>&lt;https://hub.espanso.org/&gt;<span class="o">)</span>:
+    espanso install package_name
+
+- Restart <span class="o">(</span>required after installing a package, useful <span class="k">in</span> <span class="k">case</span> of failure<span class="o">)</span>:
+    espanso restart
+</code></pre></div>
+
+<p>And it's easier that searching my shell history:</p>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">history</span> <span class="p">|</span> grep espanso
+ <span class="m">4998</span>  brew tap federico-terzi/espanso
+ <span class="m">4999</span>  brew install espanso
+ <span class="m">5000</span>  espanso register
+ <span class="m">5001</span>  mkdir espanso
+ <span class="m">5002</span>  <span class="nb">cd</span> espanso
+ <span class="m">5013</span>  espanso stop
+ <span class="m">5014</span>  espanso start
+ <span class="m">5015</span>  espanso path
+</code></pre></div>
+
+<h3>A welcoming community 🤗</h3>
+<p>I was very well received by the contributors who encourage without putting pressure. My feelings are mainly related to comments on <em>pull requests</em> / <em>issues</em>, for example this kind <a href="https://github.com/tldr-pages/tldr/pull/5662#issuecomment-812137443">comment</a>:</p>
+<blockquote>
+<p>Welcome to tldr-pages, @nicokosi! ⚡ 🎉</p>
+</blockquote>
+<p>However, I hardly used <a href="https://gitter.im/tldr-pages/tldr">the Gitter discussion board</a>. I think I'm not active enough (I contribute a few minutes / hours per week) to be able to keep up with the flow of trade!</p>
+<h3>Learn new commands 👨‍🎓</h3>
+<p>While reviewing the contributions (<a href="https://github.com/tldr-pages/tldr/pulls"><em>pull requests</em></a>), I sometimes discovered new commands/discovered new options.</p>
+<p>For example, I learned that it was possible to format the return of the GitHub CLI command <code>gh</code> as JSON via [this <em>pull request</em><code>gh-formatting: add page # 6290</code>] (https://github.com / tldr-pages / tldr / pull / 6290 / files? short_path = 193df31 # diff-193df31fff2a4e88a95b3bd8732bead1fbbe8343eb8617ed1b727e4d1ba4d751):</p>
+<blockquote>
+<p>Formatting options for JSON data exported from gh GitHub CLI command. More information: https://cli.github.com/manual/gh_help_formatting.
+Display help about formatting JSON output from gh using jq:
+gh formatting</p>
+</blockquote>
+<h3>Learn to compromise ⚖️</h3>
+<p>I have learned to accept feedback from others and sometimes to accept a majority opinion that is not mine.</p>
+<p>Example: using the term <code>slug</code> in an authentication context for <a href="https://github.com/tldr-pages/tldr/pull/6108#discussion_r648835227">this post</a>.</p>
+<h2>The bad parts 👎</h2>
+<h3>Time-consuming ⏳</h3>
+<p>Contributors on OSS project do this on their free time. Morever, when collaborating on <em>pull requests</em>, everything is done writing in English, but we are not all bilingual. So collaboration/contribution is not always easy and can take time.</p>
+<p>Example of misunderstanding (<a href="https://github.com/tldr-pages/tldr/pull/6269#issuecomment-888351398">link</a>):</p>
+<blockquote>
+<p>Yes, it does seem that only common is shown, anyway that can be fixed since a user might think we have a lack of pages if we only show them.</p>
+<blockquote>
+<p>Sorry, I don't understand after "anyway".</p>
+</blockquote>
+</blockquote>
+<p>Example of slowness: it took a little less to integrate <a href="https://github.com/tldr-pages/tldr.jsx-fork/pull/3">this contribution, <code>Prevent search misses via input's placeholder / tooltip</code></a>.</p>
+<h3>No user feedback 🧑‍🦯</h3>
+<p>Only contributors give feedback via <em>pull requests</em> or <em>issues</em> GitHub.
+There are no metrics such as "number of views", "rating" etc. therefore we do not really know the use of examples (which is a good thing for confidentiality)..</p>
+<h2>What's next? 🔜</h2>
+<p>Contribute on code rather than documentation? 🧑‍💻</p>
+<p>On this project or on another? To be continued! 🔮</p>
     </article>
 
         <div class="tags">
-            <p>tags: <a href="https://nicokosi.github.io/tag/tools.html">tools</a></p>
+            <p>tags: <a href="https://nicokosi.github.io/tag/oss-cli.html">OSS cli</a></p>
         </div>
 
     <hr>

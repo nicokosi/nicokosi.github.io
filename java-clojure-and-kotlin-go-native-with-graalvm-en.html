@@ -138,57 +138,51 @@
 <h2>An optimized executable for a "WordCount" <code>Java</code> application</h2>
 <p>Our "hello world" is a 10-line program that counts the number of distinct words in a text file: <a href="https://github.com/nicokosi/wordcount-with-java-stream">wordcount-with-java-stream</a>.</p>
 <p>Let's generate an executable JAR file via Maven and OpenJDK. It takes 2 seconds on my machine:</p>
-<div class="highlight"><pre><span></span>$ sdk use java <span class="m">8</span>.0.222.hs-adpt
-Using java version <span class="m">8</span>.0.222.hs-adpt in this shell.
+<div class="highlight"><pre><span></span><code>$ sdk use java <span class="m">8</span>.0.222.hs-adpt
+Using java version <span class="m">8</span>.0.222.hs-adpt <span class="k">in</span> this shell.
 $ <span class="nb">time</span> ./mvnw clean --quiet compile
 ./mvnw clean --quiet compile  <span class="m">6</span>.24s user <span class="m">0</span>.31s system <span class="m">323</span>% cpu <span class="m">2</span>.022 total
-</pre></div>
-
+</code></pre></div>
 
 <p>Note that the ellapsed time is at the end of the last line, in seconds: <code>2.022 total</code> means 2.022 seconds.</p>
 <p>Now generate an executable via GraalVM native-image. It takes 42 seconds on my machine:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
      --enable-https <span class="se">\</span>
      --no-fallback <span class="se">\</span>
      --no-server <span class="se">\</span>
      -cp target/classes org.nicokosi.WordCount <span class="se">\</span>
      wordcount-with-java-stream
 <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image --enable-https   -c  <span class="m">236</span>,70s user <span class="m">2</span>,75s system <span class="m">566</span>% cpu <span class="m">42</span>,285 total
-</pre></div>
-
+</code></pre></div>
 
 <p>Let's compare the runtime durations for a small input file:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">alias</span> <span class="nv">wordcount_java</span><span class="o">=</span><span class="s2">&quot; </span><span class="nv">$HOME</span><span class="s2">/.sdkman/candidates/java/8.0.222.hs-adpt/bin/java -cp target/classes org.nicokosi.WordCount&quot;</span>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">alias</span> <span class="nv">wordcount_java</span><span class="o">=</span><span class="s2">&quot; </span><span class="nv">$HOME</span><span class="s2">/.sdkman/candidates/java/8.0.222.hs-adpt/bin/java -cp target/classes org.nicokosi.WordCount&quot;</span>
 $ <span class="nb">time</span> wordcount_java /etc/hosts
 File /etc/hosts contains <span class="m">26</span> words
 /home/nkosinski/.sdkman/candidates/java/8.0.222.hs-adpt/bin/java -cp     <span class="m">0</span>,16s user <span class="m">0</span>,02s system <span class="m">152</span>% cpu <span class="m">0</span>,118 total
-</pre></div>
+</code></pre></div>
 
-
-<div class="highlight"><pre><span></span>$ <span class="nb">time</span> ./wordcount-with-java-stream /etc/hosts
+<div class="highlight"><pre><span></span><code>$ <span class="nb">time</span> ./wordcount-with-java-stream /etc/hosts
 File /etc/hosts contains <span class="m">26</span> words
 ./wordcount-with-java-stream /etc/hosts  <span class="m">0</span>,00s user <span class="m">0</span>,01s system <span class="m">92</span>% cpu <span class="m">0</span>,007 total
-</pre></div>
-
+</code></pre></div>
 
 <p>And the memory footprints:</p>
-<div class="highlight"><pre><span></span>$ <span class="nv">JAVA_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt <span class="se">\</span>
+<div class="highlight"><pre><span></span><code>$ <span class="nv">JAVA_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt <span class="se">\</span>
   valgrind java -cp target/classes org.nicokosi.WordCount /etc/hosts
 
 <span class="o">==</span><span class="nv">23352</span><span class="o">==</span> HEAP SUMMARY:
-<span class="o">==</span><span class="nv">23352</span><span class="o">==</span>     in use at exit: <span class="m">34</span>,892,297 bytes in <span class="m">6</span>,155 <span class="nv">blocks</span>
+<span class="o">==</span><span class="nv">23352</span><span class="o">==</span>     <span class="k">in</span> use at exit: <span class="m">34</span>,892,297 bytes <span class="k">in</span> <span class="m">6</span>,155 <span class="nv">blocks</span>
 <span class="o">==</span><span class="nv">23352</span><span class="o">==</span>   total heap usage: <span class="m">14</span>,555 allocs, <span class="m">8</span>,400 frees, <span class="m">49</span>,960,719 bytes allocated  **
-</pre></div>
-
+</code></pre></div>
 
 <p>Note that the amount of allocated memory is at the end of the last line, in bytes: <code>49,960,719 allocated</code> means that 50 megabytes have been allocated.</p>
-<div class="highlight"><pre><span></span>$ valgrind ./wordcount-with-java-stream /etc/hosts
+<div class="highlight"><pre><span></span><code>$ valgrind ./wordcount-with-java-stream /etc/hosts
 
 <span class="o">==</span><span class="nv">23753</span><span class="o">==</span> HEAP SUMMARY:
-<span class="o">==</span><span class="nv">23753</span><span class="o">==</span>     in use at exit: <span class="m">10</span>,468 bytes in <span class="m">3</span> <span class="nv">blocks</span>
+<span class="o">==</span><span class="nv">23753</span><span class="o">==</span>     <span class="k">in</span> use at exit: <span class="m">10</span>,468 bytes <span class="k">in</span> <span class="m">3</span> <span class="nv">blocks</span>
 <span class="o">==</span><span class="nv">23753</span><span class="o">==</span>   total heap usage: <span class="m">8</span> allocs, <span class="m">5</span> frees, <span class="m">12</span>,436 bytes allocated**
-</pre></div>
-
+</code></pre></div>
 
 <p>To sum up, at the cost of a longer compilation (42 seconds instead of 2 seconds), GraalVM:</p>
 <ul>
@@ -198,68 +192,62 @@ File /etc/hosts contains <span class="m">26</span> words
 <h2>An optimized executable for a <code>Kotlin</code> CLI tool</h2>
 <p>Now let's generate an executable for a <a href="https://kotlinlang.org/">Kotlin</a> CLI tool, <a href="https://github.com/nicokosi/pullpitoK/">pullpitoK</a> (200 lines of code, with third-party libraries) that calls GitHub API to display information on GitHub pull requests.</p>
 <p>The cost of compilation is similar, so let's focus on comparing the runtime behavior for a short execution (we will display the <a href="https://en.wikipedia.org/wiki/Usage_message">"usage message"</a>):</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt/bin:<span class="nv">$PATH</span>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt/bin:<span class="nv">$PATH</span>
 $ <span class="nb">time</span> <span class="o">(</span>java -jar ./build/libs/pullpitoK-all.jar <span class="p">|</span> head -1<span class="o">)</span>
 Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
 <span class="o">(</span> java -jar ./build/libs/pullpitoK-all.jar <span class="p">|</span> head -1<span class="p">;</span> <span class="o">)</span>  <span class="m">0</span>.08s user <span class="m">0</span>.02s system <span class="m">108</span>% cpu <span class="m">0</span>.093 total
-</pre></div>
+</code></pre></div>
 
-
-<div class="highlight"><pre><span></span>$ <span class="nb">alias</span> <span class="nv">pullpitoK</span><span class="o">=</span><span class="s2">&quot;PULLPITOK_LIBSUNEC=</span><span class="nv">$HOME</span><span class="s2">/.sdkman/candidates/java/19.1.1-grl/jre/lib ./pullpitoK&quot;</span>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">alias</span> <span class="nv">pullpitoK</span><span class="o">=</span><span class="s2">&quot;PULLPITOK_LIBSUNEC=</span><span class="nv">$HOME</span><span class="s2">/.sdkman/candidates/java/19.1.1-grl/jre/lib ./pullpitoK&quot;</span>
 $ <span class="nb">time</span> <span class="o">(</span>pullpitoK --help <span class="p">|</span> head -1<span class="o">)</span>
 Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
 <span class="o">(</span> <span class="nv">PULLPITOK_LIBSUNEC</span><span class="o">=</span>/Users/nicolas/.sdkman/candidates/java/19.1.1-grl/jre/li<span class="o">)</span>  <span class="m">0</span>.00s user <span class="m">0</span>.00s system <span class="m">88</span>% cpu <span class="m">0</span>.009 total
-</pre></div>
-
+</code></pre></div>
 
 <p>So, 9 milliseconds for the native version versus 93 milliseconds for the JVM version.</p>
 <p>Now let's compare the memory footprints:</p>
-<div class="highlight"><pre><span></span>$ valgrind java -jar ./build/libs/pullpitoK-all.jar
+<div class="highlight"><pre><span></span><code>$ valgrind java -jar ./build/libs/pullpitoK-all.jar
 ...
 Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
 ...
 <span class="o">==</span><span class="nv">26273</span><span class="o">==</span> HEAP SUMMARY:
-<span class="o">==</span><span class="nv">26273</span><span class="o">==</span>     in use at exit: <span class="m">32</span>,181,758 bytes in <span class="m">2</span>,134 <span class="nv">blocks</span>
+<span class="o">==</span><span class="nv">26273</span><span class="o">==</span>     <span class="k">in</span> use at exit: <span class="m">32</span>,181,758 bytes <span class="k">in</span> <span class="m">2</span>,134 <span class="nv">blocks</span>
 <span class="o">==</span><span class="nv">26273</span><span class="o">==</span>   total heap usage: <span class="m">5</span>,725 allocs, <span class="m">3</span>,591 frees, <span class="m">33</span>,187,784 bytes allocated
 ...
-</pre></div>
+</code></pre></div>
 
-
-<div class="highlight"><pre><span></span>$ valgrind pullpitoK <span class="p">|</span> head -1
+<div class="highlight"><pre><span></span><code>$ valgrind pullpitoK <span class="p">|</span> head -1
 ...
 Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
 ...
 <span class="o">==</span><span class="nv">27690</span><span class="o">==</span> HEAP SUMMARY:
-<span class="o">==</span><span class="nv">27690</span><span class="o">==</span>     in use at exit: <span class="m">228</span> bytes in <span class="m">1</span> <span class="nv">blocks</span>
+<span class="o">==</span><span class="nv">27690</span><span class="o">==</span>     <span class="k">in</span> use at exit: <span class="m">228</span> bytes <span class="k">in</span> <span class="m">1</span> <span class="nv">blocks</span>
 <span class="o">==</span><span class="nv">27690</span><span class="o">==</span>   total heap usage: <span class="m">6</span> allocs, <span class="m">5</span> frees, <span class="m">2</span>,196 bytes allocated
 ...
-</pre></div>
-
+</code></pre></div>
 
 <p>So, 2 kilobytes for the native version versus 33 megabytes for the JVM version.</p>
 <h2>An "not-fully optimized" executable for a <code>Clojure</code> CLI tool</h2>
 <p>When I wrote my previous article <a href="https://nicokosi.github.io/clojure-goes-native-with-graalvm-en.html">Clojure goes native with GraalVM</a>, GraalVM was still experimental (<em>release candidates</em>). Moreover, I was stuck with the <a href="https://github.com/oracle/graal/blob/master/substratevm/LIMITATIONS.md">Native Image limitations</a> with dynamic class loading, the refection API (<code>java.lang.reflect</code>).</p>
 <p>Let's try again with GraalVM release for a Clojure CLI tool: <a href="https://github.com/nicokosi/hubstats/">hubstats</a> (200 lines of code, with third-party libraries).</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
    --enable-https <span class="se">\</span>
    --no-fallback <span class="se">\</span>
    --no-server <span class="se">\</span>
    -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar <span class="se">\</span>
    hubstats
-</pre></div>
-
+</code></pre></div>
 
 <p>Native compilation fails:</p>
-<div class="highlight"><pre><span></span><span class="nv">Error</span>: <span class="nv">Unsupported</span> <span class="nv">features</span> <span class="nv">in</span> <span class="mi">4</span> <span class="nv">methods</span>
-<span class="nv">Detailed</span> <span class="nv">message</span>:
-<span class="nv">Error</span>: <span class="nv">Unsupported</span> <span class="nv">type</span> <span class="nv">java</span>.<span class="nv">lang</span>.<span class="nv">invoke</span>.<span class="nv">MemberName</span> <span class="nv">is</span> <span class="nv">reachable</span>: <span class="nv">All</span> <span class="nv">methods</span> <span class="nv">from</span> <span class="nv">java</span>.<span class="nv">lang</span>.<span class="nv">invoke</span> <span class="nv">should</span> <span class="nv">have</span> <span class="nv">been</span> <span class="nv">replaced</span> <span class="nv">during</span> <span class="nv">image</span> <span class="nv">building</span>.
-<span class="nv">To</span> <span class="nv">diagnose</span> <span class="nv">the</span> <span class="nv">issue</span>, <span class="nv">you</span> <span class="nv">can</span> <span class="nv">add</span> <span class="nv">the</span> <span class="nv">option</span> <span class="o">--</span><span class="nv">report</span><span class="o">-</span><span class="nv">unsupported</span><span class="o">-</span><span class="nv">elements</span><span class="o">-</span><span class="nv">at</span><span class="o">-</span><span class="nv">runtime</span>. <span class="nv">The</span> <span class="nv">unsupported</span> <span class="nv">element</span> <span class="nv">is</span> <span class="k">then</span> <span class="nv">reported</span> <span class="nv">at</span> <span class="nv">run</span> <span class="nv">time</span> <span class="nv">when</span> <span class="nv">it</span> <span class="nv">is</span> <span class="nv">accessed</span> <span class="nv">the</span> <span class="nv">first</span> <span class="nv">time</span>.
-...
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="n">Error</span><span class="o">:</span> <span class="n">Unsupported</span> <span class="n">features</span> <span class="k">in</span> <span class="mi">4</span> <span class="n">methods</span>
+<span class="n">Detailed</span> <span class="n">message</span><span class="o">:</span>
+<span class="n">Error</span><span class="o">:</span> <span class="n">Unsupported</span> <span class="n">type</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">invoke</span><span class="o">.</span><span class="na">MemberName</span> <span class="k">is</span> <span class="n">reachable</span><span class="o">:</span> <span class="n">All</span> <span class="n">methods</span> <span class="n">from</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">invoke</span> <span class="n">should</span> <span class="n">have</span> <span class="n">been</span> <span class="n">replaced</span> <span class="n">during</span> <span class="n">image</span> <span class="n">building</span><span class="o">.</span>
+<span class="n">To</span> <span class="n">diagnose</span> <span class="n">the</span> <span class="n">issue</span><span class="o">,</span> <span class="n">you</span> <span class="n">can</span> <span class="n">add</span> <span class="n">the</span> <span class="n">option</span> <span class="o">--</span><span class="n">report</span><span class="o">-</span><span class="n">unsupported</span><span class="o">-</span><span class="n">elements</span><span class="o">-</span><span class="n">at</span><span class="o">-</span><span class="n">runtime</span><span class="o">.</span> <span class="n">The</span> <span class="n">unsupported</span> <span class="n">element</span> <span class="k">is</span> <span class="n">then</span> <span class="n">reported</span> <span class="n">at</span> <span class="n">run</span> <span class="n">time</span> <span class="n">when</span> <span class="n">it</span> <span class="k">is</span> <span class="n">accessed</span> <span class="n">the</span> <span class="n">first</span> <span class="n">time</span><span class="o">.</span>
+<span class="o">...</span>
+</code></pre></div>
 
 <p>We could probably change the source code to fix this issue. As quick fix, let's try the <code>fallback</code> mode that embeds a classic virtual machine:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
    --enable-https <span class="se">\</span>
    --force-fallback <span class="se">\</span>
    --no-server <span class="se">\</span>
@@ -269,47 +257,42 @@ Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
 <span class="o">[</span>hubstats:31661<span class="o">]</span>      <span class="o">[</span>total<span class="o">]</span>:  <span class="m">14</span>,663.95 ms
 Warning: Image <span class="s1">&#39;hubstats&#39;</span> is a fallback image that requires a JDK <span class="k">for</span> execution <span class="o">(</span>use --no-fallback to suppress fallback image generation<span class="o">)</span>.
 <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image --enable-https       <span class="m">78</span>,73s user <span class="m">1</span>,31s system <span class="m">536</span>% cpu <span class="m">14</span>,926 total
-</pre></div>
-
+</code></pre></div>
 
 <p>With the fallback mode, duration times are similar since the startup time cannot be reduced in the native mode:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt/bin:<span class="nv">$PATH</span>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt/bin:<span class="nv">$PATH</span>
 $ <span class="nb">time</span> <span class="o">(</span>java -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar <span class="p">|</span> head -1<span class="o">)</span>
 Display statistics <span class="k">for</span> GitHub pull requests.
 <span class="o">(</span> java -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar <span class="p">|</span> head -1<span class="p">;</span> <span class="o">)</span>  <span class="m">3</span>,36s user <span class="m">0</span>,10s system <span class="m">262</span>% cpu <span class="m">1</span>,318 total
-</pre></div>
+</code></pre></div>
 
-
-<div class="highlight"><pre><span></span>$ <span class="nb">time</span> <span class="o">(</span>./hubstats <span class="p">|</span> head -1<span class="o">)</span>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">time</span> <span class="o">(</span>./hubstats <span class="p">|</span> head -1<span class="o">)</span>
 
 Display statistics <span class="k">for</span> GitHub pull requests.
 <span class="o">(</span> ./hubstats <span class="p">|</span> head -1<span class="p">;</span> <span class="o">)</span>  <span class="m">2</span>,86s user <span class="m">0</span>,14s system <span class="m">236</span>% cpu <span class="m">1</span>,272 total
-</pre></div>
-
+</code></pre></div>
 
 <p>but the memory footprint of the executable is still reduced:</p>
-<div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt/bin:<span class="nv">$PATH</span>
+<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt/bin:<span class="nv">$PATH</span>
 $ valgrind java -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar
 ...
 Display statistics <span class="k">for</span> GitHub pull requests.
 ...
 <span class="o">==</span><span class="nv">2690</span><span class="o">==</span> HEAP SUMMARY:
-<span class="o">==</span><span class="nv">2690</span><span class="o">==</span>     in use at exit: <span class="m">38</span>,656,326 bytes in <span class="m">34</span>,800 <span class="nv">blocks</span>
+<span class="o">==</span><span class="nv">2690</span><span class="o">==</span>     <span class="k">in</span> use at exit: <span class="m">38</span>,656,326 bytes <span class="k">in</span> <span class="m">34</span>,800 <span class="nv">blocks</span>
 <span class="o">==</span><span class="nv">2690</span><span class="o">==</span>   total heap usage: <span class="m">170</span>,569 allocs, <span class="m">135</span>,769 frees, <span class="m">406</span>,386,571 bytes allocated
 ...
-</pre></div>
+</code></pre></div>
 
-
-<div class="highlight"><pre><span></span>$ valgrind pullpitoK
+<div class="highlight"><pre><span></span><code>$ valgrind pullpitoK
 ...
 Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
 ...
 <span class="o">==</span><span class="nv">5747</span><span class="o">==</span> HEAP SUMMARY:
-<span class="o">==</span><span class="nv">5747</span><span class="o">==</span>     in use at exit: <span class="m">228</span> bytes in <span class="m">1</span> <span class="nv">blocks</span>
+<span class="o">==</span><span class="nv">5747</span><span class="o">==</span>     <span class="k">in</span> use at exit: <span class="m">228</span> bytes <span class="k">in</span> <span class="m">1</span> <span class="nv">blocks</span>
 <span class="o">==</span><span class="nv">5747</span><span class="o">==</span>   total heap usage: <span class="m">6</span> allocs, <span class="m">5</span> frees, <span class="m">2</span>,196 bytes allocated
 ...
-</pre></div>
-
+</code></pre></div>
 
 <h2>Conclusion</h2>
 <p>With these three small applications implemented with distinct JVM languages (Java, Kotlin and Clojure), we have checked some values of GraalVM native images:</p>

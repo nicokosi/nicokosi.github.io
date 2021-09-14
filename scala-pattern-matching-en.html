@@ -124,30 +124,27 @@ Let's say we want to return the color (red or black) of a playing card.</p>
 <p><br/></p>
 <h2>Step #1: let's create a simple class</h2>
 <p>Let's create a immutable class for the "club" suite:</p>
-<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Club</span> <span class="o">{</span>
-  <span class="k">val</span> <span class="n">symbol</span> <span class="k">=</span> <span class="s">&quot;♣&quot;</span>
-  <span class="k">val</span> <span class="n">label</span> <span class="k">=</span> <span class="s">&quot;club&quot;</span>
-<span class="o">}</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Club</span> <span class="p">{</span>
+  <span class="kd">val</span> <span class="n">symbol</span> <span class="o">=</span> <span class="s">&quot;♣&quot;</span>
+  <span class="kd">val</span> <span class="n">label</span> <span class="o">=</span> <span class="s">&quot;club&quot;</span>
+<span class="p">}</span>
 
-<span class="k">val</span> <span class="n">club</span><span class="k">:</span> <span class="kt">Club</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Club</span><span class="o">()</span>
-<span class="n">club</span><span class="o">.</span><span class="n">symbol</span> <span class="c1">// ♣</span>
-</pre></div>
-
+<span class="kd">val</span> <span class="n">club</span><span class="p">:</span> <span class="nc">Club</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Club</span><span class="p">()</span>
+<span class="n">club</span><span class="p">.</span><span class="n">symbol</span> <span class="c1">// ♣</span>
+</code></pre></div>
 
 <p>So far, so good. Instances can be compared by identity (reference) but not by value because we did not override the <code>equals</code> method:</p>
-<div class="highlight"><pre><span></span><span class="n">club</span><span class="o">.</span><span class="n">equals</span><span class="o">(</span><span class="n">club</span><span class="o">)</span> <span class="c1">// true</span>
+<div class="highlight"><pre><span></span><code><span class="n">club</span><span class="p">.</span><span class="n">equals</span><span class="p">(</span><span class="n">club</span><span class="p">)</span> <span class="c1">// true</span>
 <span class="n">club</span> <span class="o">==</span> <span class="k">new</span> <span class="nc">Club</span> <span class="c1">// false</span>
-<span class="n">club</span><span class="o">.</span><span class="n">eq</span><span class="o">(</span><span class="k">new</span> <span class="nc">Club</span><span class="o">)</span> <span class="c1">// false</span>
-<span class="n">club</span><span class="o">.</span><span class="n">equals</span><span class="o">(</span><span class="k">new</span> <span class="nc">Club</span><span class="o">)</span> <span class="c1">// false</span>
-</pre></div>
-
+<span class="n">club</span><span class="p">.</span><span class="n">eq</span><span class="p">(</span><span class="k">new</span> <span class="nc">Club</span><span class="p">)</span> <span class="c1">// false</span>
+<span class="n">club</span><span class="p">.</span><span class="n">equals</span><span class="p">(</span><span class="k">new</span> <span class="nc">Club</span><span class="p">)</span> <span class="c1">// false</span>
+</code></pre></div>
 
 <p><code>hashCode</code> and <code>toString</code> are also default ones:</p>
-<div class="highlight"><pre><span></span><span class="n">club</span> <span class="c1">// Club@1ac88f64</span>
-<span class="n">club</span><span class="o">.</span><span class="n">hashCode</span><span class="o">()</span> <span class="c1">// 1976061787</span>
-<span class="k">new</span> <span class="nc">Club</span><span class="o">().</span><span class="n">hashCode</span><span class="o">()</span> <span class="c1">// 1751431390</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="n">club</span> <span class="c1">// Club@1ac88f64</span>
+<span class="n">club</span><span class="p">.</span><span class="n">hashCode</span><span class="p">()</span> <span class="c1">// 1976061787</span>
+<span class="k">new</span> <span class="nc">Club</span><span class="p">().</span><span class="n">hashCode</span><span class="p">()</span> <span class="c1">// 1751431390</span>
+</code></pre></div>
 
 <p><br/></p>
 <h2>Step #2: let's create a case class</h2>
@@ -156,53 +153,48 @@ Let's say we want to return the color (red or black) of a playing card.</p>
 <li>auto-implement <code>equals</code>, <code>hashCode</code> and <code>toString</code> methods.</li>
 <li>enhance pattern matching capability via two methods: a "constructor" method, <code>apply</code>, and a "de-constructor" method, <code>unapply</code>.</li>
 </ol>
-<div class="highlight"><pre><span></span><span class="k">case</span> <span class="k">class</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="n">symbol</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">label</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="k">case</span> <span class="k">class</span> <span class="nc">CardSuite</span><span class="p">(</span><span class="n">symbol</span><span class="p">:</span> <span class="nc">String</span><span class="p">,</span> <span class="n">label</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span>
+</code></pre></div>
 
 <p><code>apply</code> method is a kind of free constructor. By the way, we don't need to use the <code>new</code> keyword:</p>
-<div class="highlight"><pre><span></span><span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">)</span> <span class="c1">// CardSuite(♣,club)</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span> <span class="s">&quot;club&quot;</span><span class="p">)</span> <span class="c1">// CardSuite(♣,club)</span>
+</code></pre></div>
 
 <p><code>equals</code>, <code>hashCode</code> and <code>toString</code> methods are also implemented for free:</p>
-<div class="highlight"><pre><span></span><span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">).</span><span class="n">symbol</span>
-<span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">)</span> <span class="o">==</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">)</span> <span class="c1">// true</span>
-<span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">).</span><span class="n">equals</span><span class="o">(</span><span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">))</span> <span class="c1">// true</span>
-<span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">).</span><span class="n">eq</span><span class="o">(</span><span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">))</span> <span class="c1">// false</span>
-<span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">).</span><span class="n">hashCode</span><span class="o">()</span> <span class="c1">// 1302714609</span>
-<span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">).</span><span class="n">hashCode</span><span class="o">()</span> <span class="c1">// 1302714609</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span> <span class="s">&quot;club&quot;</span><span class="p">).</span><span class="n">symbol</span>
+<span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span> <span class="s">&quot;club&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span> <span class="s">&quot;club&quot;</span><span class="p">)</span> <span class="c1">// true</span>
+<span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span> <span class="s">&quot;club&quot;</span><span class="p">).</span><span class="n">equals</span><span class="p">(</span><span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span> <span class="s">&quot;club&quot;</span><span class="p">))</span> <span class="c1">// true</span>
+<span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span> <span class="s">&quot;club&quot;</span><span class="p">).</span><span class="n">eq</span><span class="p">(</span><span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span> <span class="s">&quot;club&quot;</span><span class="p">))</span> <span class="c1">// false</span>
+<span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span> <span class="s">&quot;club&quot;</span><span class="p">).</span><span class="n">hashCode</span><span class="p">()</span> <span class="c1">// 1302714609</span>
+<span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span> <span class="s">&quot;club&quot;</span><span class="p">).</span><span class="n">hashCode</span><span class="p">()</span> <span class="c1">// 1302714609</span>
+</code></pre></div>
 
 <p><br/></p>
 <h2>"Bonus" step: use an enumeration</h2>
 <p>Since there are four suites in French playing cards, we can create an enumeration. This is not directly related to our pattern matching example, but let's do it, for fun and profit. ;-)</p>
-<div class="highlight"><pre><span></span><span class="k">object</span> <span class="nc">CardSuites</span> <span class="o">{</span>
-  <span class="k">val</span> <span class="nc">CLUB</span> <span class="k">=</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;club&quot;</span><span class="o">)</span>
-  <span class="k">val</span> <span class="nc">DIAMOND</span> <span class="k">=</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♦&quot;</span><span class="o">,</span> <span class="s">&quot;diamond&quot;</span><span class="o">)</span>
-  <span class="k">val</span> <span class="nc">HEART</span> <span class="k">=</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♥&quot;</span><span class="o">,</span> <span class="s">&quot;heart&quot;</span><span class="o">)</span>
-  <span class="k">val</span> <span class="nc">SPADE</span> <span class="k">=</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="s">&quot;♠&quot;</span><span class="o">,</span> <span class="s">&quot;spade&quot;</span><span class="o">)</span>
-  <span class="k">def</span> <span class="n">values</span><span class="o">()</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span><span class="nc">DIAMOND</span><span class="o">,</span> <span class="nc">HEART</span><span class="o">,</span> <span class="nc">SPADE</span><span class="o">,</span> <span class="nc">CLUB</span><span class="o">)</span>
-<span class="o">}</span>
-<span class="nc">CardSuites</span><span class="o">.</span><span class="nc">CLUB</span> <span class="o">!=</span> <span class="nc">CardSuites</span><span class="o">.</span><span class="nc">DIAMOND</span> <span class="c1">// true</span>
-<span class="nc">CardSuites</span><span class="o">.</span><span class="n">values</span> <span class="c1">// List(CardSuite(♦,diamond), CardSuite(♥,heart), CardSuite(♠,spade), CardSuite(♣,club))</span>
-</pre></div>
-
+<div class="highlight"><pre><span></span><code><span class="k">object</span> <span class="nc">CardSuites</span> <span class="p">{</span>
+  <span class="kd">val</span> <span class="nc">CLUB</span> <span class="o">=</span> <span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span> <span class="s">&quot;club&quot;</span><span class="p">)</span>
+  <span class="kd">val</span> <span class="nc">DIAMOND</span> <span class="o">=</span> <span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♦&quot;</span><span class="p">,</span> <span class="s">&quot;diamond&quot;</span><span class="p">)</span>
+  <span class="kd">val</span> <span class="nc">HEART</span> <span class="o">=</span> <span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♥&quot;</span><span class="p">,</span> <span class="s">&quot;heart&quot;</span><span class="p">)</span>
+  <span class="kd">val</span> <span class="nc">SPADE</span> <span class="o">=</span> <span class="nc">CardSuite</span><span class="p">(</span><span class="s">&quot;♠&quot;</span><span class="p">,</span> <span class="s">&quot;spade&quot;</span><span class="p">)</span>
+  <span class="k">def</span> <span class="nf">values</span><span class="p">()</span> <span class="o">=</span> <span class="nc">List</span><span class="p">(</span><span class="nc">DIAMOND</span><span class="p">,</span> <span class="nc">HEART</span><span class="p">,</span> <span class="nc">SPADE</span><span class="p">,</span> <span class="nc">CLUB</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="nc">CardSuites</span><span class="p">.</span><span class="nc">CLUB</span> <span class="o">!=</span> <span class="nc">CardSuites</span><span class="p">.</span><span class="nc">DIAMOND</span> <span class="c1">// true</span>
+<span class="nc">CardSuites</span><span class="p">.</span><span class="n">values</span> <span class="c1">// List(CardSuite(♦,diamond), CardSuite(♥,heart), CardSuite(♠,spade), CardSuite(♣,club))</span>
+</code></pre></div>
 
 <p><br/></p>
 <h2>Last step: let's use pattern matching!</h2>
 <h3>First example</h3>
 <p>Here is a first pattern matching example, used in a function that returns the color of a suite card:</p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="n">justColor</span><span class="o">(</span><span class="n">cardSuite</span><span class="k">:</span> <span class="kt">CardSuite</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="n">cardSuite</span> <span class="k">match</span> <span class="o">{</span>
-  <span class="k">case</span> <span class="nc">CardSuites</span><span class="o">.</span><span class="nc">CLUB</span> <span class="o">|</span> <span class="nc">CardSuites</span><span class="o">.</span><span class="nc">SPADE</span> <span class="k">=&gt;</span> <span class="s">&quot;black&quot;</span>
-  <span class="k">case</span> <span class="nc">CardSuites</span><span class="o">.</span><span class="nc">DIAMOND</span> <span class="o">|</span> <span class="nc">CardSuites</span><span class="o">.</span><span class="nc">HEART</span> <span class="k">=&gt;</span> <span class="s">&quot;red&quot;</span>
-  <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="s">&quot;none&quot;</span>
-<span class="o">}</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">justColor</span><span class="p">(</span><span class="n">cardSuite</span><span class="p">:</span> <span class="nc">CardSuite</span><span class="p">):</span> <span class="nc">String</span> <span class="o">=</span> <span class="n">cardSuite</span> <span class="k">match</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="nc">CardSuites</span><span class="p">.</span><span class="nc">CLUB</span> <span class="o">|</span> <span class="nc">CardSuites</span><span class="p">.</span><span class="nc">SPADE</span> <span class="o">=&gt;</span> <span class="s">&quot;black&quot;</span>
+  <span class="k">case</span> <span class="nc">CardSuites</span><span class="p">.</span><span class="nc">DIAMOND</span> <span class="o">|</span> <span class="nc">CardSuites</span><span class="p">.</span><span class="nc">HEART</span> <span class="o">=&gt;</span> <span class="s">&quot;red&quot;</span>
+  <span class="k">case</span> <span class="n">_</span> <span class="o">=&gt;</span> <span class="s">&quot;none&quot;</span>
+<span class="p">}</span>
 
-<span class="n">justColor</span><span class="o">(</span><span class="nc">CardSuites</span><span class="o">.</span><span class="nc">SPADE</span><span class="o">)</span> <span class="c1">// black</span>
-</pre></div>
-
+<span class="n">justColor</span><span class="p">(</span><span class="nc">CardSuites</span><span class="p">.</span><span class="nc">SPADE</span><span class="p">)</span> <span class="c1">// black</span>
+</code></pre></div>
 
 <p>This example demonstrates:</p>
 <ul>
@@ -211,13 +203,12 @@ Let's say we want to return the color (red or black) of a playing card.</p>
 </ul>
 <h3>Second example</h3>
 <p>Here is a second example to demonstrate field filtering, also known as "de-structuring":</p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="n">describeColor</span><span class="o">(</span><span class="n">cardSuite</span><span class="k">:</span> <span class="kt">CardSuite</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="n">cardSuite</span> <span class="k">match</span> <span class="o">{</span>
-  <span class="k">case</span> <span class="nc">CardSuite</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">label</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="s">s&quot;</span><span class="si">$label</span><span class="s"> is </span><span class="si">${</span><span class="n">justColor</span><span class="o">(</span><span class="n">cardSuite</span><span class="o">)</span><span class="si">}</span><span class="s">&quot;</span>
-<span class="o">}</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">describeColor</span><span class="p">(</span><span class="n">cardSuite</span><span class="p">:</span> <span class="nc">CardSuite</span><span class="p">):</span> <span class="nc">String</span> <span class="o">=</span> <span class="n">cardSuite</span> <span class="k">match</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="nc">CardSuite</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="s">s&quot;</span><span class="si">$</span><span class="n">label</span><span class="s"> is </span><span class="si">${</span><span class="n">justColor</span><span class="p">(</span><span class="n">cardSuite</span><span class="p">)</span><span class="si">}</span><span class="s">&quot;</span>
+<span class="p">}</span>
 
-<span class="n">describeColor</span><span class="o">(</span><span class="nc">CardSuites</span><span class="o">.</span><span class="nc">SPADE</span><span class="o">)</span> <span class="c1">// spade is black</span>
-</pre></div>
-
+<span class="n">describeColor</span><span class="p">(</span><span class="nc">CardSuites</span><span class="p">.</span><span class="nc">SPADE</span><span class="p">)</span> <span class="c1">// spade is black</span>
+</code></pre></div>
 
 <p>We only keep the suite label using the <code>unapply</code> method of our case class.</p>
 <p>That's all folks! 🤓</p>

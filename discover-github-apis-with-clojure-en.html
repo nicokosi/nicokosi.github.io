@@ -126,15 +126,14 @@
 <h2>What is <em>hubstats</em>?</h2>
 <p><em>hubstats</em> is a simple command line tool that outputs, for a given <a href="https://help.github.com/articles/github-glossary/#repository">GitHub repository</a>, the number of opened/commented/merged pull requests by author for a given period (last week, since a given date, etc.).</p>
 <p>Here is an output example:</p>
-<div class="highlight"><pre><span></span>lein run --organization softwarevidal --repository arthur --token <span class="nv">$token</span>
+<div class="highlight"><pre><span></span><code>lein run --organization softwarevidal --repository arthur --token <span class="nv">$token</span>
 pull requests <span class="k">for</span> softwarevidal/arthur -&gt;
     since <span class="m">1</span> week<span class="o">(</span>s<span class="o">)</span>:
         <span class="m">9</span> opened / <span class="m">56</span> commented / <span class="m">5</span> closed
         opened per author: <span class="o">{</span><span class="s2">&quot;cmahalin&quot;</span> <span class="m">5</span>, <span class="s2">&quot;jcgay&quot;</span> <span class="m">2</span>, <span class="s2">&quot;AElMehdiVidal&quot;</span> <span class="m">2</span><span class="o">}</span>
         commented per author: <span class="o">{</span><span class="s2">&quot;vidal-rm&quot;</span> <span class="m">30</span>, <span class="s2">&quot;jcgay&quot;</span> <span class="m">17</span>, <span class="s2">&quot;cmahalin&quot;</span> <span class="m">9</span><span class="o">}</span>
         closed per author: <span class="o">{</span><span class="s2">&quot;cmahalin&quot;</span> <span class="m">2</span>, <span class="s2">&quot;AElMehdiVidal&quot;</span> <span class="m">2</span>, <span class="s2">&quot;jprudent&quot;</span> <span class="m">1</span><span class="o">}</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><br/></p>
 <h2>How does it work?</h2>

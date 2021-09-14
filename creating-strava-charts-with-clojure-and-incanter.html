@@ -139,18 +139,17 @@
 <p><br/></p>
 <h3>1. Récupérer les données Strava</h3>
 <p>La fonction suivante appelle l'<a href="http://strava.github.io/api/v3/activities/">API Strava "activities"</a> avec un jeton d'autorisation (access token) et récupère les 200 dernières sorties ("activities" = activité de course à pied, vélo ou natation) sous forme d'un tableau d'objets JSON :</p>
-<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">strava-activities</span> <span class="p">[</span><span class="nv">token</span><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="kd">defn </span><span class="nv">strava-activities</span> <span class="p">[</span><span class="nv">token</span><span class="p">]</span>
   <span class="p">(</span><span class="nf">json/read-str</span> <span class="p">(</span><span class="ss">:body</span>
                    <span class="p">(</span><span class="nf">http-client/get</span>
                      <span class="s">&quot;https://www.strava.com/api/v3/activities&quot;</span>
 <span class="p">{</span><span class="ss">:query-params</span> <span class="p">{</span><span class="ss">:access_token</span> <span class="nv">token</span> <span class="ss">:per_page</span> <span class="mi">200</span><span class="p">}}))))</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><br/></p>
 <h3>2. Transformer les données</h3>
 <p>On définit les fonctions suivantes pour transformer les données :</p>
-<div class="highlight"><pre><span></span><span class="c1">; Convertir les vitesses en km/h (l&#39;API Strava retourne des m/s) :</span>
+<div class="highlight"><pre><span></span><code><span class="c1">; Convertir les vitesses en km/h (l&#39;API Strava retourne des m/s) :</span>
 <span class="p">(</span><span class="k">def </span><span class="nv">meters-per-second-&gt;kilometers-per-hour</span> <span class="p">(</span><span class="nb">partial * </span><span class="mf">3.6</span><span class="p">))</span>
 
 <span class="c1">; Convertir les durées en minutes (l&#39;API Strava API retourne des secondes) :</span>
@@ -160,22 +159,20 @@
 <span class="p">(</span><span class="kd">defn- </span><span class="nv">string-date-&gt;millis</span> <span class="p">[</span><span class="nv">str-date</span><span class="p">]</span>
   <span class="p">(</span><span class="nf">.getTime</span>
     <span class="p">(</span><span class="nf">clojure.instant/read-instant-date</span> <span class="nv">str-date</span><span class="p">)))</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Ces fonctions peuvent être appliquées aux données brutes, en utilisant par exemple l'opérateur "thread-last" (<code>-&gt;&gt;</code>), bien pratique pour chaîner les appels de fonctions :</p>
-<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">-&gt;&gt;</span> <span class="p">(</span><span class="nf">strava-activities</span> <span class="nv">token</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="nf">-&gt;&gt;</span> <span class="p">(</span><span class="nf">strava-activities</span> <span class="nv">token</span><span class="p">)</span>
        <span class="p">(</span><span class="nb">map </span><span class="o">#</span><span class="p">(</span><span class="nf">update-in</span> <span class="nv">%</span> <span class="p">[</span><span class="s">&quot;average_speed&quot;</span><span class="p">]</span> <span class="nv">meters-per-second-&gt;kilometers-per-hour</span><span class="p">))</span>
        <span class="p">(</span><span class="nb">map </span><span class="o">#</span><span class="p">(</span><span class="nf">update-in</span> <span class="nv">%</span> <span class="p">[</span><span class="s">&quot;start_date_local&quot;</span><span class="p">]</span> <span class="nv">string-date-&gt;millis</span><span class="p">))</span>
        <span class="p">(</span><span class="nb">map </span><span class="o">#</span><span class="p">(</span><span class="nf">update-in</span> <span class="nv">%</span> <span class="p">[</span><span class="s">&quot;elapsed_time&quot;</span><span class="p">]</span> <span class="nv">seconds-&gt;minutes</span><span class="p">))</span>
        <span class="p">(</span><span class="nb">map </span><span class="o">#</span><span class="p">(</span><span class="nf">update-in</span> <span class="nv">%</span> <span class="p">[</span><span class="s">&quot;moving_time&quot;</span><span class="p">]</span> <span class="nv">seconds-&gt;minutes</span><span class="p">)))</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><br/></p>
 <h3>3. Affichage d'un graphique avec Incanter</h3>
 <p>La dernière étape consiste à utiliser l'une des fonctions de la librairie Incanter pour afficher un graphique. L'exemple de code suivant affiche l'évolution de la vitesse moyenne de chaque sortie en fonction de la date de la sortie :</p>
-<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">display-chart</span> <span class="p">[</span><span class="nv">token</span><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="kd">defn </span><span class="nv">display-chart</span> <span class="p">[</span><span class="nv">token</span><span class="p">]</span>
   <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">activities</span> <span class="p">(</span><span class="nf">get-activities</span> <span class="nv">token</span><span class="p">)]</span>
     <span class="p">(</span><span class="nf">with-data</span>
       <span class="p">(</span><span class="nf">to-dataset</span> <span class="nv">activities</span><span class="p">)</span>
@@ -190,8 +187,7 @@
           <span class="ss">:y-label</span> <span class="s">&quot;average speed (km/h)&quot;</span>
           <span class="ss">:points</span> <span class="nv">true</span>
           <span class="ss">:legend</span> <span class="nv">true</span><span class="p">)))))</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>Le graphique généré :
 <img alt="Chart: average speed over time" src="images/chart-average-speed-over-time.png"></p>

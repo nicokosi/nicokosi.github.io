@@ -143,18 +143,17 @@
 <li>calls the <a href="http://strava.github.io/api/v3/activities/">Strava API for activities</a> with an authorization token to retrieve the 200 last activities (run/ride/swim), as a JSON object array</li>
 <li>converts this JSON object array to a sequence of Clojure maps:</li>
 </ul>
-<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">strava-activities</span> <span class="p">[</span><span class="nv">token</span><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="kd">defn </span><span class="nv">strava-activities</span> <span class="p">[</span><span class="nv">token</span><span class="p">]</span>
   <span class="p">(</span><span class="nf">json/read-str</span> <span class="p">(</span><span class="ss">:body</span>
                    <span class="p">(</span><span class="nf">http-client/get</span>
                      <span class="s">&quot;https://www.strava.com/api/v3/activities&quot;</span>
 <span class="p">{</span><span class="ss">:query-params</span> <span class="p">{</span><span class="ss">:access_token</span> <span class="nv">token</span> <span class="ss">:per_page</span> <span class="mi">200</span><span class="p">}}))))</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><br/></p>
 <h3>2. Transform data</h3>
 <p>We can operate some data transformation, defining the following functions:</p>
-<div class="highlight"><pre><span></span><span class="c1">; Display speed unit in km/h (Strava API returns m/s):</span>
+<div class="highlight"><pre><span></span><code><span class="c1">; Display speed unit in km/h (Strava API returns m/s):</span>
 <span class="p">(</span><span class="k">def </span><span class="nv">meters-per-second-&gt;kilometers-per-hour</span> <span class="p">(</span><span class="nb">partial * </span><span class="mf">3.6</span><span class="p">))</span>
 
 <span class="c1">; Display durations in minutes (Strava API returns seconds):</span>
@@ -164,22 +163,20 @@
 <span class="p">(</span><span class="kd">defn- </span><span class="nv">string-date-&gt;millis</span> <span class="p">[</span><span class="nv">str-date</span><span class="p">]</span>
   <span class="p">(</span><span class="nf">.getTime</span>
     <span class="p">(</span><span class="nf">clojure.instant/read-instant-date</span> <span class="nv">str-date</span><span class="p">)))</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>These functions can be applied on activities data via the "thread-last" operator (<code>-&gt;&gt;</code>), which is great for function pipelines:</p>
-<div class="highlight"><pre><span></span><span class="p">(</span><span class="nf">-&gt;&gt;</span> <span class="p">(</span><span class="nf">strava-activities</span> <span class="nv">token</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="nf">-&gt;&gt;</span> <span class="p">(</span><span class="nf">strava-activities</span> <span class="nv">token</span><span class="p">)</span>
        <span class="p">(</span><span class="nb">map </span><span class="o">#</span><span class="p">(</span><span class="nf">update-in</span> <span class="nv">%</span> <span class="p">[</span><span class="s">&quot;average_speed&quot;</span><span class="p">]</span> <span class="nv">meters-per-second-&gt;kilometers-per-hour</span><span class="p">))</span>
        <span class="p">(</span><span class="nb">map </span><span class="o">#</span><span class="p">(</span><span class="nf">update-in</span> <span class="nv">%</span> <span class="p">[</span><span class="s">&quot;start_date_local&quot;</span><span class="p">]</span> <span class="nv">string-date-&gt;millis</span><span class="p">))</span>
        <span class="p">(</span><span class="nb">map </span><span class="o">#</span><span class="p">(</span><span class="nf">update-in</span> <span class="nv">%</span> <span class="p">[</span><span class="s">&quot;elapsed_time&quot;</span><span class="p">]</span> <span class="nv">seconds-&gt;minutes</span><span class="p">))</span>
        <span class="p">(</span><span class="nb">map </span><span class="o">#</span><span class="p">(</span><span class="nf">update-in</span> <span class="nv">%</span> <span class="p">[</span><span class="s">&quot;moving_time&quot;</span><span class="p">]</span> <span class="nv">seconds-&gt;minutes</span><span class="p">)))</span>
-</pre></div>
-
+</code></pre></div>
 
 <p><br/></p>
 <h3>3. Display a chart via Incanter</h3>
 <p>The final step is to use an Incanter function to display a chart:</p>
-<div class="highlight"><pre><span></span><span class="p">(</span><span class="kd">defn </span><span class="nv">display-chart</span> <span class="p">[</span><span class="nv">token</span><span class="p">]</span>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="kd">defn </span><span class="nv">display-chart</span> <span class="p">[</span><span class="nv">token</span><span class="p">]</span>
   <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">activities</span> <span class="p">(</span><span class="nf">get-activities</span> <span class="nv">token</span><span class="p">)]</span>
     <span class="p">(</span><span class="nf">with-data</span>
       <span class="p">(</span><span class="nf">to-dataset</span> <span class="nv">activities</span><span class="p">)</span>
@@ -194,8 +191,7 @@
           <span class="ss">:y-label</span> <span class="s">&quot;average speed (km/h)&quot;</span>
           <span class="ss">:points</span> <span class="nv">true</span>
           <span class="ss">:legend</span> <span class="nv">true</span><span class="p">)))))</span>
-</pre></div>
-
+</code></pre></div>
 
 <p>All this code displays this kind of chart:
 <img alt="Chart: average speed over time" src="images/chart-average-speed-over-time.png"></p>
