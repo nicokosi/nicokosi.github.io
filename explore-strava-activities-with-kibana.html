@@ -117,20 +117,14 @@
     <article>
         <p>Public présumé : personnes intéressées par l’exploration de données.</p>
 <h1>Exploration de données Strava avec Kibana</h1>
-<p>Cela fait quelques années que j'enregistre mes sorties sportives (course à pied et marche) sur <a href="https://strava.com/">strava.com</a>.
+<p>Cela fait quelques années que j'enregistre mes sorties sportives (essentiellement pour la course à pied et la marche) sur <a href="https://strava.com/">strava.com</a>.
 Comme les données sont accessibles par une API, j'ai voulu les explorer en utilisant un outil de visualisation de données, <a href="https://www.elastic.co/kibana/">Kibana</a>.
 Cet article décrit mon premier essai "d'exploration".</p>
 <h2>Mise en place</h2>
-<p>Noter que le code ci-dessous utilise le shell Unix <code>zsh</code>. </p>
-<h3>Récupération des activité Strava</h3>
-<ol>
-<li>
+<p>Noter que le code ci-dessous utilise le shell Unix <code>zsh</code>.</p>
+<h3>Récupération des activités Strava</h3>
 <p>Il faut d'abord créer <a href="https://developers.strava.com/docs/getting-started/#account">un compte développeur Strava</a> puis créer un jeton OAuth2 (j'ai utilisé <a href="https://github.com/mgryszko/strava-access-token">le générateur mgryszko/strava-access-token</a>).</p>
-</li>
-<li>
 <p>Ensuite, on peut utiliser <a href="https://developers.strava.com/docs/reference/#api-Activities-getLoggedInAthleteActivities">l'API Strava API pour récupérer les activités</a> pour générer plusieurs fichiers JSON :</p>
-</li>
-</ol>
 <div class="highlight"><pre><span></span><code><span class="k">for</span> page <span class="k">in</span> <span class="o">{</span><span class="m">1</span>..10<span class="o">}</span><span class="p">;</span> http GET <span class="s2">&quot;https://www.strava.com/api/v3/athlete/activities?include_all_efforts=&amp;per_page=200&amp;page=</span><span class="si">${</span><span class="nv">page</span><span class="si">}</span><span class="s2">&quot;</span> <span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span> &gt; strava-activities-<span class="si">${</span><span class="nv">page</span><span class="si">}</span>.json
 </code></pre></div>
 
@@ -150,18 +144,14 @@ Cet article décrit mon premier essai "d'exploration".</p>
   <span class="m">767026</span> total
 </code></pre></div>
 
-<ol>
-<li>Pour finir, agrégeons ces fichiers dans un fichier unique au format "Newline Delimited JSON" (extension <code>ndjson</code>) :</li>
-</ol>
+<p>Pour finir, agrégeons ces fichiers dans un fichier unique au format "Newline Delimited JSON" (extension <code>ndjson</code>) :</p>
 <div class="highlight"><pre><span></span><code><span class="k">for</span> n <span class="k">in</span> <span class="o">{</span><span class="m">1</span>..3<span class="o">}</span><span class="p">;</span> cat strava-activities-<span class="si">${</span><span class="nv">n</span><span class="si">}</span>.json <span class="p">|</span> jq -c <span class="s1">&#39;.[]&#39;</span> &gt; strava-activities-<span class="si">${</span><span class="nv">n</span><span class="si">}</span>.ndjson
 cat strava-activities-1.ndjson strava-activities-2.ndjson strava-activities-3.ndjson &gt;&gt; strava-activities.ndjson
 </code></pre></div>
 
 <h3>Import des données</h3>
 <p>Nous allons utiliser les <a href="https://www.elastic.co/guide/en/kibana/current/docker.html">images officielles Docker</a>.</p>
-<ol>
-<li>Démarrage de services Elastic et Kibana :</li>
-</ol>
+<p>Démarrons les services Elastic et Kibana :</p>
 <div class="highlight"><pre><span></span><code>docker network create elastic
 docker run --name es-dataviz --net elastic --publish <span class="m">9200</span>:9200 --publish <span class="m">9300</span>:9300 --env <span class="s2">&quot;discovery.type=single-node&quot;</span> --env <span class="s2">&quot;xpack.security.enabled=false&quot;</span> docker.elastic.co/elasticsearch/elasticsearch:7.15.1
 </code></pre></div>
@@ -169,17 +159,15 @@ docker run --name es-dataviz --net elastic --publish <span class="m">9200</span>
 <div class="highlight"><pre><span></span><code>docker run --name kb-dataviz --net elastic --publish <span class="m">5601</span>:5601 --env <span class="s2">&quot;ELASTICSEARCH_HOSTS=http://es-dataviz:9200&quot;</span> --env <span class="s2">&quot;xpack.security.enabled=false&quot;</span> docker.elastic.co/kibana/kibana:7.15.1
 </code></pre></div>
 
-<ol>
-<li>Import des données <code>ndjson</code> [http://localhost:5601/app/home#/tutorial_directory] dans un index nommé <code>strava</code> :</li>
-</ol>
-<p>Ouvrons la vue "discover" pour les 6 dernières années :</p>
-<p><img alt="Discover Kibana" src="images/explore-strava-discover.png"></p>
+<p>Puis importons les données ("upload") en sélectionnant le fichier <code>ndjson</code> [http://localhost:5601/app/home#/tutorial_directory] que nous importons dans un index nommé "strava" :</p>
+<p>Ouvrons ensuite la vue "discover" pour les 6 dernières années :</p>
+<p><img alt="Discover Kibana" src="images/explore-strava-discover.png" title="Discover Kibana"></p>
 <h2>Exploration des données</h2>
 <h3>Vitesse moyenne par sortie</h3>
 <p>Créons un <em>dashboard</em> pour visualiser l'évolution dans le temps de la vitesse moyenne par type d'activité (course, marche etc.) :</p>
-<p><img alt="Create Kibana dashboard" src="images/explore-strava-create-dashboard.png"></p>
+<p><img alt="Create Kibana dashboard" src="images/explore-strava-create-dashboard.png" title="Create Kibana dashboard"></p>
 <p>Ca ressemble à ça :</p>
-<p><img width="1436" alt="Create Kibana dashboard" src="images/explore-strava-dashboard.png"></p>
+<p><img alt="Create Kibana dashboard&quot;" src="images/explore-strava-dashboard.png" title="Create Kibana dashboard&quot;"></p>
 <p>C'est tout pour cette fois. J’essaierai d'aller plus loin dans un autre article. 🤓</p>
     </article>
 

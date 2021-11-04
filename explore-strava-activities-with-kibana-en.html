@@ -119,16 +119,10 @@
 <h1>Exploring my own Strava activities using Kibana</h1>
 <p>I use <a href="https://strava.com/">strava.com</a> to track my running/hike activities since a few years. Since Strava provides an API to export my activities, I had a try exploring them via a data visualization tool, <a href="https://www.elastic.co/kibana/">Kibana</a>. This article relates my first exploration.</p>
 <h2>Setup</h2>
-<p>Note that the code shown below uses <code>zsh</code> Unix shell. </p>
+<p>Note that the code shown below uses <code>zsh</code> Unix shell.</p>
 <h3>Grab Strava activities</h3>
-<ol>
-<li>
 <p>First step, create a <a href="https://developers.strava.com/docs/getting-started/#account">Strava developer account</a>, then create a Strava API OAuth2 access token (I have used the <a href="https://github.com/mgryszko/strava-access-token">mgryszko/strava-access-token generator</a>).</p>
-</li>
-<li>
 <p>Second step, use <a href="https://developers.strava.com/docs/reference/#api-Activities-getLoggedInAthleteActivities">the Strava API to grab my Strava activities</a>, exporting all activities into separate JSON files:</p>
-</li>
-</ol>
 <div class="highlight"><pre><span></span><code><span class="k">for</span> page <span class="k">in</span> <span class="o">{</span><span class="m">1</span>..10<span class="o">}</span><span class="p">;</span> http GET <span class="s2">&quot;https://www.strava.com/api/v3/athlete/activities?include_all_efforts=&amp;per_page=200&amp;page=</span><span class="si">${</span><span class="nv">page</span><span class="si">}</span><span class="s2">&quot;</span> <span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span> &gt; strava-activities-<span class="si">${</span><span class="nv">page</span><span class="si">}</span>.json
 </code></pre></div>
 
@@ -148,18 +142,14 @@
   <span class="m">767026</span> total
 </code></pre></div>
 
-<ol>
-<li>Third step, aggregate files into a single "Newline Delimited JSON" file (<code>ndjson</code> extension):</li>
-</ol>
+<p>Third step, aggregate files into a single "Newline Delimited JSON" file (<code>ndjson</code> extension):</p>
 <div class="highlight"><pre><span></span><code><span class="k">for</span> n <span class="k">in</span> <span class="o">{</span><span class="m">1</span>..3<span class="o">}</span><span class="p">;</span> cat strava-activities-<span class="si">${</span><span class="nv">n</span><span class="si">}</span>.json <span class="p">|</span> jq -c <span class="s1">&#39;.[]&#39;</span> &gt; strava-activities-<span class="si">${</span><span class="nv">n</span><span class="si">}</span>.ndjson
 cat strava-activities-1.ndjson strava-activities-2.ndjson strava-activities-3.ndjson &gt;&gt; strava-activities.ndjson
 </code></pre></div>
 
 <h3>Insert data into Kibana</h3>
 <p>We will run Elastic and Kibana using the <a href="https://www.elastic.co/guide/en/kibana/current/docker.html">official Docker images</a>.</p>
-<ol>
-<li>Start Elastic and Kibana:</li>
-</ol>
+<p>Start Elastic and Kibana:</p>
 <div class="highlight"><pre><span></span><code>docker network create elastic
 docker run --name es-dataviz --net elastic --publish <span class="m">9200</span>:9200 --publish <span class="m">9300</span>:9300 --env <span class="s2">&quot;discovery.type=single-node&quot;</span> --env <span class="s2">&quot;xpack.security.enabled=false&quot;</span> docker.elastic.co/elasticsearch/elasticsearch:7.15.1
 </code></pre></div>
@@ -167,17 +157,15 @@ docker run --name es-dataviz --net elastic --publish <span class="m">9200</span>
 <div class="highlight"><pre><span></span><code>docker run --name kb-dataviz --net elastic --publish <span class="m">5601</span>:5601 --env <span class="s2">&quot;ELASTICSEARCH_HOSTS=http://es-dataviz:9200&quot;</span> --env <span class="s2">&quot;xpack.security.enabled=false&quot;</span> docker.elastic.co/kibana/kibana:7.15.1
 </code></pre></div>
 
-<ol>
-<li>Upload <code>ndjson</code> file [http://localhost:5601/app/home#/tutorial_directory] into a <code>strava</code> index:</li>
-</ol>
-<p>Open Kibana's "discover" view for the last 6 years:
-<img alt="Discover Kibana" src="images/explore-strava-discover.png"></p>
+<p>Upload <code>ndjson</code> file [http://localhost:5601/app/home#/tutorial_directory] into an index named "strava":</p>
+<p>Open Kibana's "discover" view for the last 6 years:</p>
+<p><img alt="Discover Kibana" src="images/explore-strava-discover.png" title="Discover Kibana"></p>
 <h2>Explore data / create dashboards</h2>
 <h3>Average speed per activity</h3>
 <p>Let's create a dashboard to visualize the activities' average speed by activity type (run, hike etc.):</p>
-<p><img alt="Create Kibana dashboard" src="images/explore-strava-create-dashboard.png"></p>
+<p><img alt="Create Kibana dashboard" src="images/explore-strava-create-dashboard.png" title="Create Kibana dashboard"></p>
 <p>It looks like this:</p>
-<p><img width="1436" alt="Create Kibana dashboard" src="images/explore-strava-dashboard.png"></p>
+<p><img alt="Create Kibana dashboard&quot;" src="images/explore-strava-dashboard.png" title="Create Kibana dashboard&quot;"></p>
 <p>That's all! I'll try to go further an other time. 🤓</p>
     </article>
 
