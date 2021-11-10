@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all-fr.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2021-11-03T13:00:00+01:00</updated><subtitle>#SoftwareDevelopment #WhatElse?;-)</subtitle><subtitle>#SoftwareDevelopment #WhatElse?;-)</subtitle><entry><title>Exploration des données sportives Strava avec Kibana</title><link href="https://nicokosi.github.io/explore-strava-activities-with-kibana.html" rel="alternate"></link><published>2021-11-03T13:00:00+01:00</published><updated>2021-11-03T13:00:00+01:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2021-11-03:/explore-strava-activities-with-kibana.html</id><summary type="html">&lt;p&gt;Utilisation de Kibana pour explorer mes sorties sportives strava.com&lt;/p&gt;</summary><content type="html">&lt;p&gt;Public présumé : personnes intéressées par l’exploration de données.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all-fr.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2021-11-09T07:00:00+01:00</updated><subtitle>#SoftwareDevelopment #WhatElse?;-)</subtitle><subtitle>#SoftwareDevelopment #WhatElse?;-)</subtitle><entry><title>Exploration des données sportives Strava avec Kibana (2ème partie) : un dashboard amélioré</title><link href="https://nicokosi.github.io/explore-strava-activities-with-kibana-2.html" rel="alternate"></link><published>2021-11-09T07:00:00+01:00</published><updated>2021-11-09T07:00:00+01:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2021-11-09:/explore-strava-activities-with-kibana-2.html</id><summary type="html">&lt;p&gt;Utilisation de Kibana pour explorer mes sorties sportives strava.com (2ème partie) : un dashboard amélioré&lt;/p&gt;</summary><content type="html">&lt;p&gt;Public présumé : personnes intéressées par l’exploration de données.&lt;/p&gt;
+&lt;p&gt;Cet article fait suite à &lt;a href="./explore-strava-activities-with-kibana.md"&gt;ce premier article&lt;/a&gt; pour la mise en place de Kibana et l'import des données Strava.&lt;/p&gt;
+&lt;p&gt;Franck, un collègue qui connaît bien Kibana, m'a conseillé d'essayer un graphique  de type "vertical bar" avec un opérateur "count".
+J'ai notamment voulu essayer ce type de graphique, tout en en testant d'autres, en créant un "dashboard" plus complet que celui détaillé dans mon premier article.&lt;/p&gt;
+&lt;p&gt;J'ai créé avec les graphiques suivants :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;"histogramme de la vitesse moyenne", en utilisant un graphique &lt;code&gt;Vertical bar&lt;/code&gt; : &lt;em&gt;Y-axis&lt;/em&gt; "average(average_speed)", &lt;em&gt;X-axis&lt;/em&gt; "@timestamp" and &lt;em&gt;Split series&lt;/em&gt; on "type".&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;"compteurs d'activités par type", en utilisant un graphique de type &lt;code&gt;Metric&lt;/code&gt; avec &lt;em&gt;Aggregation&lt;/em&gt; "Count" and &lt;em&gt;Split group&lt;/em&gt; sur "type".&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;"histogramme de la distance parcourue", en utilisant un graphique de type &lt;code&gt;Vertical bar&lt;/code&gt; : &lt;em&gt;Y-axis&lt;/em&gt; "average(distance)", &lt;em&gt;X-axis&lt;/em&gt; "@timestamp" et &lt;em&gt;split series&lt;/em&gt; sur "type".&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;"tree map du nombre d'activité par type", en utilisant un graphique de type &lt;code&gt;Treemap&lt;/code&gt; chart avec &lt;em&gt;Group by&lt;/em&gt; "type.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;"compteurs d'activités par jour" en utilisant un graphique de type &lt;code&gt;Bar vertical&lt;/code&gt; avec &lt;em&gt;horizontal axis&lt;/em&gt; sur "start_date", &lt;em&gt;vertical axis&lt;/em&gt; sur "Count of records" et &lt;em&gt;break down by&lt;/em&gt; "top values of type".&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Et voila le dashboard final : 🎉&lt;/p&gt;
+&lt;p&gt;&lt;img alt="dashboard final" src="images/explore-strava-activities-with-kibana-2-view-dashboard.png" title="final dashboard"&gt;.&lt;/p&gt;
+&lt;p&gt;Le même dashboard après avoir cliqué sur le type d'activité "Run" (course à pied) :&lt;/p&gt;
+&lt;p&gt;&lt;img alt="dashboard &amp;quot;Run&amp;quot;" src="images/explore-strava-activities-with-kibana-2-view-dashboard-run.png" title="dashboard 'Run'"&gt;.&lt;/p&gt;</content><category term="all"></category><category term="dataviz data visualization"></category></entry><entry><title>Exploration des données sportives Strava avec Kibana</title><link href="https://nicokosi.github.io/explore-strava-activities-with-kibana.html" rel="alternate"></link><published>2021-11-03T13:00:00+01:00</published><updated>2021-11-03T13:00:00+01:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2021-11-03:/explore-strava-activities-with-kibana.html</id><summary type="html">&lt;p&gt;Utilisation de Kibana pour explorer mes sorties sportives strava.com&lt;/p&gt;</summary><content type="html">&lt;p&gt;Public présumé : personnes intéressées par l’exploration de données.&lt;/p&gt;
 &lt;p&gt;Cela fait quelques années que j'enregistre mes sorties sportives (essentiellement pour la course à pied et la marche) sur &lt;a href="https://strava.com/"&gt;strava.com&lt;/a&gt;.
 Comme les données sont accessibles par une API, j'ai voulu les explorer en utilisant un outil de visualisation de données, &lt;a href="https://www.elastic.co/kibana/"&gt;Kibana&lt;/a&gt;.
 Cet article décrit mon premier essai "d'exploration".&lt;/p&gt;
@@ -60,7 +85,7 @@ docker run --name es-dataviz --net elastic --publish &lt;span class="m"&gt;9200&
 &lt;p&gt;mes performances baissent dans le temps, c'est normal, je vieillis ! 🧓&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Et sinon, j'ai trouvé ça sympa de faire mon propre dashboard éphémère (non persisté) sans payer l'abonnement Strava. 😇&lt;/p&gt;
+&lt;p&gt;Et sinon, j'ai trouvé ça sympa de faire mon propre dashboard éphémère sans payer l'abonnement Strava. 😇&lt;/p&gt;
 &lt;p&gt;C'est tout pour cette fois. J’essaierai d'aller plus loin dans un autre article. 🤓&lt;/p&gt;</content><category term="all"></category><category term="dataviz data visualisation"></category></entry><entry><title>Contributing to TLDR (collaborative cheatsheets for console commands)</title><link href="https://nicokosi.github.io/contributing-to-tldr.html" rel="alternate"></link><published>2021-09-14T08:00:00+02:00</published><updated>2021-09-14T08:00:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2021-09-14:/contributing-to-tldr.html</id><summary type="html">&lt;p&gt;mes contributions récentes au projet open-source 'tldr' (bons et mauvais côtés)&lt;/p&gt;</summary><content type="html">&lt;p&gt;Public présumé : développeurs.euses intéressé.es par les outils en ligne de commande et à la collaboration open-source.&lt;/p&gt;
 &lt;h1&gt;Mes débuts de contribution au projet open-source &lt;code&gt;tldr&lt;/code&gt;&lt;/h1&gt;
 &lt;p&gt;Cela fait quelques mois que je contribue épisodiquement au projet &lt;a href="https://github.com/tldr-pages/tldr"&gt;&lt;code&gt;tldr&lt;/code&gt;&lt;/a&gt; (ou &lt;code&gt;tldr-pages&lt;/code&gt;), une sorte d'anti-sèche collaborative pour commandes shell (cf. mes &lt;a href="https://github.com/tldr-pages/tldr/pulls?q=is%3Apr+author%3Anicokosi"&gt;contributions récentes&lt;/a&gt;).

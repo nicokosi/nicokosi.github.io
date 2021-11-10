@@ -2,12 +2,12 @@
 <html lang="fr">
 
 <head>
-        <meta charset="utf-8">
+            <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
-        <title>Nicokosi's blog - Authors</title>
+        <title>Exploring my own Strava activities using Kibana (part 2): a better dashboard</title>
 
         <link href="https://nicokosi.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Nicokosi's blog Full Atom Feed" />
         <!-- Bootstrap Core CSS -->
@@ -34,13 +34,32 @@
             <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
 
-                <meta property="og:locale" content="">
+
+
+        <meta name="description" content="Use Kibana to explore my personal Sport activities from strava.com (part 2) - create a better dashboard">
+
+        <meta name="author" content="Nicolas Kosinski">
+
+        <meta name="tags" content="dataviz data visualization">
+
+	                <meta property="og:locale" content="">
 		<meta property="og:site_name" content="Nicokosi's blog">
-            <meta name="twitter:card" content="summary_large_image">
-            <meta name="twitter:site" content="@nicokosi">
-            <meta name="twitter:title" content="Nicokosi's blog">
-            <meta name="twitter:description" content="#SoftwareDevelopment #WhatElse?;-)">
-                <meta name="twitter:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
+
+	<meta property="og:type" content="article">
+            <meta property="article:author" content="https://nicokosi.github.io/author/nicolas-kosinski.html">
+	<meta property="og:url" content="https://nicokosi.github.io/explore-strava-activities-with-kibana-2-en.html">
+	<meta property="og:title" content="Exploring my own Strava activities using Kibana (part 2): a better dashboard">
+	<meta property="article:published_time" content="2021-11-09 07:00:00+01:00">
+            <meta property="og:description" content="Use Kibana to explore my personal Sport activities from strava.com (part 2) - create a better dashboard">
+
+            <meta property="og:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="@nicokosi">
+        <meta name="twitter:title" content="Exploring my own Strava activities using Kibana (part 2): a better dashboard">
+
+            <meta name="twitter:image" content="https://nicokosi.github.io/theme/images/post-bg.jpg">
+
+            <meta name="twitter:description" content="Use Kibana to explore my personal Sport activities from strava.com (part 2) - create a better dashboard">
 </head>
 
 <body>
@@ -76,7 +95,14 @@
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                     <div class="post-heading">
-                        <h1>Articles by </h1>
+                        <h1>Exploring my own Strava activities using Kibana (part 2): a better dashboard</h1>
+                        <span class="meta">Posted by
+                                <a href="https://nicokosi.github.io/author/nicolas-kosinski.html">Nicolas Kosinski</a>
+                             on 2021-11-09
+                        </span>
+                        Translations:
+<a href="https://nicokosi.github.io/explore-strava-activities-with-kibana-2.html" hreflang="fr">fr</a>
+
                     </div>
                 </div>
             </div>
@@ -87,14 +113,41 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-        <div class="post-preview">
-            <a href="https://nicokosi.github.io/author/nicolas-kosinski.html" rel="bookmark">
-                <h2 class="post-title">
-                    Nicolas Kosinski (13)
-                </h2>
-            </a>
+    <!-- Post Content -->
+    <article>
+        <p>Assumed audience: people interested in data exploration.</p>
+<p>Please read the <a href="./explore-strava-activities-with-kibana-en.md">first part on this article</a> about the Kibana setup and Strava data injection.</p>
+<p>My colleague Franck gave me a cool Kibana tip: try the "vertical bar" with a "count" operator.</p>
+<p>In order to give it a try, I created a dashboard with the following charts:</p>
+<ul>
+<li>
+<p>"average speed histogram", using a <code>Vertical bar</code> chart: Y-axis is "average(average_speed)", X-axis is "@timestamp" and Split series on "type".</p>
+</li>
+<li>
+<p>"count activities by type", using a <code>Metric</code> chart, using Aggregation "Count" and Split group on "type".</p>
+</li>
+<li>
+<p>"distance histogram", using a <code>Vertical bar</code> chart: Y-axis is "average(distance)", X-axis is "@timestamp" and split series on "type".</p>
+</li>
+<li>
+<p>"activity type tree map", using a <code>Treemap</code> chart with Group by "type.</p>
+</li>
+<li>
+<p>"counts per day" using a <code>Bar vertical</code> chart with horizontal axis on "start_date", vertical axis on "Count of records" and break down by "top values of type".</p>
+</li>
+</ul>
+<p>Here is a preview of the final dashboard: 🎉</p>
+<p><img alt="the final dashboard" src="images/explore-strava-activities-with-kibana-2-view-dashboard.png" title="The final dashboard">.</p>
+<p>The same dashboard when clicking on "Run" activity type:</p>
+<p><img alt="dashboard on &quot;Run&quot; activity type" src="images/explore-strava-activities-with-kibana-2-view-dashboard-run.png" title="dashboard on 'Run' activity type">.</p>
+    </article>
+
+        <div class="tags">
+            <p>tags: <a href="https://nicokosi.github.io/tag/dataviz-data-visualization.html">dataviz data visualization</a></p>
         </div>
-        <hr>
+
+    <hr>
+
             </div>
         </div>
     </div>
