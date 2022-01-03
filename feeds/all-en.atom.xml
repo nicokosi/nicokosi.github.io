@@ -94,7 +94,7 @@ docker run --name es-dataviz --net elastic --publish &lt;span class="m"&gt;9200&
 &lt;p&gt;This blog post lists the good and bad parts of these contributions.&lt;/p&gt;
 &lt;h2&gt;The good parts 👍&lt;/h2&gt;
 &lt;h3&gt;Share my "local knowledge" 🎁&lt;/h3&gt;
-&lt;p&gt;Many commands that were only in my Unix shell history or in my head are now shared to all &lt;code&gt;tldr&lt;/code&gt; users... and to my-self!&lt;/p&gt;
+&lt;p&gt;Many commands that were only in my Unix shell history or in my head are now shared to all &lt;code&gt;tldr&lt;/code&gt; users… and to my-self!&lt;/p&gt;
 &lt;p&gt;I can now retrieve my favorite commands typing &lt;code&gt;tldr &amp;lt;command_name&amp;gt;&lt;/code&gt;, i.e. &lt;code&gt;tldr espanso&lt;/code&gt; since &lt;a href="https://github.com/tldr-pages/tldr/pull/5662"&gt;my contribution #5662&lt;/a&gt; :&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ tldr espanso
 
@@ -129,7 +129,7 @@ More information: &amp;lt;https://espanso.org&amp;gt;.
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h3&gt;A welcoming community 🤗&lt;/h3&gt;
-&lt;p&gt;I was very well received by the contributors who encourage without putting pressure. My feelings are mainly related to comments on &lt;em&gt;pull requests&lt;/em&gt; / &lt;em&gt;issues&lt;/em&gt;, for example this kind &lt;a href="https://github.com/tldr-pages/tldr/pull/5662#issuecomment-812137443"&gt;comment&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;Contributors were welcoming and encouraged me without putting any pressure. My feelings are mainly related to the comments on &lt;em&gt;pull requests&lt;/em&gt; / &lt;em&gt;issues&lt;/em&gt;, for example this kind &lt;a href="https://github.com/tldr-pages/tldr/pull/5662#issuecomment-812137443"&gt;comment&lt;/a&gt;:&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Welcome to tldr-pages, @nicokosi! ⚡ 🎉&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -147,7 +147,7 @@ gh formatting&lt;/p&gt;
 &lt;p&gt;Example: using the term &lt;code&gt;slug&lt;/code&gt; in an authentication context for &lt;a href="https://github.com/tldr-pages/tldr/pull/6108#discussion_r648835227"&gt;this post&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;The bad parts 👎&lt;/h2&gt;
 &lt;h3&gt;Time-consuming ⏳&lt;/h3&gt;
-&lt;p&gt;Contributors on OSS project do this on their free time. Morever, when collaborating on &lt;em&gt;pull requests&lt;/em&gt;, everything is done writing in English, but we are not all bilingual. So collaboration/contribution is not always easy and can take time.&lt;/p&gt;
+&lt;p&gt;Contributors on OSS project do this on their free time. Moreover, when collaborating on &lt;em&gt;pull requests&lt;/em&gt;, everything is done writing in English, but we are not all bilingual. So collaboration/contribution is not always easy and can take time.&lt;/p&gt;
 &lt;p&gt;Example of misunderstanding (&lt;a href="https://github.com/tldr-pages/tldr/pull/6269#issuecomment-888351398"&gt;link&lt;/a&gt;):&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Yes, it does seem that only common is shown, anyway that can be fixed since a user might think we have a lack of pages if we only show them.&lt;/p&gt;
