@@ -122,8 +122,8 @@
 <p><br/></p>
 <h2>Step #1: create an enumeration</h2>
 <p>We can create an enumeration that represent the four suites in French playing cards:</p>
-<div class="highlight"><pre><span></span><code><span class="kr">data</span> <span class="kt">CardSuite</span> <span class="ow">=</span> <span class="kt">Club</span> <span class="o">|</span> <span class="kt">Diamond</span> <span class="o">|</span> <span class="kt">Heart</span> <span class="o">|</span> <span class="kt">Spade</span>
-  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Enum</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kr">data</span><span class="w"> </span><span class="kt">CardSuite</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Club</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">Diamond</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">Heart</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">Spade</span>
+<span class="w">  </span><span class="kr">deriving</span><span class="w"> </span><span class="p">(</span><span class="kt">Eq</span><span class="p">,</span><span class="w"> </span><span class="kt">Enum</span><span class="p">,</span><span class="w"> </span><span class="kt">Show</span><span class="p">)</span>
 </code></pre></div>
 
 <p>We have just created our own <em>data type</em> which:</p>
@@ -137,11 +137,11 @@
 </li>
 </ul>
 <p>We can then use <code>ghci</code> (<em>Glascow Haskell Compiler Interactive environment</em>), the Haskell REPL, to illustrate how we can use this enumeration:</p>
-<div class="highlight"><pre><span></span><code><span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span> <span class="kt">Heart</span> <span class="o">==</span> <span class="kt">Heart</span>
+<div class="highlight"><pre><span></span><code><span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span><span class="w"> </span><span class="kt">Heart</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kt">Heart</span>
 <span class="kt">True</span>
-<span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span> <span class="kt">Heart</span> <span class="o">&lt;</span> <span class="kt">Spade</span>
+<span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span><span class="w"> </span><span class="kt">Heart</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="kt">Spade</span>
 <span class="kt">True</span>
-<span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span> <span class="n">succ</span> <span class="kt">Heart</span>
+<span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span><span class="w"> </span><span class="n">succ</span><span class="w"> </span><span class="kt">Heart</span>
 <span class="kt">Spade</span>
 </code></pre></div>
 
@@ -149,17 +149,17 @@
 <h2>Pattern matching examples</h2>
 <h3>Example #1</h3>
 <p>The following function returns the Unicode symbol for a given card suite:</p>
-<div class="highlight"><pre><span></span><code><span class="nf">symbol</span> <span class="ow">::</span> <span class="kt">CardSuite</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
-<span class="nf">symbol</span> <span class="n">cardSuite</span> <span class="ow">=</span>
-  <span class="kr">case</span> <span class="n">cardSuite</span> <span class="kr">of</span>
-    <span class="kt">Club</span> <span class="ow">-&gt;</span> <span class="s">&quot;♣&quot;</span>
-    <span class="kt">Diamond</span> <span class="ow">-&gt;</span><span class="s">&quot;♦&quot;</span>
-    <span class="kt">Heart</span> <span class="ow">-&gt;</span> <span class="s">&quot;♥&quot;</span>
-    <span class="kt">Spade</span> <span class="ow">-&gt;</span> <span class="s">&quot;♠&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="nf">symbol</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">CardSuite</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">String</span>
+<span class="nf">symbol</span><span class="w"> </span><span class="n">cardSuite</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="kr">case</span><span class="w"> </span><span class="n">cardSuite</span><span class="w"> </span><span class="kr">of</span>
+<span class="w">    </span><span class="kt">Club</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="s">&quot;♣&quot;</span>
+<span class="w">    </span><span class="kt">Diamond</span><span class="w"> </span><span class="ow">-&gt;</span><span class="s">&quot;♦&quot;</span>
+<span class="w">    </span><span class="kt">Heart</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="s">&quot;♥&quot;</span>
+<span class="w">    </span><span class="kt">Spade</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="s">&quot;♠&quot;</span>
 </code></pre></div>
 
 <p>Let's evaluate it :</p>
-<div class="highlight"><pre><span></span><code><span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span> <span class="n">putStrLn</span> <span class="o">$</span> <span class="n">symbol</span> <span class="o">$</span> <span class="kt">Heart</span>
+<div class="highlight"><pre><span></span><code><span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span><span class="w"> </span><span class="n">putStrLn</span><span class="w"> </span><span class="o">$</span><span class="w"> </span><span class="n">symbol</span><span class="w"> </span><span class="o">$</span><span class="w"> </span><span class="kt">Heart</span>
 <span class="err">♥</span>
 </code></pre></div>
 
@@ -170,40 +170,40 @@
 </ul>
 <p><br/>
 Morevover, the Haskell compiler can detect a non-exhaustive pattern matching. For instance, the following code :</p>
-<div class="highlight"><pre><span></span><code><span class="nf">symbol</span> <span class="ow">::</span> <span class="kt">CardSuite</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
-<span class="nf">symbol</span> <span class="n">cardSuite</span> <span class="ow">=</span>
-  <span class="kr">case</span> <span class="n">cardSuite</span> <span class="kr">of</span>
-    <span class="kt">Club</span> <span class="ow">-&gt;</span> <span class="s">&quot;♣&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="nf">symbol</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">CardSuite</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">String</span>
+<span class="nf">symbol</span><span class="w"> </span><span class="n">cardSuite</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="kr">case</span><span class="w"> </span><span class="n">cardSuite</span><span class="w"> </span><span class="kr">of</span>
+<span class="w">    </span><span class="kt">Club</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="s">&quot;♣&quot;</span>
 </code></pre></div>
 
 <p>generates a compile-time warning :</p>
-<div class="highlight"><pre><span></span><code><span class="nf">warning</span><span class="kt">:</span> <span class="p">[</span><span class="o">-</span><span class="kt">Wincomplete</span><span class="o">-</span><span class="n">patterns</span><span class="p">]</span>
-    <span class="kt">Pattern</span> <span class="n">match</span><span class="p">(</span><span class="n">es</span><span class="p">)</span> <span class="n">are</span> <span class="n">non</span><span class="o">-</span><span class="n">exhaustive</span>
-    <span class="kt">In</span> <span class="n">a</span> <span class="kr">case</span> <span class="n">alternative</span><span class="kt">:</span>
-        <span class="kt">Patterns</span> <span class="n">not</span> <span class="n">matched</span><span class="kt">:</span>
-            <span class="kt">Diamond</span>
-            <span class="kt">Heart</span>
-            <span class="kt">Spade</span>
+<div class="highlight"><pre><span></span><code><span class="nf">warning</span><span class="kt">:</span><span class="w"> </span><span class="p">[</span><span class="o">-</span><span class="kt">Wincomplete</span><span class="o">-</span><span class="n">patterns</span><span class="p">]</span>
+<span class="w">    </span><span class="kt">Pattern</span><span class="w"> </span><span class="n">match</span><span class="p">(</span><span class="n">es</span><span class="p">)</span><span class="w"> </span><span class="n">are</span><span class="w"> </span><span class="n">non</span><span class="o">-</span><span class="n">exhaustive</span>
+<span class="w">    </span><span class="kt">In</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="kr">case</span><span class="w"> </span><span class="n">alternative</span><span class="kt">:</span>
+<span class="w">        </span><span class="kt">Patterns</span><span class="w"> </span><span class="n">not</span><span class="w"> </span><span class="n">matched</span><span class="kt">:</span>
+<span class="w">            </span><span class="kt">Diamond</span>
+<span class="w">            </span><span class="kt">Heart</span>
+<span class="w">            </span><span class="kt">Spade</span>
 </code></pre></div>
 
 <p>and the following evaluation triggers an error :</p>
-<div class="highlight"><pre><span></span><code><span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span> <span class="n">symbol</span> <span class="kt">Diamond</span>
+<div class="highlight"><pre><span></span><code><span class="o">*</span><span class="kt">Main</span><span class="o">&gt;</span><span class="w"> </span><span class="n">symbol</span><span class="w"> </span><span class="kt">Diamond</span>
 <span class="s">&quot;*** Exception: test-en.hs:(13,3)-(14,15): Non-exhaustive patterns in case</span>
 </code></pre></div>
 
 <p><br/></p>
 <h3>Example #2, share expression with a 'where' block</h3>
 <p>Let's implement a <code>color</code> function that returns "red" or "black" depending on the input card suite:</p>
-<div class="highlight"><pre><span></span><code><span class="nf">color</span> <span class="ow">::</span> <span class="kt">CardSuite</span> <span class="ow">-&gt;</span> <span class="kt">String</span>
-<span class="nf">color</span> <span class="n">cardSuite</span> <span class="ow">=</span>
-  <span class="kr">case</span> <span class="n">cardSuite</span> <span class="kr">of</span>
-    <span class="kt">Club</span> <span class="ow">-&gt;</span> <span class="n">black</span>
-    <span class="kt">Diamond</span> <span class="ow">-&gt;</span> <span class="n">red</span>
-    <span class="kt">Heart</span> <span class="ow">-&gt;</span> <span class="n">red</span>
-    <span class="kt">Spade</span> <span class="ow">-&gt;</span> <span class="n">black</span>
-    <span class="kr">where</span>
-      <span class="n">red</span> <span class="ow">=</span> <span class="s">&quot;red&quot;</span>
-      <span class="n">black</span> <span class="ow">=</span> <span class="s">&quot;black&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="nf">color</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">CardSuite</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">String</span>
+<span class="nf">color</span><span class="w"> </span><span class="n">cardSuite</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="kr">case</span><span class="w"> </span><span class="n">cardSuite</span><span class="w"> </span><span class="kr">of</span>
+<span class="w">    </span><span class="kt">Club</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">black</span>
+<span class="w">    </span><span class="kt">Diamond</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">red</span>
+<span class="w">    </span><span class="kt">Heart</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">red</span>
+<span class="w">    </span><span class="kt">Spade</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">black</span>
+<span class="w">    </span><span class="kr">where</span>
+<span class="w">      </span><span class="n">red</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="s">&quot;red&quot;</span>
+<span class="w">      </span><span class="n">black</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="s">&quot;black&quot;</span>
 </code></pre></div>
 
 <p>Let's evaluate it:</p>
@@ -216,22 +216,22 @@ Morevover, the Haskell compiler can detect a non-exhaustive pattern matching. Fo
 <br/></p>
 <h3>Example #3: destructuring</h3>
 <p>Let's say we want to define our custom type <code>Card</code> that combines a rank (1, 2, 3, ..., Jack, Queen, King) and a suite:</p>
-<div class="highlight"><pre><span></span><code><span class="kr">data</span> <span class="kt">Rank</span> <span class="ow">=</span>
-  <span class="kt">R1</span> <span class="o">|</span> <span class="kt">R2</span> <span class="o">|</span> <span class="kt">R3</span> <span class="o">|</span> <span class="kt">R4</span> <span class="o">|</span> <span class="kt">R5</span> <span class="o">|</span> <span class="kt">R6</span> <span class="o">|</span> <span class="kt">R7</span> <span class="o">|</span> <span class="kt">R8</span> <span class="o">|</span> <span class="kt">R9</span> <span class="o">|</span> <span class="kt">R10</span> <span class="o">|</span> <span class="kt">Jack</span> <span class="o">|</span> <span class="kt">Queen</span> <span class="o">|</span> <span class="kt">King</span>
-  <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Ord</span><span class="p">,</span> <span class="kt">Enum</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kr">data</span><span class="w"> </span><span class="kt">Rank</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="kt">R1</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">R2</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">R3</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">R4</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">R5</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">R6</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">R7</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">R8</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">R9</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">R10</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">Jack</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">Queen</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="kt">King</span>
+<span class="w">  </span><span class="kr">deriving</span><span class="w"> </span><span class="p">(</span><span class="kt">Eq</span><span class="p">,</span><span class="w"> </span><span class="kt">Ord</span><span class="p">,</span><span class="w"> </span><span class="kt">Enum</span><span class="p">,</span><span class="w"> </span><span class="kt">Show</span><span class="p">)</span>
 
-<span class="kr">data</span> <span class="kt">Card</span> <span class="ow">=</span> <span class="kt">Card</span> <span class="p">{</span>
-  <span class="n">rank</span> <span class="ow">::</span> <span class="kt">Rank</span><span class="p">,</span>
-  <span class="n">suite</span> <span class="ow">::</span> <span class="kt">CardSuite</span>
-<span class="p">}</span> <span class="kr">deriving</span> <span class="p">(</span><span class="kt">Eq</span><span class="p">,</span> <span class="kt">Show</span><span class="p">)</span>
+<span class="kr">data</span><span class="w"> </span><span class="kt">Card</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">Card</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">rank</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Rank</span><span class="p">,</span>
+<span class="w">  </span><span class="n">suite</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">CardSuite</span>
+<span class="p">}</span><span class="w"> </span><span class="kr">deriving</span><span class="w"> </span><span class="p">(</span><span class="kt">Eq</span><span class="p">,</span><span class="w"> </span><span class="kt">Show</span><span class="p">)</span>
 </code></pre></div>
 
 <p>The <code>Card</code> type uses the <em>record</em> syntax that allows to name fields.</p>
 <p>We can then use pattern matching in order to de-structure a card, filtering some fields.
 For instance, the following function determines if two cards have the same suite:</p>
-<div class="highlight"><pre><span></span><code><span class="nf">sameSuite</span> <span class="ow">::</span> <span class="p">(</span><span class="kt">Card</span><span class="p">,</span> <span class="kt">Card</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span>
-<span class="nf">sameSuite</span> <span class="p">((</span><span class="kt">Card</span> <span class="kr">_</span> <span class="n">suite1</span><span class="p">),</span> <span class="p">(</span><span class="kt">Card</span> <span class="kr">_</span> <span class="n">suite2</span><span class="p">))</span> <span class="ow">=</span>
-  <span class="n">suite1</span> <span class="o">==</span> <span class="n">suite2</span>
+<div class="highlight"><pre><span></span><code><span class="nf">sameSuite</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="p">(</span><span class="kt">Card</span><span class="p">,</span><span class="w"> </span><span class="kt">Card</span><span class="p">)</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Bool</span>
+<span class="nf">sameSuite</span><span class="w"> </span><span class="p">((</span><span class="kt">Card</span><span class="w"> </span><span class="kr">_</span><span class="w"> </span><span class="n">suite1</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="kt">Card</span><span class="w"> </span><span class="kr">_</span><span class="w"> </span><span class="n">suite2</span><span class="p">))</span><span class="w"> </span><span class="ow">=</span>
+<span class="w">  </span><span class="n">suite1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">suite2</span>
 </code></pre></div>
 
 <p>Call examples:</p>

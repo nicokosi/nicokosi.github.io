@@ -126,26 +126,26 @@
 <p><br/></p>
 <h2>1ère étape : création d'une simple classe</h2>
 <p>Commençons par créer une classe immuable représentant l'enseigne "trèfle" :</p>
-<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Trèfle</span> <span class="o">{</span>
-   <span class="k">val</span> <span class="n">symbole</span> <span class="o">=</span> <span class="s">&quot;♣&quot;</span>
-   <span class="k">val</span> <span class="n">libellé</span> <span class="o">=</span> <span class="s">&quot;trèfle&quot;</span>
-<span class="o">}</span>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Trèfle</span><span class="w"> </span><span class="p">{</span>
+<span class="w">   </span><span class="kd">val</span><span class="w"> </span><span class="n">symbole</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;♣&quot;</span>
+<span class="w">   </span><span class="kd">val</span><span class="w"> </span><span class="n">libellé</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;trèfle&quot;</span>
+<span class="p">}</span>
 
-<span class="k">val</span> <span class="n">trèfle</span><span class="k">:</span> <span class="kt">Trèfle</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Trèfle</span><span class="o">()</span>
-<span class="n">trèfle</span><span class="o">.</span><span class="n">symbole</span> <span class="c1">// ♣</span>
+<span class="kd">val</span><span class="w"> </span><span class="n">trèfle</span><span class="p">:</span><span class="w"> </span><span class="nc">Trèfle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="nc">Trèfle</span><span class="p">()</span>
+<span class="n">trèfle</span><span class="p">.</span><span class="n">symbole</span><span class="w"> </span><span class="c1">// ♣</span>
 </code></pre></div>
 
 <p>Notons que cette classe permet de comparer des objets par identité (référence) et non par valeur car on ne surcharge pas la méthode <code>equals</code> :</p>
-<div class="highlight"><pre><span></span><code><span class="n">trèfle</span><span class="o">.</span><span class="n">equals</span><span class="o">(</span><span class="n">trèfle</span><span class="o">)</span> <span class="c1">// true</span>
-<span class="n">trèfle</span> <span class="o">==</span> <span class="k">new</span> <span class="nc">Trèfle</span> <span class="c1">// false</span>
-<span class="n">trèfle</span><span class="o">.</span><span class="n">eq</span><span class="o">(</span><span class="k">new</span> <span class="nc">Trèfle</span><span class="o">)</span> <span class="c1">// false</span>
-<span class="n">trèfle</span><span class="o">.</span><span class="n">equals</span><span class="o">(</span><span class="k">new</span> <span class="nc">Trèfle</span><span class="o">)</span> <span class="c1">// false</span>
+<div class="highlight"><pre><span></span><code><span class="n">trèfle</span><span class="p">.</span><span class="n">equals</span><span class="p">(</span><span class="n">trèfle</span><span class="p">)</span><span class="w"> </span><span class="c1">// true</span>
+<span class="n">trèfle</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="nc">Trèfle</span><span class="w"> </span><span class="c1">// false</span>
+<span class="n">trèfle</span><span class="p">.</span><span class="n">eq</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="nc">Trèfle</span><span class="p">)</span><span class="w"> </span><span class="c1">// false</span>
+<span class="n">trèfle</span><span class="p">.</span><span class="n">equals</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="nc">Trèfle</span><span class="p">)</span><span class="w"> </span><span class="c1">// false</span>
 </code></pre></div>
 
 <p>De même, les méthodes <code>hashCode</code>, <code>toString</code> sont celles par défaut :</p>
-<div class="highlight"><pre><span></span><code><span class="n">trèfle</span> <span class="c1">// Trèfle@1ac88f64</span>
-<span class="n">trèfle</span><span class="o">.</span><span class="n">hashCode</span><span class="o">()</span> <span class="c1">// 123717365</span>
-<span class="k">new</span> <span class="nc">Trèfle</span><span class="o">().</span><span class="n">hashCode</span><span class="o">()</span> <span class="c1">// 1323753063</span>
+<div class="highlight"><pre><span></span><code><span class="n">trèfle</span><span class="w"> </span><span class="c1">// Trèfle@1ac88f64</span>
+<span class="n">trèfle</span><span class="p">.</span><span class="n">hashCode</span><span class="p">()</span><span class="w"> </span><span class="c1">// 123717365</span>
+<span class="k">new</span><span class="w"> </span><span class="nc">Trèfle</span><span class="p">().</span><span class="n">hashCode</span><span class="p">()</span><span class="w"> </span><span class="c1">// 1323753063</span>
 </code></pre></div>
 
 <p><br/></p>
@@ -155,47 +155,47 @@
 <li>d'auto-implémenter les méthodes <code>equals</code>, <code>hashCode</code> et <code>toString</code> ;</li>
 <li>de bénéficier de deux méthodes utiles au pattern matching : un "constructeur", la méthode <code>apply</code>, et un "dé-constructeur", la méthode <code>unapply</code>.</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="k">case</span> <span class="k">class</span> <span class="nc">Enseigne</span><span class="o">(</span><span class="n">symbole</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">libellé</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
+<div class="highlight"><pre><span></span><code><span class="k">case</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">Enseigne</span><span class="p">(</span><span class="n">symbole</span><span class="p">:</span><span class="w"> </span><span class="nc">String</span><span class="p">,</span><span class="w"> </span><span class="n">libellé</span><span class="p">:</span><span class="w"> </span><span class="nc">String</span><span class="p">)</span>
 </code></pre></div>
 
 <p>Nous avons un constructeur "gratuit", la méthode <code>apply</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;trèfle&quot;</span><span class="o">)</span> <span class="c1">// Enseigne(♣,trèfle)</span>
+<div class="highlight"><pre><span></span><code><span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;trèfle&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// Enseigne(♣,trèfle)</span>
 </code></pre></div>
 
 <p>Nous avons également une implémentation "gratuite", basée sur les champs, des méthodes <code>equals</code>, <code>hashCode</code> et <code>toString</code> :</p>
-<div class="highlight"><pre><span></span><code><span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;trèfle&quot;</span><span class="o">).</span><span class="n">symbole</span> <span class="c1">// ♣</span>
-<span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;trèfle&quot;</span><span class="o">)</span> <span class="o">==</span> <span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;trèfle&quot;</span><span class="o">)</span> <span class="c1">// true</span>
-<span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;trèfle&quot;</span><span class="o">).</span><span class="n">equals</span><span class="o">(</span><span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;trèfle&quot;</span><span class="o">))</span> <span class="c1">// true</span>
-<span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;trèfle&quot;</span><span class="o">).</span><span class="n">eq</span><span class="o">(</span><span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;trèfle&quot;</span><span class="o">))</span> <span class="c1">// false</span>
-<span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;trèfle&quot;</span><span class="o">).</span><span class="n">hashCode</span><span class="o">()</span> <span class="c1">// 841520215</span>
-<span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;trèfle&quot;</span><span class="o">).</span><span class="n">hashCode</span><span class="o">()</span> <span class="c1">// 841520215</span>
+<div class="highlight"><pre><span></span><code><span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;trèfle&quot;</span><span class="p">).</span><span class="n">symbole</span><span class="w"> </span><span class="c1">// ♣</span>
+<span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;trèfle&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;trèfle&quot;</span><span class="p">)</span><span class="w"> </span><span class="c1">// true</span>
+<span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;trèfle&quot;</span><span class="p">).</span><span class="n">equals</span><span class="p">(</span><span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;trèfle&quot;</span><span class="p">))</span><span class="w"> </span><span class="c1">// true</span>
+<span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;trèfle&quot;</span><span class="p">).</span><span class="n">eq</span><span class="p">(</span><span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;trèfle&quot;</span><span class="p">))</span><span class="w"> </span><span class="c1">// false</span>
+<span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;trèfle&quot;</span><span class="p">).</span><span class="n">hashCode</span><span class="p">()</span><span class="w"> </span><span class="c1">// 841520215</span>
+<span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;trèfle&quot;</span><span class="p">).</span><span class="n">hashCode</span><span class="p">()</span><span class="w"> </span><span class="c1">// 841520215</span>
 </code></pre></div>
 
 <p><br/></p>
 <h2>Etape "bonus" : création d'une énumération</h2>
 <p>Puisque nous avons quatre enseignes, nous pouvons créer une énumération. Ca ne servira pas directement à implémenter notre exemple final mais l'exemple s'y prête bien.</p>
-<div class="highlight"><pre><span></span><code><span class="k">object</span> <span class="nc">Enseignes</span> <span class="o">{</span>
-  <span class="k">val</span> <span class="nc">TREFLE</span> <span class="o">=</span> <span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♣&quot;</span><span class="o">,</span> <span class="s">&quot;trèfle&quot;</span><span class="o">)</span>
-  <span class="k">val</span> <span class="nc">CARREAU</span> <span class="o">=</span> <span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♦&quot;</span><span class="o">,</span> <span class="s">&quot;carreau&quot;</span><span class="o">)</span>
-  <span class="k">val</span> <span class="nc">COEUR</span> <span class="o">=</span> <span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♥&quot;</span><span class="o">,</span> <span class="s">&quot;coeur&quot;</span><span class="o">)</span>
-  <span class="k">val</span> <span class="nc">PIQUE</span> <span class="o">=</span> <span class="nc">Enseigne</span><span class="o">(</span><span class="s">&quot;♠&quot;</span><span class="o">,</span> <span class="s">&quot;pique&quot;</span><span class="o">)</span>
-  <span class="k">def</span> <span class="n">values</span><span class="o">()</span> <span class="o">=</span> <span class="nc">List</span><span class="o">(</span><span class="nc">CARREAU</span><span class="o">,</span> <span class="nc">COEUR</span><span class="o">,</span> <span class="nc">PIQUE</span><span class="o">,</span> <span class="nc">TREFLE</span><span class="o">)</span>
-<span class="o">}</span>
-<span class="nc">Enseignes</span><span class="o">.</span><span class="nc">TREFLE</span> <span class="o">!=</span> <span class="nc">Enseignes</span><span class="o">.</span><span class="nc">CARREAU</span> <span class="c1">// true</span>
-<span class="nc">Enseignes</span><span class="o">.</span><span class="n">values</span> <span class="c1">// List[Enseigne] = List(Enseigne(♦,carreau), Enseigne(♥,coeur), Enseigne(♠,pique), Enseigne(♣,trèfle))</span>
+<div class="highlight"><pre><span></span><code><span class="k">object</span><span class="w"> </span><span class="nc">Enseignes</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">val</span><span class="w"> </span><span class="nc">TREFLE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♣&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;trèfle&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="kd">val</span><span class="w"> </span><span class="nc">CARREAU</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♦&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;carreau&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="kd">val</span><span class="w"> </span><span class="nc">COEUR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♥&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;coeur&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="kd">val</span><span class="w"> </span><span class="nc">PIQUE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">Enseigne</span><span class="p">(</span><span class="s">&quot;♠&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pique&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">def</span><span class="w"> </span><span class="nf">values</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nc">List</span><span class="p">(</span><span class="nc">CARREAU</span><span class="p">,</span><span class="w"> </span><span class="nc">COEUR</span><span class="p">,</span><span class="w"> </span><span class="nc">PIQUE</span><span class="p">,</span><span class="w"> </span><span class="nc">TREFLE</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="nc">Enseignes</span><span class="p">.</span><span class="nc">TREFLE</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="nc">Enseignes</span><span class="p">.</span><span class="nc">CARREAU</span><span class="w"> </span><span class="c1">// true</span>
+<span class="nc">Enseignes</span><span class="p">.</span><span class="n">values</span><span class="w"> </span><span class="c1">// List[Enseigne] = List(Enseigne(♦,carreau), Enseigne(♥,coeur), Enseigne(♠,pique), Enseigne(♣,trèfle))</span>
 </code></pre></div>
 
 <p><br/></p>
 <h2>Dernière étape : pattern matchons !</h2>
 <h3>Premier exemple</h3>
 <p>Un premier exemple de pattern matching, utilisé dans une fonction qui retourne la couleur de l'enseigne :</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="n">indiquerJusteLaCouleur</span><span class="o">(</span><span class="n">cardSuite</span><span class="k">:</span> <span class="kt">Enseigne</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="n">cardSuite</span> <span class="k">match</span> <span class="o">{</span>
-  <span class="k">case</span> <span class="nc">Enseignes</span><span class="o">.</span><span class="nc">TREFLE</span> <span class="o">|</span> <span class="nc">Enseignes</span><span class="o">.</span><span class="nc">PIQUE</span> <span class="o">=&gt;</span> <span class="s">&quot;noir&quot;</span>
-  <span class="k">case</span> <span class="nc">Enseignes</span><span class="o">.</span><span class="nc">CARREAU</span> <span class="o">|</span> <span class="nc">Enseignes</span><span class="o">.</span><span class="nc">COEUR</span> <span class="o">=&gt;</span> <span class="s">&quot;rouge&quot;</span>
-  <span class="k">case</span> <span class="k">_</span> <span class="o">=&gt;</span> <span class="s">&quot;aucune&quot;</span>
-<span class="o">}</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">indiquerJusteLaCouleur</span><span class="p">(</span><span class="n">cardSuite</span><span class="p">:</span><span class="w"> </span><span class="nc">Enseigne</span><span class="p">):</span><span class="w"> </span><span class="nc">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cardSuite</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="nc">Enseignes</span><span class="p">.</span><span class="nc">TREFLE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="nc">Enseignes</span><span class="p">.</span><span class="nc">PIQUE</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s">&quot;noir&quot;</span>
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="nc">Enseignes</span><span class="p">.</span><span class="nc">CARREAU</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="nc">Enseignes</span><span class="p">.</span><span class="nc">COEUR</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s">&quot;rouge&quot;</span>
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s">&quot;aucune&quot;</span>
+<span class="p">}</span>
 
-<span class="n">indiquerJusteLaCouleur</span><span class="o">(</span><span class="nc">Enseignes</span><span class="o">.</span><span class="nc">PIQUE</span><span class="o">)</span> <span class="c1">// noir</span>
+<span class="n">indiquerJusteLaCouleur</span><span class="p">(</span><span class="nc">Enseignes</span><span class="p">.</span><span class="nc">PIQUE</span><span class="p">)</span><span class="w"> </span><span class="c1">// noir</span>
 </code></pre></div>
 
 <p>Ce premier exemple met en avant :</p>
@@ -205,11 +205,11 @@
 </ul>
 <h3>Deuxième exemple</h3>
 <p>Voici un deuxième exemple montrant comment récupérer sélectivement certains champs (ici, le libellé de l'enseigne) en "dé-structurant" notre instance de <code>case class</code>, via la méthode <code>unapply</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="n">décrireLaCouleur</span><span class="o">(</span><span class="n">enseigne</span><span class="k">:</span> <span class="kt">Enseigne</span><span class="o">)</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="n">enseigne</span> <span class="k">match</span> <span class="o">{</span>
-  <span class="k">case</span> <span class="nc">Enseigne</span><span class="o">(</span><span class="k">_</span><span class="o">,</span> <span class="n">libellé</span><span class="o">)</span> <span class="o">=&gt;</span> <span class="s">s&quot;</span><span class="si">$libellé</span><span class="s"> is </span><span class="si">${</span><span class="n">indiquerJusteLaCouleur</span><span class="o">(</span><span class="n">enseigne</span><span class="o">)</span><span class="si">}</span><span class="s">&quot;</span>
-<span class="o">}</span>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">décrireLaCouleur</span><span class="p">(</span><span class="n">enseigne</span><span class="p">:</span><span class="w"> </span><span class="nc">Enseigne</span><span class="p">):</span><span class="w"> </span><span class="nc">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">enseigne</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">case</span><span class="w"> </span><span class="nc">Enseigne</span><span class="p">(</span><span class="n">_</span><span class="p">,</span><span class="w"> </span><span class="n">libellé</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s">s&quot;</span><span class="si">$</span><span class="n">libellé</span><span class="s"> is </span><span class="si">${</span><span class="n">indiquerJusteLaCouleur</span><span class="p">(</span><span class="n">enseigne</span><span class="p">)</span><span class="si">}</span><span class="s">&quot;</span>
+<span class="p">}</span>
 
-<span class="n">décrireLaCouleur</span><span class="o">(</span><span class="nc">Enseignes</span><span class="o">.</span><span class="nc">PIQUE</span><span class="o">)</span> <span class="c1">// pique est noir</span>
+<span class="n">décrireLaCouleur</span><span class="p">(</span><span class="nc">Enseignes</span><span class="p">.</span><span class="nc">PIQUE</span><span class="p">)</span><span class="w"> </span><span class="c1">// pique est noir</span>
 </code></pre></div>
 
 <p>Et voilà ! 🤓</p>

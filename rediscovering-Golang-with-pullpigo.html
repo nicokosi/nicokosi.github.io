@@ -125,36 +125,36 @@ est d'afficher le nombre d'événements du type "tant d'événements créés par
 <p>Notez que j'ai déjà implémenté un outil similaire dans d'autres langages (que je voulais aussi découvrir ou approfondir) : en <strong>Clojure</strong> (cf. <a href="https://github.com/nicokosi/hubstats">hubstats</a>), <strong>Kotlin</strong> (cf. <a href="https://github.com/nicokosi/pullpitoK">pullpitoK</a>) et <strong>Rust</strong> (cf. <a href="https://github.com/nicokosi/pullpito">pullpito</a>).</p>
 <h2>Les exécutables natifs sont rapides 🚀</h2>
 <p>Compilons pullpigo :</p>
-<div class="highlight"><pre><span></span><code>$ go clean
-$ <span class="nb">time</span> go build
-go build  <span class="m">1</span>.05s user <span class="m">0</span>.58s system <span class="m">105</span>% cpu <span class="m">1</span>.559 total
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>go<span class="w"> </span>clean
+$<span class="w"> </span><span class="nb">time</span><span class="w"> </span>go<span class="w"> </span>build
+go<span class="w"> </span>build<span class="w">  </span><span class="m">1</span>.05s<span class="w"> </span>user<span class="w"> </span><span class="m">0</span>.58s<span class="w"> </span>system<span class="w"> </span><span class="m">105</span>%<span class="w"> </span>cpu<span class="w"> </span><span class="m">1</span>.559<span class="w"> </span>total
 </code></pre></div>
 
 <p>Puis lançons le :</p>
-<div class="highlight"><pre><span></span><code><span class="nb">time</span> ./pullpigo -repo<span class="o">=</span>vidal-community/atom-jaxb
-GitHub repository <span class="s1">&#39;vidal-community/atom-jaxb&#39;</span>
-  <span class="m">2</span> events created by amairi
-  <span class="m">1</span> events created by fchetouani
-  <span class="m">6</span> events created by AElMehdiVidal
-  <span class="m">3</span> events created by jcgay
-./pullpigo -repo<span class="o">=</span>vidal-community/atom-jaxb  <span class="m">0</span>.07s user <span class="m">0</span>.03s system <span class="m">20</span>% cpu <span class="m">0</span>.482 total
+<div class="highlight"><pre><span></span><code><span class="nb">time</span><span class="w"> </span>./pullpigo<span class="w"> </span>-repo<span class="o">=</span>vidal-community/atom-jaxb
+GitHub<span class="w"> </span>repository<span class="w"> </span><span class="s1">&#39;vidal-community/atom-jaxb&#39;</span>
+<span class="w">  </span><span class="m">2</span><span class="w"> </span>events<span class="w"> </span>created<span class="w"> </span>by<span class="w"> </span>amairi
+<span class="w">  </span><span class="m">1</span><span class="w"> </span>events<span class="w"> </span>created<span class="w"> </span>by<span class="w"> </span>fchetouani
+<span class="w">  </span><span class="m">6</span><span class="w"> </span>events<span class="w"> </span>created<span class="w"> </span>by<span class="w"> </span>AElMehdiVidal
+<span class="w">  </span><span class="m">3</span><span class="w"> </span>events<span class="w"> </span>created<span class="w"> </span>by<span class="w"> </span>jcgay
+./pullpigo<span class="w"> </span>-repo<span class="o">=</span>vidal-community/atom-jaxb<span class="w">  </span><span class="m">0</span>.07s<span class="w"> </span>user<span class="w"> </span><span class="m">0</span>.03s<span class="w"> </span>system<span class="w"> </span><span class="m">20</span>%<span class="w"> </span>cpu<span class="w"> </span><span class="m">0</span>.482<span class="w"> </span>total
 </code></pre></div>
 
 <p>Comparons ces temps avec ceux d'un projet similaire implémenté en Kotlin, (<a href="https://github.com/nicokosi/pullpitoK/">pullpitoK</a>) :</p>
-<div class="highlight"><pre><span></span><code>$ ./gradlew clean
-$ <span class="nb">time</span> ./gradlew build --quiet
-./gradlew build --quiet  <span class="m">1</span>.37s user <span class="m">0</span>.17s system <span class="m">39</span>% cpu <span class="m">3</span>.932 total
-$ <span class="nb">time</span> ./gradlew run --quiet --args <span class="s2">&quot;vidal-community/atom-jaxb&quot;</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>./gradlew<span class="w"> </span>clean
+$<span class="w"> </span><span class="nb">time</span><span class="w"> </span>./gradlew<span class="w"> </span>build<span class="w"> </span>--quiet
+./gradlew<span class="w"> </span>build<span class="w"> </span>--quiet<span class="w">  </span><span class="m">1</span>.37s<span class="w"> </span>user<span class="w"> </span><span class="m">0</span>.17s<span class="w"> </span>system<span class="w"> </span><span class="m">39</span>%<span class="w"> </span>cpu<span class="w"> </span><span class="m">3</span>.932<span class="w"> </span>total
+$<span class="w"> </span><span class="nb">time</span><span class="w"> </span>./gradlew<span class="w"> </span>run<span class="w"> </span>--quiet<span class="w"> </span>--args<span class="w"> </span><span class="s2">&quot;vidal-community/atom-jaxb&quot;</span>
 
-pull requests <span class="k">for</span> <span class="s2">&quot;vidal-community/atom-jaxb&quot;</span> -&gt;
-            opened per author
-                amairi: <span class="m">1</span>
-            commented per author
-                AElMehdiVidal: <span class="m">1</span>
-                jcgay: <span class="m">1</span>
-            closed per author
+pull<span class="w"> </span>requests<span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="s2">&quot;vidal-community/atom-jaxb&quot;</span><span class="w"> </span>-&gt;
+<span class="w">            </span>opened<span class="w"> </span>per<span class="w"> </span>author
+<span class="w">                </span>amairi:<span class="w"> </span><span class="m">1</span>
+<span class="w">            </span>commented<span class="w"> </span>per<span class="w"> </span>author
+<span class="w">                </span>AElMehdiVidal:<span class="w"> </span><span class="m">1</span>
+<span class="w">                </span>jcgay:<span class="w"> </span><span class="m">1</span>
+<span class="w">            </span>closed<span class="w"> </span>per<span class="w"> </span>author
 
-./gradlew run --quiet --args <span class="s2">&quot;vidal-community/atom-jaxb&quot;</span>  <span class="m">1</span>.37s user <span class="m">0</span>.18s system <span class="m">62</span>% cpu <span class="m">2</span>.473 total
+./gradlew<span class="w"> </span>run<span class="w"> </span>--quiet<span class="w"> </span>--args<span class="w"> </span><span class="s2">&quot;vidal-community/atom-jaxb&quot;</span><span class="w">  </span><span class="m">1</span>.37s<span class="w"> </span>user<span class="w"> </span><span class="m">0</span>.18s<span class="w"> </span>system<span class="w"> </span><span class="m">62</span>%<span class="w"> </span>cpu<span class="w"> </span><span class="m">2</span>.473<span class="w"> </span>total
 </code></pre></div>
 
 <p>Compilation rapide + exécution rapide = ❤️</p>

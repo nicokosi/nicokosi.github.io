@@ -126,38 +126,38 @@ Cet article décrit mon premier essai "d'exploration".</p>
 <h3>Récupération des activités Strava</h3>
 <p>Il faut d'abord créer <a href="https://developers.strava.com/docs/getting-started/#account">un compte développeur Strava</a> puis créer un jeton OAuth2 (j'ai utilisé <a href="https://github.com/mgryszko/strava-access-token">le générateur mgryszko/strava-access-token</a>).</p>
 <p>Ensuite, on peut utiliser <a href="https://developers.strava.com/docs/reference/#api-Activities-getLoggedInAthleteActivities">l'API Strava API pour récupérer les activités</a> pour générer plusieurs fichiers JSON :</p>
-<div class="highlight"><pre><span></span><code><span class="k">for</span> page <span class="k">in</span> <span class="o">{</span><span class="m">1</span>..10<span class="o">}</span><span class="p">;</span> http GET <span class="s2">&quot;https://www.strava.com/api/v3/athlete/activities?include_all_efforts=&amp;per_page=200&amp;page=</span><span class="si">${</span><span class="nv">page</span><span class="si">}</span><span class="s2">&quot;</span> <span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span> &gt; strava-activities-<span class="si">${</span><span class="nv">page</span><span class="si">}</span>.json
+<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span>page<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">{</span><span class="m">1</span>..10<span class="o">}</span><span class="p">;</span><span class="w"> </span>http<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://www.strava.com/api/v3/athlete/activities?include_all_efforts=&amp;per_page=200&amp;page=</span><span class="si">${</span><span class="nv">page</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>strava-activities-<span class="si">${</span><span class="nv">page</span><span class="si">}</span>.json
 </code></pre></div>
 
 <p>Ayant un historique d'environ 300 sorties, seuls 3 fichiers ont du contenu (les autres contient un tableau vide : <code>[]</code>), comme on peut le voir avec la commande <code>wc</code> :</p>
-<div class="highlight"><pre><span></span><code>wc -c strava-activities-*.json
+<div class="highlight"><pre><span></span><code>wc<span class="w"> </span>-c<span class="w"> </span>strava-activities-*.json
 
-  <span class="m">421462</span> strava-activities-1.json
-       <span class="m">2</span> strava-activities-10.json
-  <span class="m">288391</span> strava-activities-2.json
-   <span class="m">57159</span> strava-activities-3.json
-       <span class="m">2</span> strava-activities-4.json
-       <span class="m">2</span> strava-activities-5.json
-       <span class="m">2</span> strava-activities-6.json
-       <span class="m">2</span> strava-activities-7.json
-       <span class="m">2</span> strava-activities-8.json
-       <span class="m">2</span> strava-activities-9.json
-  <span class="m">767026</span> total
+<span class="w">  </span><span class="m">421462</span><span class="w"> </span>strava-activities-1.json
+<span class="w">       </span><span class="m">2</span><span class="w"> </span>strava-activities-10.json
+<span class="w">  </span><span class="m">288391</span><span class="w"> </span>strava-activities-2.json
+<span class="w">   </span><span class="m">57159</span><span class="w"> </span>strava-activities-3.json
+<span class="w">       </span><span class="m">2</span><span class="w"> </span>strava-activities-4.json
+<span class="w">       </span><span class="m">2</span><span class="w"> </span>strava-activities-5.json
+<span class="w">       </span><span class="m">2</span><span class="w"> </span>strava-activities-6.json
+<span class="w">       </span><span class="m">2</span><span class="w"> </span>strava-activities-7.json
+<span class="w">       </span><span class="m">2</span><span class="w"> </span>strava-activities-8.json
+<span class="w">       </span><span class="m">2</span><span class="w"> </span>strava-activities-9.json
+<span class="w">  </span><span class="m">767026</span><span class="w"> </span>total
 </code></pre></div>
 
 <p>Pour finir, agrégeons ces fichiers dans un fichier unique au format "Newline Delimited JSON" (extension <code>ndjson</code>) :</p>
-<div class="highlight"><pre><span></span><code><span class="k">for</span> n <span class="k">in</span> <span class="o">{</span><span class="m">1</span>..3<span class="o">}</span><span class="p">;</span> cat strava-activities-<span class="si">${</span><span class="nv">n</span><span class="si">}</span>.json <span class="p">|</span> jq -c <span class="s1">&#39;.[]&#39;</span> &gt; strava-activities-<span class="si">${</span><span class="nv">n</span><span class="si">}</span>.ndjson
-cat strava-activities-1.ndjson strava-activities-2.ndjson strava-activities-3.ndjson &gt;&gt; strava-activities.ndjson
+<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span>n<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">{</span><span class="m">1</span>..3<span class="o">}</span><span class="p">;</span><span class="w"> </span>cat<span class="w"> </span>strava-activities-<span class="si">${</span><span class="nv">n</span><span class="si">}</span>.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>-c<span class="w"> </span><span class="s1">&#39;.[]&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>strava-activities-<span class="si">${</span><span class="nv">n</span><span class="si">}</span>.ndjson
+cat<span class="w"> </span>strava-activities-1.ndjson<span class="w"> </span>strava-activities-2.ndjson<span class="w"> </span>strava-activities-3.ndjson<span class="w"> </span>&gt;&gt;<span class="w"> </span>strava-activities.ndjson
 </code></pre></div>
 
 <h3>Import des données</h3>
 <p>Nous allons utiliser les <a href="https://www.elastic.co/guide/en/kibana/current/docker.html">images officielles Docker</a>.</p>
 <p>Démarrons les services Elastic et Kibana :</p>
-<div class="highlight"><pre><span></span><code>docker network create elastic
-docker run --name es-dataviz --net elastic --publish <span class="m">9200</span>:9200 --publish <span class="m">9300</span>:9300 --env <span class="s2">&quot;discovery.type=single-node&quot;</span> --env <span class="s2">&quot;xpack.security.enabled=false&quot;</span> docker.elastic.co/elasticsearch/elasticsearch:7.15.1
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>network<span class="w"> </span>create<span class="w"> </span>elastic
+docker<span class="w"> </span>run<span class="w"> </span>--name<span class="w"> </span>es-dataviz<span class="w"> </span>--net<span class="w"> </span>elastic<span class="w"> </span>--publish<span class="w"> </span><span class="m">9200</span>:9200<span class="w"> </span>--publish<span class="w"> </span><span class="m">9300</span>:9300<span class="w"> </span>--env<span class="w"> </span><span class="s2">&quot;discovery.type=single-node&quot;</span><span class="w"> </span>--env<span class="w"> </span><span class="s2">&quot;xpack.security.enabled=false&quot;</span><span class="w"> </span>docker.elastic.co/elasticsearch/elasticsearch:7.15.1
 </code></pre></div>
 
-<div class="highlight"><pre><span></span><code>docker run --name kb-dataviz --net elastic --publish <span class="m">5601</span>:5601 --env <span class="s2">&quot;ELASTICSEARCH_HOSTS=http://es-dataviz:9200&quot;</span> --env <span class="s2">&quot;xpack.security.enabled=false&quot;</span> docker.elastic.co/kibana/kibana:7.15.1
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>--name<span class="w"> </span>kb-dataviz<span class="w"> </span>--net<span class="w"> </span>elastic<span class="w"> </span>--publish<span class="w"> </span><span class="m">5601</span>:5601<span class="w"> </span>--env<span class="w"> </span><span class="s2">&quot;ELASTICSEARCH_HOSTS=http://es-dataviz:9200&quot;</span><span class="w"> </span>--env<span class="w"> </span><span class="s2">&quot;xpack.security.enabled=false&quot;</span><span class="w"> </span>docker.elastic.co/kibana/kibana:7.15.1
 </code></pre></div>
 
 <p>Puis importons les données ("upload") en sélectionnant le fichier <code>ndjson</code> [http://localhost:5601/app/home#/tutorial_directory] que nous importons dans un index nommé "strava" :</p>

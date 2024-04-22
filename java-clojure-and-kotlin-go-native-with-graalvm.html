@@ -140,50 +140,50 @@
 <h2>Exécutable optimisé pour une application "WordCount" <code>Java</code></h2>
 <p>Notre "hello world" est un programme Java de 10 lignes qui compte le nombre de mots d'un fichier de texte : <a href="https://github.com/nicokosi/wordcount-with-java-stream">wordcount-with-java-stream</a>.</p>
 <p>Générons un JAR exécutable via Maven et OpenJDK, cela prend 2 secondes sur ma machine :</p>
-<div class="highlight"><pre><span></span><code>$ sdk use java <span class="m">8</span>.0.222.hs-adpt
-Using java version <span class="m">8</span>.0.222.hs-adpt <span class="k">in</span> this shell.
-$ <span class="nb">time</span> ./mvnw clean --quiet compile
-./mvnw clean --quiet compile  <span class="m">6</span>.24s user <span class="m">0</span>.31s system <span class="m">323</span>% cpu <span class="m">2</span>.022 total
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>sdk<span class="w"> </span>use<span class="w"> </span>java<span class="w"> </span><span class="m">8</span>.0.222.hs-adpt
+Using<span class="w"> </span>java<span class="w"> </span>version<span class="w"> </span><span class="m">8</span>.0.222.hs-adpt<span class="w"> </span><span class="k">in</span><span class="w"> </span>this<span class="w"> </span>shell.
+$<span class="w"> </span><span class="nb">time</span><span class="w"> </span>./mvnw<span class="w"> </span>clean<span class="w"> </span>--quiet<span class="w"> </span>compile
+./mvnw<span class="w"> </span>clean<span class="w"> </span>--quiet<span class="w"> </span>compile<span class="w">  </span><span class="m">6</span>.24s<span class="w"> </span>user<span class="w"> </span><span class="m">0</span>.31s<span class="w"> </span>system<span class="w"> </span><span class="m">323</span>%<span class="w"> </span>cpu<span class="w"> </span><span class="m">2</span>.022<span class="w"> </span>total
 </code></pre></div>
 
 <p>Note : le temps d'exécution indiqué par la commande <code>time</code> se trouve à la fin de la dernière ligne, en secondes : <code>2.022 total</code> pour 2,022 secondes.</p>
 <p>Puis générons l'exécutable via GraalVM native-image, cela prend 42 secondes sur ma machine :</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
-     --enable-https <span class="se">\</span>
-     --no-fallback <span class="se">\</span>
-     --no-server <span class="se">\</span>
-     -cp target/classes org.nicokosi.WordCount <span class="se">\</span>
-     wordcount-with-java-stream
-<span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image --enable-https   -c  <span class="m">236</span>,70s user <span class="m">2</span>,75s system <span class="m">566</span>% cpu <span class="m">42</span>,285 total
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">time</span><span class="w"> </span><span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>--enable-https<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>--no-fallback<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>--no-server<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-cp<span class="w"> </span>target/classes<span class="w"> </span>org.nicokosi.WordCount<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>wordcount-with-java-stream
+<span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image<span class="w"> </span>--enable-https<span class="w">   </span>-c<span class="w">  </span><span class="m">236</span>,70s<span class="w"> </span>user<span class="w"> </span><span class="m">2</span>,75s<span class="w"> </span>system<span class="w"> </span><span class="m">566</span>%<span class="w"> </span>cpu<span class="w"> </span><span class="m">42</span>,285<span class="w"> </span>total
 </code></pre></div>
 
 <p>Comparons les temps d'exécution pour un petit fichier d'entrée.</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">alias</span> <span class="nv">wordcount_java</span><span class="o">=</span><span class="s2">&quot; </span><span class="nv">$HOME</span><span class="s2">/.sdkman/candidates/java/8.0.222.hs-adpt/bin/java -cp target/classes org.nicokosi.WordCount&quot;</span>
-$ <span class="nb">time</span> wordcount_java /etc/hosts
-File /etc/hosts contains <span class="m">26</span> words
-/home/nkosinski/.sdkman/candidates/java/8.0.222.hs-adpt/bin/java -cp     <span class="m">0</span>,16s user <span class="m">0</span>,02s system <span class="m">152</span>% cpu <span class="m">0</span>,118 total
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">alias</span><span class="w"> </span><span class="nv">wordcount_java</span><span class="o">=</span><span class="s2">&quot; </span><span class="nv">$HOME</span><span class="s2">/.sdkman/candidates/java/8.0.222.hs-adpt/bin/java -cp target/classes org.nicokosi.WordCount&quot;</span>
+$<span class="w"> </span><span class="nb">time</span><span class="w"> </span>wordcount_java<span class="w"> </span>/etc/hosts
+File<span class="w"> </span>/etc/hosts<span class="w"> </span>contains<span class="w"> </span><span class="m">26</span><span class="w"> </span>words
+/home/nkosinski/.sdkman/candidates/java/8.0.222.hs-adpt/bin/java<span class="w"> </span>-cp<span class="w">     </span><span class="m">0</span>,16s<span class="w"> </span>user<span class="w"> </span><span class="m">0</span>,02s<span class="w"> </span>system<span class="w"> </span><span class="m">152</span>%<span class="w"> </span>cpu<span class="w"> </span><span class="m">0</span>,118<span class="w"> </span>total
 </code></pre></div>
 
-<div class="highlight"><pre><span></span><code>$ <span class="nb">time</span> ./wordcount-with-java-stream /etc/hosts
-File /etc/hosts contains <span class="m">26</span> words
-./wordcount-with-java-stream /etc/hosts  <span class="m">0</span>,00s user <span class="m">0</span>,01s system <span class="m">92</span>% cpu <span class="m">0</span>,007 total
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">time</span><span class="w"> </span>./wordcount-with-java-stream<span class="w"> </span>/etc/hosts
+File<span class="w"> </span>/etc/hosts<span class="w"> </span>contains<span class="w"> </span><span class="m">26</span><span class="w"> </span>words
+./wordcount-with-java-stream<span class="w"> </span>/etc/hosts<span class="w">  </span><span class="m">0</span>,00s<span class="w"> </span>user<span class="w"> </span><span class="m">0</span>,01s<span class="w"> </span>system<span class="w"> </span><span class="m">92</span>%<span class="w"> </span>cpu<span class="w"> </span><span class="m">0</span>,007<span class="w"> </span>total
 </code></pre></div>
 
 <p>Puis comparons l'empreinte mémoire :</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nv">JAVA_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt <span class="se">\</span>
-  valgrind java -cp target/classes org.nicokosi.WordCount /etc/hosts
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nv">JAVA_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>valgrind<span class="w"> </span>java<span class="w"> </span>-cp<span class="w"> </span>target/classes<span class="w"> </span>org.nicokosi.WordCount<span class="w"> </span>/etc/hosts
 
-<span class="o">==</span><span class="nv">23352</span><span class="o">==</span> HEAP SUMMARY:
-<span class="o">==</span><span class="nv">23352</span><span class="o">==</span>     <span class="k">in</span> use at exit: <span class="m">34</span>,892,297 bytes <span class="k">in</span> <span class="m">6</span>,155 <span class="nv">blocks</span>
-<span class="o">==</span><span class="nv">23352</span><span class="o">==</span>   total heap usage: <span class="m">14</span>,555 allocs, <span class="m">8</span>,400 frees, <span class="m">49</span>,960,719 bytes allocated  **
+<span class="o">==</span><span class="nv">23352</span><span class="o">==</span><span class="w"> </span>HEAP<span class="w"> </span>SUMMARY:
+<span class="o">==</span><span class="nv">23352</span><span class="o">==</span><span class="w">     </span><span class="k">in</span><span class="w"> </span>use<span class="w"> </span>at<span class="w"> </span>exit:<span class="w"> </span><span class="m">34</span>,892,297<span class="w"> </span>bytes<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">6</span>,155<span class="w"> </span><span class="nv">blocks</span>
+<span class="o">==</span><span class="nv">23352</span><span class="o">==</span><span class="w">   </span>total<span class="w"> </span>heap<span class="w"> </span>usage:<span class="w"> </span><span class="m">14</span>,555<span class="w"> </span>allocs,<span class="w"> </span><span class="m">8</span>,400<span class="w"> </span>frees,<span class="w"> </span><span class="m">49</span>,960,719<span class="w"> </span>bytes<span class="w"> </span>allocated<span class="w">  </span>**
 </code></pre></div>
 
 <p>Note : la mémoire totale allouée est à la fin de la dernière ligne ; <code>49,960,719 bytes allocated</code> signifie qu'environ 50 mégaoctets ont été alloués.</p>
-<div class="highlight"><pre><span></span><code>$ valgrind ./wordcount-with-java-stream /etc/hosts
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>valgrind<span class="w"> </span>./wordcount-with-java-stream<span class="w"> </span>/etc/hosts
 
-<span class="o">==</span><span class="nv">23753</span><span class="o">==</span> HEAP SUMMARY:
-<span class="o">==</span><span class="nv">23753</span><span class="o">==</span>     <span class="k">in</span> use at exit: <span class="m">10</span>,468 bytes <span class="k">in</span> <span class="m">3</span> <span class="nv">blocks</span>
-<span class="o">==</span><span class="nv">23753</span><span class="o">==</span>   total heap usage: <span class="m">8</span> allocs, <span class="m">5</span> frees, <span class="m">12</span>,436 bytes allocated**
+<span class="o">==</span><span class="nv">23753</span><span class="o">==</span><span class="w"> </span>HEAP<span class="w"> </span>SUMMARY:
+<span class="o">==</span><span class="nv">23753</span><span class="o">==</span><span class="w">     </span><span class="k">in</span><span class="w"> </span>use<span class="w"> </span>at<span class="w"> </span>exit:<span class="w"> </span><span class="m">10</span>,468<span class="w"> </span>bytes<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="nv">blocks</span>
+<span class="o">==</span><span class="nv">23753</span><span class="o">==</span><span class="w">   </span>total<span class="w"> </span>heap<span class="w"> </span>usage:<span class="w"> </span><span class="m">8</span><span class="w"> </span>allocs,<span class="w"> </span><span class="m">5</span><span class="w"> </span>frees,<span class="w"> </span><span class="m">12</span>,436<span class="w"> </span>bytes<span class="w"> </span>allocated**
 </code></pre></div>
 
 <p>Pour résumer, au prix d'un temps de compilation plus long (42 secondes au lieu de 2 secondes), GraalVM :</p>
@@ -194,37 +194,37 @@ File /etc/hosts contains <span class="m">26</span> words
 <h2>Exécutable optimisé pour une application <code>Kotlin</code></h2>
 <p>Faisons la même chose pour une application <a href="https://kotlinlang.org/">Kotlin</a> un peu plus complexe, <a href="https://github.com/nicokosi/pullpitoK/">pullpitoK</a> (200 lignes de codes avec des librairies tierces) qui consomme les API GitHub pour afficher des statistiques sur les pull requests GitHub.</p>
 <p>La différence de temps de construction étant similaire au paragraphe précédent, concentrons-nous sur la comparaison du temps de démarrage pour une exécution rapide (affichage de l'aide souvent appelée <a href="https://en.wikipedia.org/wiki/Usage_message">"usage message"</a>) :</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt/bin:<span class="nv">$PATH</span>
-$ <span class="nb">time</span> <span class="o">(</span>java -jar ./build/libs/pullpitoK-all.jar <span class="p">|</span> head -1<span class="o">)</span>
-Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
-<span class="o">(</span> java -jar ./build/libs/pullpitoK-all.jar <span class="p">|</span> head -1<span class="p">;</span> <span class="o">)</span>  <span class="m">0</span>.08s user <span class="m">0</span>.02s system <span class="m">108</span>% cpu <span class="m">0</span>.093 total
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt/bin:<span class="nv">$PATH</span>
+$<span class="w"> </span><span class="nb">time</span><span class="w"> </span><span class="o">(</span>java<span class="w"> </span>-jar<span class="w"> </span>./build/libs/pullpitoK-all.jar<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="o">)</span>
+Usage:<span class="w"> </span>pullpitoK<span class="w"> </span>&lt;repository&gt;<span class="w"> </span>&lt;token&gt;
+<span class="o">(</span><span class="w"> </span>java<span class="w"> </span>-jar<span class="w"> </span>./build/libs/pullpitoK-all.jar<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="p">;</span><span class="w"> </span><span class="o">)</span><span class="w">  </span><span class="m">0</span>.08s<span class="w"> </span>user<span class="w"> </span><span class="m">0</span>.02s<span class="w"> </span>system<span class="w"> </span><span class="m">108</span>%<span class="w"> </span>cpu<span class="w"> </span><span class="m">0</span>.093<span class="w"> </span>total
 </code></pre></div>
 
-<div class="highlight"><pre><span></span><code>$ <span class="nb">alias</span> <span class="nv">pullpitoK</span><span class="o">=</span><span class="s2">&quot;PULLPITOK_LIBSUNEC=</span><span class="nv">$HOME</span><span class="s2">/.sdkman/candidates/java/19.1.1-grl/jre/lib ./pullpitoK&quot;</span>
-$ <span class="nb">time</span> <span class="o">(</span>pullpitoK --help <span class="p">|</span> head -1<span class="o">)</span>
-Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
-<span class="o">(</span> <span class="nv">PULLPITOK_LIBSUNEC</span><span class="o">=</span>/Users/nicolas/.sdkman/candidates/java/19.1.1-grl/jre/li<span class="o">)</span>  <span class="m">0</span>.00s user <span class="m">0</span>.00s system <span class="m">88</span>% cpu <span class="m">0</span>.009 total
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">alias</span><span class="w"> </span><span class="nv">pullpitoK</span><span class="o">=</span><span class="s2">&quot;PULLPITOK_LIBSUNEC=</span><span class="nv">$HOME</span><span class="s2">/.sdkman/candidates/java/19.1.1-grl/jre/lib ./pullpitoK&quot;</span>
+$<span class="w"> </span><span class="nb">time</span><span class="w"> </span><span class="o">(</span>pullpitoK<span class="w"> </span>--help<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="o">)</span>
+Usage:<span class="w"> </span>pullpitoK<span class="w"> </span>&lt;repository&gt;<span class="w"> </span>&lt;token&gt;
+<span class="o">(</span><span class="w"> </span><span class="nv">PULLPITOK_LIBSUNEC</span><span class="o">=</span>/Users/nicolas/.sdkman/candidates/java/19.1.1-grl/jre/li<span class="o">)</span><span class="w">  </span><span class="m">0</span>.00s<span class="w"> </span>user<span class="w"> </span><span class="m">0</span>.00s<span class="w"> </span>system<span class="w"> </span><span class="m">88</span>%<span class="w"> </span>cpu<span class="w"> </span><span class="m">0</span>.009<span class="w"> </span>total
 </code></pre></div>
 
 <p>Soit 9 millisecondes avec la version native contre 93 millisecondes pour la version JVM.</p>
 <p>Comparons maintenant l'empreinte mémoire :</p>
-<div class="highlight"><pre><span></span><code>$ valgrind java -jar ./build/libs/pullpitoK-all.jar
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>valgrind<span class="w"> </span>java<span class="w"> </span>-jar<span class="w"> </span>./build/libs/pullpitoK-all.jar
 ...
-Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
+Usage:<span class="w"> </span>pullpitoK<span class="w"> </span>&lt;repository&gt;<span class="w"> </span>&lt;token&gt;
 ...
-<span class="o">==</span><span class="nv">26273</span><span class="o">==</span> HEAP SUMMARY:
-<span class="o">==</span><span class="nv">26273</span><span class="o">==</span>     <span class="k">in</span> use at exit: <span class="m">32</span>,181,758 bytes <span class="k">in</span> <span class="m">2</span>,134 <span class="nv">blocks</span>
-<span class="o">==</span><span class="nv">26273</span><span class="o">==</span>   total heap usage: <span class="m">5</span>,725 allocs, <span class="m">3</span>,591 frees, <span class="m">33</span>,187,784 bytes allocated
+<span class="o">==</span><span class="nv">26273</span><span class="o">==</span><span class="w"> </span>HEAP<span class="w"> </span>SUMMARY:
+<span class="o">==</span><span class="nv">26273</span><span class="o">==</span><span class="w">     </span><span class="k">in</span><span class="w"> </span>use<span class="w"> </span>at<span class="w"> </span>exit:<span class="w"> </span><span class="m">32</span>,181,758<span class="w"> </span>bytes<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">2</span>,134<span class="w"> </span><span class="nv">blocks</span>
+<span class="o">==</span><span class="nv">26273</span><span class="o">==</span><span class="w">   </span>total<span class="w"> </span>heap<span class="w"> </span>usage:<span class="w"> </span><span class="m">5</span>,725<span class="w"> </span>allocs,<span class="w"> </span><span class="m">3</span>,591<span class="w"> </span>frees,<span class="w"> </span><span class="m">33</span>,187,784<span class="w"> </span>bytes<span class="w"> </span>allocated
 ...
 </code></pre></div>
 
-<div class="highlight"><pre><span></span><code>$ valgrind pullpitoK <span class="p">|</span> head -1
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>valgrind<span class="w"> </span>pullpitoK<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1
 ...
-Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
+Usage:<span class="w"> </span>pullpitoK<span class="w"> </span>&lt;repository&gt;<span class="w"> </span>&lt;token&gt;
 ...
-<span class="o">==</span><span class="nv">27690</span><span class="o">==</span> HEAP SUMMARY:
-<span class="o">==</span><span class="nv">27690</span><span class="o">==</span>     <span class="k">in</span> use at exit: <span class="m">228</span> bytes <span class="k">in</span> <span class="m">1</span> <span class="nv">blocks</span>
-<span class="o">==</span><span class="nv">27690</span><span class="o">==</span>   total heap usage: <span class="m">6</span> allocs, <span class="m">5</span> frees, <span class="m">2</span>,196 bytes allocated
+<span class="o">==</span><span class="nv">27690</span><span class="o">==</span><span class="w"> </span>HEAP<span class="w"> </span>SUMMARY:
+<span class="o">==</span><span class="nv">27690</span><span class="o">==</span><span class="w">     </span><span class="k">in</span><span class="w"> </span>use<span class="w"> </span>at<span class="w"> </span>exit:<span class="w"> </span><span class="m">228</span><span class="w"> </span>bytes<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="nv">blocks</span>
+<span class="o">==</span><span class="nv">27690</span><span class="o">==</span><span class="w">   </span>total<span class="w"> </span>heap<span class="w"> </span>usage:<span class="w"> </span><span class="m">6</span><span class="w"> </span>allocs,<span class="w"> </span><span class="m">5</span><span class="w"> </span>frees,<span class="w"> </span><span class="m">2</span>,196<span class="w"> </span>bytes<span class="w"> </span>allocated
 ...
 </code></pre></div>
 
@@ -236,68 +236,68 @@ Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
 <li>l'outil Native Image possède des <a href="https://github.com/oracle/graal/blob/master/substratevm/LIMITATIONS.md">limitations</a> qui concernent notamment le chargement de classes dynamiques, l'utilisation de la réflexion (API java.lang.reflect) etc.</li>
 </ul>
 <p>Essayons de refaire l'essai avec une version <em>release</em> de GraalVM pour l'application <a href="https://github.com/nicokosi/hubstats/">hubstats</a> (200 lignes de codes, utilisation de librairies tierces pour appeler les API HTTP GitHub).</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
-   --enable-https <span class="se">\</span>
-   --no-fallback <span class="se">\</span>
-   --no-server <span class="se">\</span>
-   -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar <span class="se">\</span>
-   hubstats
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">time</span><span class="w"> </span><span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--enable-https<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--no-fallback<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--no-server<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-jar<span class="w"> </span>target/hubstats-0.1.0-SNAPSHOT-standalone.jar<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>hubstats
 </code></pre></div>
 
 <p>La compilation native échoue. Voici un extrait du message d'erreur :</p>
-<div class="highlight"><pre><span></span><code><span class="n">Error</span><span class="o">:</span> <span class="n">Unsupported</span> <span class="n">features</span> <span class="k">in</span> <span class="mi">4</span> <span class="n">methods</span>
-<span class="n">Detailed</span> <span class="n">message</span><span class="o">:</span>
-<span class="n">Error</span><span class="o">:</span> <span class="n">Unsupported</span> <span class="n">type</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">invoke</span><span class="o">.</span><span class="na">MemberName</span> <span class="k">is</span> <span class="n">reachable</span><span class="o">:</span> <span class="n">All</span> <span class="n">methods</span> <span class="n">from</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">invoke</span> <span class="n">should</span> <span class="n">have</span> <span class="n">been</span> <span class="n">replaced</span> <span class="n">during</span> <span class="n">image</span> <span class="n">building</span><span class="o">.</span>
-<span class="n">To</span> <span class="n">diagnose</span> <span class="n">the</span> <span class="n">issue</span><span class="o">,</span> <span class="n">you</span> <span class="n">can</span> <span class="n">add</span> <span class="n">the</span> <span class="n">option</span> <span class="o">--</span><span class="n">report</span><span class="o">-</span><span class="n">unsupported</span><span class="o">-</span><span class="n">elements</span><span class="o">-</span><span class="n">at</span><span class="o">-</span><span class="n">runtime</span><span class="o">.</span> <span class="n">The</span> <span class="n">unsupported</span> <span class="n">element</span> <span class="k">is</span> <span class="n">then</span> <span class="n">reported</span> <span class="n">at</span> <span class="n">run</span> <span class="n">time</span> <span class="n">when</span> <span class="n">it</span> <span class="k">is</span> <span class="n">accessed</span> <span class="n">the</span> <span class="n">first</span> <span class="n">time</span><span class="o">.</span>
+<div class="highlight"><pre><span></span><code><span class="n">Error</span><span class="o">:</span><span class="w"> </span><span class="n">Unsupported</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="n">methods</span>
+<span class="n">Detailed</span><span class="w"> </span><span class="n">message</span><span class="o">:</span>
+<span class="n">Error</span><span class="o">:</span><span class="w"> </span><span class="n">Unsupported</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">invoke</span><span class="o">.</span><span class="na">MemberName</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">reachable</span><span class="o">:</span><span class="w"> </span><span class="n">All</span><span class="w"> </span><span class="n">methods</span><span class="w"> </span><span class="n">from</span><span class="w"> </span><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">invoke</span><span class="w"> </span><span class="n">should</span><span class="w"> </span><span class="n">have</span><span class="w"> </span><span class="n">been</span><span class="w"> </span><span class="n">replaced</span><span class="w"> </span><span class="n">during</span><span class="w"> </span><span class="n">image</span><span class="w"> </span><span class="n">building</span><span class="o">.</span>
+<span class="n">To</span><span class="w"> </span><span class="n">diagnose</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">issue</span><span class="o">,</span><span class="w"> </span><span class="n">you</span><span class="w"> </span><span class="n">can</span><span class="w"> </span><span class="n">add</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">option</span><span class="w"> </span><span class="o">--</span><span class="n">report</span><span class="o">-</span><span class="n">unsupported</span><span class="o">-</span><span class="n">elements</span><span class="o">-</span><span class="n">at</span><span class="o">-</span><span class="n">runtime</span><span class="o">.</span><span class="w"> </span><span class="n">The</span><span class="w"> </span><span class="n">unsupported</span><span class="w"> </span><span class="n">element</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">then</span><span class="w"> </span><span class="n">reported</span><span class="w"> </span><span class="n">at</span><span class="w"> </span><span class="n">run</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="n">when</span><span class="w"> </span><span class="n">it</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">accessed</span><span class="w"> </span><span class="n">the</span><span class="w"> </span><span class="n">first</span><span class="w"> </span><span class="n">time</span><span class="o">.</span>
 <span class="o">...</span>
 </code></pre></div>
 
 <p>Nous pourrions corriger ça en adaptant le code source. Par facilité, essayons le mode <code>fallback</code> ("solution de repli") de Native Image qui permet de contourner les limitations en embarquant une JVM classique :</p>
-<div class="highlight"><pre><span></span><code>$ <span class="c1"># Construction de l&#39;exécutable avec GraalVM</span>
-<span class="nb">time</span> <span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image <span class="se">\</span>
-   --enable-https <span class="se">\</span>
-   --force-fallback <span class="se">\</span>
-   --no-server <span class="se">\</span>
-   -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar <span class="se">\</span>
-   hubstats
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="c1"># Construction de l&#39;exécutable avec GraalVM</span>
+<span class="nb">time</span><span class="w"> </span><span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--enable-https<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--force-fallback<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>--no-server<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>-jar<span class="w"> </span>target/hubstats-0.1.0-SNAPSHOT-standalone.jar<span class="w"> </span><span class="se">\</span>
+<span class="w">   </span>hubstats
 ...
-<span class="o">[</span>hubstats:31661<span class="o">]</span>      <span class="o">[</span>total<span class="o">]</span>:  <span class="m">14</span>,663.95 ms
-Warning: Image <span class="s1">&#39;hubstats&#39;</span> is a fallback image that requires a JDK <span class="k">for</span> execution <span class="o">(</span>use --no-fallback to suppress fallback image generation<span class="o">)</span>.
-<span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image --enable-https       <span class="m">78</span>,73s user <span class="m">1</span>,31s system <span class="m">536</span>% cpu <span class="m">14</span>,926 total
+<span class="o">[</span>hubstats:31661<span class="o">]</span><span class="w">      </span><span class="o">[</span>total<span class="o">]</span>:<span class="w">  </span><span class="m">14</span>,663.95<span class="w"> </span>ms
+Warning:<span class="w"> </span>Image<span class="w"> </span><span class="s1">&#39;hubstats&#39;</span><span class="w"> </span>is<span class="w"> </span>a<span class="w"> </span>fallback<span class="w"> </span>image<span class="w"> </span>that<span class="w"> </span>requires<span class="w"> </span>a<span class="w"> </span>JDK<span class="w"> </span><span class="k">for</span><span class="w"> </span>execution<span class="w"> </span><span class="o">(</span>use<span class="w"> </span>--no-fallback<span class="w"> </span>to<span class="w"> </span>suppress<span class="w"> </span>fallback<span class="w"> </span>image<span class="w"> </span>generation<span class="o">)</span>.
+<span class="nv">$HOME</span>/.sdkman/candidates/java/19.1.1-grl/bin/native-image<span class="w"> </span>--enable-https<span class="w">       </span><span class="m">78</span>,73s<span class="w"> </span>user<span class="w"> </span><span class="m">1</span>,31s<span class="w"> </span>system<span class="w"> </span><span class="m">536</span>%<span class="w"> </span>cpu<span class="w"> </span><span class="m">14</span>,926<span class="w"> </span>total
 </code></pre></div>
 
 <p>Etant donné que le mode fallback est utilisé, les temps de démarrage sont maintenant similaires :</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt/bin:<span class="nv">$PATH</span>
-$ <span class="nb">time</span> <span class="o">(</span>java -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar <span class="p">|</span> head -1<span class="o">)</span>
-Display statistics <span class="k">for</span> GitHub pull requests.
-<span class="o">(</span> java -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar <span class="p">|</span> head -1<span class="p">;</span> <span class="o">)</span>  <span class="m">3</span>,36s user <span class="m">0</span>,10s system <span class="m">262</span>% cpu <span class="m">1</span>,318 total
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt/bin:<span class="nv">$PATH</span>
+$<span class="w"> </span><span class="nb">time</span><span class="w"> </span><span class="o">(</span>java<span class="w"> </span>-jar<span class="w"> </span>target/hubstats-0.1.0-SNAPSHOT-standalone.jar<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="o">)</span>
+Display<span class="w"> </span>statistics<span class="w"> </span><span class="k">for</span><span class="w"> </span>GitHub<span class="w"> </span>pull<span class="w"> </span>requests.
+<span class="o">(</span><span class="w"> </span>java<span class="w"> </span>-jar<span class="w"> </span>target/hubstats-0.1.0-SNAPSHOT-standalone.jar<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="p">;</span><span class="w"> </span><span class="o">)</span><span class="w">  </span><span class="m">3</span>,36s<span class="w"> </span>user<span class="w"> </span><span class="m">0</span>,10s<span class="w"> </span>system<span class="w"> </span><span class="m">262</span>%<span class="w"> </span>cpu<span class="w"> </span><span class="m">1</span>,318<span class="w"> </span>total
 </code></pre></div>
 
-<div class="highlight"><pre><span></span><code>$ <span class="nb">time</span> <span class="o">(</span>./hubstats <span class="p">|</span> head -1<span class="o">)</span>
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">time</span><span class="w"> </span><span class="o">(</span>./hubstats<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="o">)</span>
 
-Display statistics <span class="k">for</span> GitHub pull requests.
-<span class="o">(</span> ./hubstats <span class="p">|</span> head -1<span class="p">;</span> <span class="o">)</span>  <span class="m">2</span>,86s user <span class="m">0</span>,14s system <span class="m">236</span>% cpu <span class="m">1</span>,272 total
+Display<span class="w"> </span>statistics<span class="w"> </span><span class="k">for</span><span class="w"> </span>GitHub<span class="w"> </span>pull<span class="w"> </span>requests.
+<span class="o">(</span><span class="w"> </span>./hubstats<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1<span class="p">;</span><span class="w"> </span><span class="o">)</span><span class="w">  </span><span class="m">2</span>,86s<span class="w"> </span>user<span class="w"> </span><span class="m">0</span>,14s<span class="w"> </span>system<span class="w"> </span><span class="m">236</span>%<span class="w"> </span>cpu<span class="w"> </span><span class="m">1</span>,272<span class="w"> </span>total
 </code></pre></div>
 
 <p>mais l'empreinte mémoire est énormément réduite :</p>
-<div class="highlight"><pre><span></span><code>$ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt/bin:<span class="nv">$PATH</span>
-$ valgrind java -jar target/hubstats-0.1.0-SNAPSHOT-standalone.jar
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/.sdkman/candidates/java/8.0.222.hs-adpt/bin:<span class="nv">$PATH</span>
+$<span class="w"> </span>valgrind<span class="w"> </span>java<span class="w"> </span>-jar<span class="w"> </span>target/hubstats-0.1.0-SNAPSHOT-standalone.jar
 ...
-Display statistics <span class="k">for</span> GitHub pull requests.
+Display<span class="w"> </span>statistics<span class="w"> </span><span class="k">for</span><span class="w"> </span>GitHub<span class="w"> </span>pull<span class="w"> </span>requests.
 ...
-<span class="o">==</span><span class="nv">2690</span><span class="o">==</span> HEAP SUMMARY:
-<span class="o">==</span><span class="nv">2690</span><span class="o">==</span>     <span class="k">in</span> use at exit: <span class="m">38</span>,656,326 bytes <span class="k">in</span> <span class="m">34</span>,800 <span class="nv">blocks</span>
-<span class="o">==</span><span class="nv">2690</span><span class="o">==</span>   total heap usage: <span class="m">170</span>,569 allocs, <span class="m">135</span>,769 frees, <span class="m">406</span>,386,571 bytes allocated
+<span class="o">==</span><span class="nv">2690</span><span class="o">==</span><span class="w"> </span>HEAP<span class="w"> </span>SUMMARY:
+<span class="o">==</span><span class="nv">2690</span><span class="o">==</span><span class="w">     </span><span class="k">in</span><span class="w"> </span>use<span class="w"> </span>at<span class="w"> </span>exit:<span class="w"> </span><span class="m">38</span>,656,326<span class="w"> </span>bytes<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">34</span>,800<span class="w"> </span><span class="nv">blocks</span>
+<span class="o">==</span><span class="nv">2690</span><span class="o">==</span><span class="w">   </span>total<span class="w"> </span>heap<span class="w"> </span>usage:<span class="w"> </span><span class="m">170</span>,569<span class="w"> </span>allocs,<span class="w"> </span><span class="m">135</span>,769<span class="w"> </span>frees,<span class="w"> </span><span class="m">406</span>,386,571<span class="w"> </span>bytes<span class="w"> </span>allocated
 ...
 </code></pre></div>
 
-<div class="highlight"><pre><span></span><code>$ valgrind pullpitoK
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>valgrind<span class="w"> </span>pullpitoK
 ...
-Usage: pullpitoK &lt;repository&gt; &lt;token&gt;
+Usage:<span class="w"> </span>pullpitoK<span class="w"> </span>&lt;repository&gt;<span class="w"> </span>&lt;token&gt;
 ...
-<span class="o">==</span><span class="nv">5747</span><span class="o">==</span> HEAP SUMMARY:
-<span class="o">==</span><span class="nv">5747</span><span class="o">==</span>     <span class="k">in</span> use at exit: <span class="m">228</span> bytes <span class="k">in</span> <span class="m">1</span> <span class="nv">blocks</span>
-<span class="o">==</span><span class="nv">5747</span><span class="o">==</span>   total heap usage: <span class="m">6</span> allocs, <span class="m">5</span> frees, <span class="m">2</span>,196 bytes allocated
+<span class="o">==</span><span class="nv">5747</span><span class="o">==</span><span class="w"> </span>HEAP<span class="w"> </span>SUMMARY:
+<span class="o">==</span><span class="nv">5747</span><span class="o">==</span><span class="w">     </span><span class="k">in</span><span class="w"> </span>use<span class="w"> </span>at<span class="w"> </span>exit:<span class="w"> </span><span class="m">228</span><span class="w"> </span>bytes<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="nv">blocks</span>
+<span class="o">==</span><span class="nv">5747</span><span class="o">==</span><span class="w">   </span>total<span class="w"> </span>heap<span class="w"> </span>usage:<span class="w"> </span><span class="m">6</span><span class="w"> </span>allocs,<span class="w"> </span><span class="m">5</span><span class="w"> </span>frees,<span class="w"> </span><span class="m">2</span>,196<span class="w"> </span>bytes<span class="w"> </span>allocated
 ...
 </code></pre></div>
 
