@@ -1,5 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog - Nicolas Kosinski</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/nicolas-kosinski.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2024-04-22T08:10:00+02:00</updated><subtitle>Code explorations (🧑‍💻 + 🧪 = ⁉️)</subtitle><entry><title>Mon Devoxx France 2024</title><link href="https://nicokosi.github.io/devoxx-fr-2024.html" rel="alternate"></link><published>2024-04-22T08:10:00+02:00</published><updated>2024-04-22T08:10:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2024-04-22:/devoxx-fr-2024.html</id><summary type="html">&lt;p&gt;Mon résumé de la conférence Devoxx France 2024.&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Mon Devoxx France 2024&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog - Nicolas Kosinski</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/nicolas-kosinski.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2024-12-13T07:00:00+01:00</updated><subtitle>Code explorations (🧑‍💻 + 🧪 = ⁉️)</subtitle><entry><title>Quelques astuces shell "unix-like" que j'utilise dans mon terminal 🧙</title><link href="https://nicokosi.github.io/nix-terminal-tricks.html" rel="alternate"></link><published>2024-11-28T06:52:00+01:00</published><updated>2024-12-13T07:00:00+01:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2024-11-28:/nix-terminal-tricks.html</id><summary type="html">&lt;p&gt;Quelques commandes shell "unix-like" que j'utilise souvent&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Quelques astuces shell *nix que j'utilise dans mon terminal 🧙&lt;/h1&gt;
+&lt;p&gt;Public présumé : dévelopeurs.ses utilisant leur terminal pour diverses tâches.&lt;/p&gt;
+&lt;p&gt;Voici quelques commandes / utilitaires que j'utilise régulièrement, peut-être que ça peut vous être utile ou que vous pourrez me donner votre avis ?&lt;/p&gt;
+&lt;h2&gt;l'anti-sèche &lt;code&gt;tldr&lt;/code&gt; 📝&lt;/h2&gt;
+&lt;p&gt;Ca m'est impossible de retenir toutes les options des commandes que j'utilise. Personnellement, j'aime avoir une sorte d'anti-sèches directement dans mon terminal, sans utiliser ni mon navigateur web, ni un outil d'intelligence artificielle comme ChatGPT.&lt;/p&gt;
+&lt;p&gt;Pour ça, j'utilise souvent &lt;a href="https://tldr.sh"&gt;tldr&lt;/a&gt; comme une anti-sèche, c'est très pratique !&lt;/p&gt;
+&lt;p&gt;Par exemple, la commande &lt;code&gt;tldr --language fr git&lt;/code&gt; affiche les 8 options les plus courantes de &lt;code&gt;git&lt;/code&gt;, avec une description courte (pour information, on peut avoir les informations en plusieurs langues) :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Système de gestion de versions décentralisé.
+Certaines commandes comme &lt;span class="sb"&gt;`git commit`&lt;/span&gt; ont leur propre documentation.
+Plus d&amp;#39;informations : &amp;lt;https://git-scm.com/&amp;gt;.
+
+Exécuter une sous-commande Git :
+
+    git sous_commande
+
+Exécuter une sous-commande Git sur un répertoire personnalisé :
+
+    git -C chemin/vers/repertoire sous_commande
+
+Exécuter une sous-commande Git avec un paramètre de configuration spécifique :
+
+    git -c &amp;#39;cle_param_config=valeur&amp;#39; sous_commande
+
+Afficher l&amp;#39;aide générale :
+
+    git --help
+
+Afficher l&amp;#39;aide sur une sous-commande Git :
+
+    git help sous_commande
+
+Obtenir la version de Git :
+
+    git --version
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h3&gt;aliases 📛&lt;/h3&gt;
+&lt;h2&gt;alias permanents&lt;/h2&gt;
+&lt;p&gt;Cas d'utilisation : taper plus vite les commandes souvent utilisées.&lt;/p&gt;
+&lt;p&gt;Par exemple, comme j'utilise souvent la commande Maven &lt;code&gt;mvn&lt;/code&gt;, j'ai défini cet aliax Unix dans ma configuration de shell :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;alias&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mcist&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;mvn clean install -DskipTests&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Ainsi, je n'ai qu'à taper &lt;code&gt;mvncist&lt;/code&gt; pour reconstruire un projet Maven sans avoir à attendre l'exécution des tests.&lt;/p&gt;
+&lt;h3&gt;aliases à la demande&lt;/h3&gt;
+&lt;p&gt;Cas d'utilisation : éviter de taper de nombreuses fois la même commande que j'utilise de façon intensive pendant une période donnée.&lt;/p&gt;
+&lt;p&gt;Par exemple, je n'utilise pas souvent Docker en ligne de commandes, mais il peut m'arriver de l'utiliser plusieurs dizaines de fois pendant une heure, si j'investigue un problème ou si je définis une image via un fichier Dockerfile.
+Dans ce cas, je peux être amené à créer un alias Unix qui ne dure que le temps de ma session, puis je taperai les différents commandes en utilisant cet alias :&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;alias&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;d&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;docker
+d&lt;span class="w"&gt; &lt;/span&gt;ps
+d&lt;span class="w"&gt; &lt;/span&gt;images
+&lt;span class="c1"&gt;# etc.&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2&gt;filtrer la sortie 🔎&lt;/h2&gt;
+&lt;h3&gt;avec &lt;code&gt;grep&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;L'utilisation de &lt;em&gt;pipe&lt;/em&gt; Unix avec la commande &lt;code&gt;grep&lt;/code&gt; ou ses équivalents comme &lt;a href="https://github.com/ggreer/the_silver_searcher"&gt;ag, "the silver searcher"&lt;/a&gt; est bien utile quand je sais quoi chercher.&lt;/p&gt;
+&lt;p&gt;Par exemple, j'utilise souvent la commande &lt;code&gt;df -h | grep disk1s1&lt;/code&gt; pour connaître l'espace disque restant sur mon disque dur.&lt;/p&gt;
+&lt;h3&gt;avec &lt;code&gt;fzf&lt;/code&gt;, le "command-line fuzzy finder"&lt;/h3&gt;
+&lt;p&gt;Quand je ne sais pas précisement quoi chercher, j'utilise souvent &lt;a href="https://junegunn.github.io/fzf/"&gt;fzf, the "command-line fuzzy finder"&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Par exemple, quand je veux connaître la liste des environnements Java (&lt;em&gt;Java Development Kits&lt;/em&gt;) que j'ai installés, je lance peux taper la commande &lt;code&gt;sdk list java | fzf&lt;/code&gt; :&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Utilisation de 'fzf' pour filtrer la commande 'sdk'" src="images/nix-terminal-tricks-fzf-sdk.gif"&gt;&lt;/p&gt;
+&lt;p&gt;Et pour copier plusieurs lignes, l'option &lt;code&gt;--multi&lt;/code&gt; (ou sa version courte &lt;code&gt;-m&lt;/code&gt;) est pratique.&lt;/p&gt;
+&lt;p&gt;Par exemple, &lt;code&gt;eza ~ | fzf -m&lt;/code&gt; affiche :&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Utilisation de 'fzf' pour filtrer et selectionner plusieurs lignes de la commande 'eza'" src="images/nix-terminal-tricks-fzf-m-eza.gif"&gt;&lt;/p&gt;
+&lt;h2&gt;les &lt;em&gt;TUIs&lt;/em&gt;, pour aller plus vite ! ⚡️&lt;/h2&gt;
+&lt;p&gt;J'utilise plusieurs commandes de type &lt;a href="https://en.wikipedia.org/wiki/Text-based_user_interface"&gt;&lt;em&gt;Text-based User Interfaces&lt;/em&gt; (ou &lt;em&gt;Terminal-based&lt;/em&gt;)&lt;/a&gt;, souvent désignées par le sigle &lt;em&gt;TUI&lt;/em&gt; :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://jonas.github.io/tig/"&gt;tig&lt;/a&gt; pour explorer rapidement les commits Git (même si j'utilise aussi la commande &lt;code&gt;git&lt;/code&gt; dans mon terminal, ainsi que l'intégration Git de mon environnement de développement (&lt;em&gt;IDE&lt;/em&gt;).)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://github.com/jesseduffield/lazydocker"&gt;lazydocker&lt;/a&gt; pour manipuler des containers Docker rapidement (même j'utilise aussi la commande &lt;code&gt;docker&lt;/code&gt; directement)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="https://github.com/imsnif/diskonaut"&gt;diskonaut&lt;/a&gt; pour faire du ménage sur mon disque dur&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href="[url](https://github.com/korosuke613/gh-user-stars?tab=readme-ov-file)"&gt;l'extension GitHub CLI &lt;code&gt;user-stars&lt;/code&gt;&lt;/a&gt; pour retrouver des dépôts GitHub auxquels j'ai mis une "étoile" (sorte de favori)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Avant de finir, un remerciement à mes collègues qui m'ont aidé à apprendre ces astuces. Je pense notamment à Amazigh, Alexis, Stéphane, Yoann, Jean-Christophe... et je suis sûr d'en oublier (ne m'en veuillez pas) ! 🤗&lt;/p&gt;
+&lt;p&gt;Et voilà, c'est terminé ! 🤓&lt;/p&gt;</content><category term="all"></category><category term="nix shell terminal cli tui"></category></entry><entry><title>Mon Devoxx France 2024</title><link href="https://nicokosi.github.io/devoxx-fr-2024.html" rel="alternate"></link><published>2024-04-22T08:10:00+02:00</published><updated>2024-04-22T08:10:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2024-04-22:/devoxx-fr-2024.html</id><summary type="html">&lt;p&gt;Mon résumé de la conférence Devoxx France 2024.&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Mon Devoxx France 2024&lt;/h1&gt;
 &lt;p&gt;Cet article est un bilan des trois jours que j’ai eu la chance de passer à la conférence &lt;a href="https://www.devoxx.fr/"&gt;Devoxx France 2024&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Génial ! 💖&lt;/h2&gt;
 &lt;ul&gt;
