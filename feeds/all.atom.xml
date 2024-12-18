@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2024-12-13T07:00:00+01:00</updated><subtitle>Code explorations (🧑‍💻 + 🧪 = ⁉️)</subtitle><entry><title>Quelques astuces shell "unix-like" que j'utilise dans mon terminal 🧙</title><link href="https://nicokosi.github.io/nix-terminal-tricks.html" rel="alternate"></link><published>2024-11-28T06:52:00+01:00</published><updated>2024-12-13T07:00:00+01:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2024-11-28:/nix-terminal-tricks.html</id><summary type="html">&lt;p&gt;Quelques commandes shell "unix-like" que j'utilise souvent&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Quelques astuces shell *nix que j'utilise dans mon terminal 🧙&lt;/h1&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Nicokosi's blog</title><link href="https://nicokosi.github.io/" rel="alternate"></link><link href="https://nicokosi.github.io/feeds/all.atom.xml" rel="self"></link><id>https://nicokosi.github.io/</id><updated>2024-12-18T07:00:00+01:00</updated><subtitle>Code explorations (🧑‍💻 + 🧪 = ⁉️)</subtitle><entry><title>Quelques astuces shell "unix-like" que j'utilise dans mon terminal 🧙</title><link href="https://nicokosi.github.io/nix-terminal-tricks.html" rel="alternate"></link><published>2024-11-28T06:52:00+01:00</published><updated>2024-12-18T07:00:00+01:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2024-11-28:/nix-terminal-tricks.html</id><summary type="html">&lt;p&gt;astuces shell "unix-like"&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Quelques astuces shell *nix que j'utilise dans mon terminal 🧙&lt;/h1&gt;
 &lt;p&gt;Public présumé : dévelopeurs.ses utilisant leur terminal pour diverses tâches.&lt;/p&gt;
 &lt;p&gt;Voici quelques commandes / utilitaires que j'utilise régulièrement, peut-être que ça peut vous être utile ou que vous pourrez me donner votre avis ?&lt;/p&gt;
 &lt;h2&gt;l'anti-sèche &lt;code&gt;tldr&lt;/code&gt; 📝&lt;/h2&gt;
@@ -39,7 +39,7 @@ Obtenir la version de Git :
 &lt;h2&gt;alias permanents&lt;/h2&gt;
 &lt;p&gt;Cas d'utilisation : taper plus vite les commandes souvent utilisées.&lt;/p&gt;
 &lt;p&gt;Par exemple, comme j'utilise souvent la commande Maven &lt;code&gt;mvn&lt;/code&gt;, j'ai défini cet aliax Unix dans ma configuration de shell :&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;alias&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mcist&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;mvn clean install -DskipTests&amp;quot;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;alias&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mvncist&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;mvn clean install -DskipTests&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Ainsi, je n'ai qu'à taper &lt;code&gt;mvncist&lt;/code&gt; pour reconstruire un projet Maven sans avoir à attendre l'exécution des tests.&lt;/p&gt;
@@ -81,7 +81,7 @@ d&lt;span class="w"&gt; &lt;/span&gt;images
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Avant de finir, un remerciement à mes collègues qui m'ont aidé à apprendre ces astuces. Je pense notamment à Amazigh, Alexis, Stéphane, Yoann, Jean-Christophe... et je suis sûr d'en oublier (ne m'en veuillez pas) ! 🤗&lt;/p&gt;
-&lt;p&gt;Et voilà, c'est terminé ! 🤓&lt;/p&gt;</content><category term="all"></category><category term="nix shell terminal cli tui"></category></entry><entry><title>A few "unix-like" terminal tricks 🧙</title><link href="https://nicokosi.github.io/nix-terminal-tricks-en.html" rel="alternate"></link><published>2024-11-28T06:52:00+01:00</published><updated>2024-12-13T07:00:00+01:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2024-11-28:/nix-terminal-tricks-en.html</id><summary type="html">&lt;p&gt;Some unix-like shell commands I often use&lt;/p&gt;</summary><content type="html">&lt;h1&gt;A few *nix terminal tricks 🧙&lt;/h1&gt;
+&lt;p&gt;Et voilà, c'est terminé ! 🤓&lt;/p&gt;</content><category term="all"></category><category term="shell terminal cli tui"></category></entry><entry><title>A few "unix-like" terminal tricks 🧙</title><link href="https://nicokosi.github.io/nix-terminal-tricks-en.html" rel="alternate"></link><published>2024-11-28T06:52:00+01:00</published><updated>2024-12-18T07:00:00+01:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2024-11-28:/nix-terminal-tricks-en.html</id><summary type="html">&lt;p&gt;unix-like shell tricks&lt;/p&gt;</summary><content type="html">&lt;h1&gt;A few "unix-like" terminal tricks 🧙&lt;/h1&gt;
 &lt;p&gt;Assumed audience: developers interested in using the terminal for various tasks.&lt;/p&gt;
 &lt;p&gt;As a developer, I like using shell commands in my terminal. Here are a few random tips I have. Maybe you can learn from them, or give me back your tips/advises?&lt;/p&gt;
 &lt;h2&gt;Simplified help using &lt;code&gt;tldr&lt;/code&gt; 📝&lt;/h2&gt;
@@ -129,7 +129,7 @@ d&lt;span class="w"&gt; &lt;/span&gt;images
 &lt;h3&gt;Permanent aliases&lt;/h3&gt;
 &lt;p&gt;Use case: speed-up typing for frequently used commands.&lt;/p&gt;
 &lt;p&gt;For instance, since I often use Maven's &lt;code&gt;mvn&lt;/code&gt; commands in my terminal, I have defined this alias in my shell configuration:&lt;/p&gt;
-&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;alias&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mcist&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;mvn clean install -DskipTests&amp;quot;&lt;/span&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nb"&gt;alias&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mvncist&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;mvn clean install -DskipTests&amp;quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Then I can just type &lt;code&gt;mvncist&lt;/code&gt; to build any Maven project without running tests.&lt;/p&gt;
@@ -170,7 +170,7 @@ d&lt;span class="w"&gt; &lt;/span&gt;images
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;Thanks to my colleagues who helped me learning these tricks: Amazigh, Alexis, Stéphane, Yoann, Jean-Christophe...and all the others I forget (please forgive me)! 🤗&lt;/p&gt;
-&lt;p&gt;That's all I got, nerds! 🤓&lt;/p&gt;</content><category term="all"></category><category term="nix shell terminal cli tui"></category></entry><entry><title>Mon Devoxx France 2024</title><link href="https://nicokosi.github.io/devoxx-fr-2024.html" rel="alternate"></link><published>2024-04-22T08:10:00+02:00</published><updated>2024-04-22T08:10:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2024-04-22:/devoxx-fr-2024.html</id><summary type="html">&lt;p&gt;Mon résumé de la conférence Devoxx France 2024.&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Mon Devoxx France 2024&lt;/h1&gt;
+&lt;p&gt;That's all I got, nerds! 🤓&lt;/p&gt;</content><category term="all"></category><category term="shell terminal cli tui"></category></entry><entry><title>Mon Devoxx France 2024</title><link href="https://nicokosi.github.io/devoxx-fr-2024.html" rel="alternate"></link><published>2024-04-22T08:10:00+02:00</published><updated>2024-04-22T08:10:00+02:00</updated><author><name>Nicolas Kosinski</name></author><id>tag:nicokosi.github.io,2024-04-22:/devoxx-fr-2024.html</id><summary type="html">&lt;p&gt;Mon résumé de la conférence Devoxx France 2024.&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Mon Devoxx France 2024&lt;/h1&gt;
 &lt;p&gt;Cet article est un bilan des trois jours que j’ai eu la chance de passer à la conférence &lt;a href="https://www.devoxx.fr/"&gt;Devoxx France 2024&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Génial ! 💖&lt;/h2&gt;
 &lt;ul&gt;
