@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en" class="dark light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    
+
+    
+    
+    
+    <title>
+         Jouons avec le pattern matching en Scala
+        
+    </title>
+
+        
+            <meta property="og:title" content="Jouons avec le pattern matching en Scala" />
+        
+     
+
+     
+         
+             <meta property="og:description" content="Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d’illustrer par l&#x27;exemple le pattern matching en Scala." />
+         
+     
+
+     
+         
+             <meta name="description" content="Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d’illustrer par l&#x27;exemple le pattern matching en Scala." />
+         
+    
+
+    
+    
+
+    
+    
+        <link href=https://nicokosi.github.io/fonts.css rel="stylesheet" />
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+
+    
+    <link rel="alternate" type="application/atom+xml" title="" href="https://nicokosi.github.io/atom.xml">
+
+
+    
+    
+        <link rel="stylesheet" type="text/css" href=https://nicokosi.github.io/theme/light.css />
+        <link rel="stylesheet" type="text/css" href="https://nicokosi.github.io/theme/dark.css" media="(prefers-color-scheme: dark)" />
+    
+
+    <!-- Set the correct theme in the script -->
+    <script src=https://nicokosi.github.io/js/themetoggle.js></script>
+    
+        <script>
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                setTheme("dark");
+            } else {
+                setTheme("light");
+            }
+        </script>
+    
+
+    <link rel="stylesheet" type="text/css" media="screen" href=https://nicokosi.github.io/main.css />
+
+    
+    <script src=https://nicokosi.github.io/js/mermaid.js></script>
+</head>
+
+
+<body>
+    <div class="content">
+        <header>
+    <div class="main">
+        
+        <a href=https:&#x2F;&#x2F;nicokosi.github.io></a>
+        
+
+        <div class="socials">
+            
+            <a rel="me" href="https:&#x2F;&#x2F;fosstodon.org&#x2F;@nicokosi" class="social">
+                <img alt=mastodon src=https://nicokosi.github.io/social_icons/mastodon.svg>
+            </a>
+            
+            <a rel="me" href="https:&#x2F;&#x2F;bsky.app&#x2F;profile&#x2F;nicokosi.bsky.social" class="social">
+                <img alt=bluesky src=https://nicokosi.github.io/social_icons/bluesky.svg>
+            </a>
+            
+            <a rel="me" href="https:&#x2F;&#x2F;github.com&#x2F;nicokosi&#x2F;" class="social">
+                <img alt=github src=https://nicokosi.github.io/social_icons/github.svg>
+            </a>
+            
+        </div>
+    </div>
+
+    <nav>
+        
+        <a href=https://nicokosi.github.io style="margin-left: 0.5em">&#x2F;posts</a>
+        
+        <a href=https://nicokosi.github.io/tags style="margin-left: 0.5em">&#x2F;tags</a>
+        
+
+        
+    </nav>
+</header>
+
+
+        
+        
+    
+<main>
+    <article>
+        <div class="title">
+            
+            
+    <div class="page-header">
+        Jouons avec le pattern matching en Scala<span class="primary-color" style="font-size: 1.6em">.</span>
+    </div>
+
+
+                <div class="meta">
+                    
+                        Posted on <time>2016-09-14</time>
+                    
+
+                    
+
+                    
+
+                    
+                    
+                            <span class="tags-label"> :: Tags:</span>
+                            <span class="tags">
+                                    <a href="https://nicokosi.github.io/tags/scala/" class="post-tag">scala</a>, 
+                                
+                                    <a href="https://nicokosi.github.io/tags/pattern-matching/" class="post-tag">pattern-matching</a>, 
+                                
+                                    <a href="https://nicokosi.github.io/tags/console/" class="post-tag">console</a>, 
+                                
+                                    <a href="https://nicokosi.github.io/tags/repl/" class="post-tag">repl</a>
+                                
+                            </span>
+                    
+
+                    
+                    
+
+                    
+
+                </div>
+        </div>
+
+        
+
+        
+        
+
+        <section class="body">
+            <h1 id="jouons-avec-le-pattern-matching-en-scala">Jouons avec le pattern matching en Scala</h1>
+<p>Le pattern matching est une technique puissante permettant de filtrer et de tester la valeur de variables. Le but de cet article est d’illustrer par l'exemple le pattern matching en Scala.</p>
+<p>Supposons que nous voulions créer une fonction retournant la couleur (noir / rouge) d'une enseigne d'une carte à jouer (les quatre enseignes du jeu français étant : trèfle, cœur, carreau et pique).</p>
+<p>Notes : dans le code ci-dessous, les commentaires se trouvant à la fin de chaque ligne correspondent à la sortie standard de la console ; j'ai utilisé un <a href="https://confluence.jetbrains.com/display/IntelliJIDEA/Working+with+Scala+Worksheet">worksheet IntelliJ IDEA</a> pour coder interactivement cet exemple, mais on peut bien sûr utiliser la console Scala.</p>
+<br/>
+## 1ère étape : création d'une simple classe
+<p>Commençons par créer une classe immuable représentant l'enseigne "trèfle" :</p>
+<pre data-lang="scala" style="background-color:#2b303b;color:#c0c5ce;" class="language-scala "><code class="language-scala" data-lang="scala"><span style="color:#b48ead;">class</span><span style="color:#ebcb8b;"> Trèfle </span><span style="color:#eff1f5;">{
+</span><span style="color:#eff1f5;">   </span><span style="color:#b48ead;">val </span><span style="color:#bf616a;">symbole </span><span>= &quot;</span><span style="color:#a3be8c;">♣</span><span>&quot;
+</span><span style="color:#eff1f5;">   </span><span style="color:#b48ead;">val </span><span style="color:#bf616a;">libellé </span><span>= &quot;</span><span style="color:#a3be8c;">trèfle</span><span>&quot;
+</span><span style="color:#eff1f5;">}
+</span><span>
+</span><span style="color:#b48ead;">val </span><span style="color:#bf616a;">trèfle</span><span>: </span><span style="color:#ebcb8b;">Trèfle </span><span>= </span><span style="color:#b48ead;">new </span><span style="color:#ebcb8b;">Trèfle</span><span>()
+</span><span>trèfle.symbole </span><span style="color:#65737e;">// ♣
+</span></code></pre>
+<p>Notons que cette classe permet de comparer des objets par identité (référence) et non par valeur car on ne surcharge pas la méthode <code>equals</code> :</p>
+<pre data-lang="scala" style="background-color:#2b303b;color:#c0c5ce;" class="language-scala "><code class="language-scala" data-lang="scala"><span>trèfle.equals(trèfle) </span><span style="color:#65737e;">// true
+</span><span>trèfle == </span><span style="color:#b48ead;">new </span><span style="color:#ebcb8b;">Trèfle </span><span style="color:#65737e;">// false
+</span><span>trèfle.eq(</span><span style="color:#b48ead;">new </span><span style="color:#ebcb8b;">Trèfle</span><span>) </span><span style="color:#65737e;">// false
+</span><span>trèfle.equals(</span><span style="color:#b48ead;">new </span><span style="color:#ebcb8b;">Trèfle</span><span>) </span><span style="color:#65737e;">// false
+</span></code></pre>
+<p>De même, les méthodes <code>hashCode</code>, <code>toString</code> sont celles par défaut :</p>
+<pre data-lang="scala" style="background-color:#2b303b;color:#c0c5ce;" class="language-scala "><code class="language-scala" data-lang="scala"><span>trèfle </span><span style="color:#65737e;">// Trèfle@1ac88f64
+</span><span>trèfle.hashCode() </span><span style="color:#65737e;">// 123717365
+</span><span style="color:#b48ead;">new </span><span style="color:#ebcb8b;">Trèfle</span><span>().hashCode() </span><span style="color:#65737e;">// 1323753063
+</span></code></pre>
+<br/>
+## 2ème étape : création d'une case class
+<p>La création d'une <code>case class</code> permet :</p>
+<ol>
+<li>d'auto-implémenter les méthodes <code>equals</code>, <code>hashCode</code> et <code>toString</code> ;</li>
+<li>de bénéficier de deux méthodes utiles au pattern matching : un "constructeur", la méthode <code>apply</code>, et un "dé-constructeur", la méthode <code>unapply</code>.</li>
+</ol>
+<pre data-lang="scala" style="background-color:#2b303b;color:#c0c5ce;" class="language-scala "><code class="language-scala" data-lang="scala"><span style="color:#b48ead;">case class</span><span style="color:#ebcb8b;"> Enseigne</span><span>(</span><span style="color:#bf616a;">symbole</span><span>: </span><span style="color:#ebcb8b;">String</span><span>, </span><span style="color:#bf616a;">libellé</span><span>: </span><span style="color:#ebcb8b;">String</span><span>)
+</span></code></pre>
+<p>Nous avons un constructeur "gratuit", la méthode <code>apply</code>:</p>
+<pre data-lang="scala" style="background-color:#2b303b;color:#c0c5ce;" class="language-scala "><code class="language-scala" data-lang="scala"><span>Enseigne(&quot;</span><span style="color:#a3be8c;">♣</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">trèfle</span><span>&quot;) </span><span style="color:#65737e;">// Enseigne(♣,trèfle)
+</span></code></pre>
+<p>Nous avons également une implémentation "gratuite", basée sur les champs, des méthodes <code>equals</code>, <code>hashCode</code> et <code>toString</code> :</p>
+<pre data-lang="scala" style="background-color:#2b303b;color:#c0c5ce;" class="language-scala "><code class="language-scala" data-lang="scala"><span>Enseigne(&quot;</span><span style="color:#a3be8c;">♣</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">trèfle</span><span>&quot;).symbole </span><span style="color:#65737e;">// ♣
+</span><span>Enseigne(&quot;</span><span style="color:#a3be8c;">♣</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">trèfle</span><span>&quot;) == Enseigne(&quot;</span><span style="color:#a3be8c;">♣</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">trèfle</span><span>&quot;) </span><span style="color:#65737e;">// true
+</span><span>Enseigne(&quot;</span><span style="color:#a3be8c;">♣</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">trèfle</span><span>&quot;).equals(Enseigne(&quot;</span><span style="color:#a3be8c;">♣</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">trèfle</span><span>&quot;)) </span><span style="color:#65737e;">// true
+</span><span>Enseigne(&quot;</span><span style="color:#a3be8c;">♣</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">trèfle</span><span>&quot;).eq(Enseigne(&quot;</span><span style="color:#a3be8c;">♣</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">trèfle</span><span>&quot;)) </span><span style="color:#65737e;">// false
+</span><span>Enseigne(&quot;</span><span style="color:#a3be8c;">♣</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">trèfle</span><span>&quot;).hashCode() </span><span style="color:#65737e;">// 841520215
+</span><span>Enseigne(&quot;</span><span style="color:#a3be8c;">♣</span><span>&quot;, &quot;</span><span style="color:#a3be8c;">trèfle</span><span>&quot;).hashCode() </span><span style="color:#65737e;">// 841520215
+</span></code></pre>
+<br/>
+## Etape "bonus" : création d'une énumération
+<p>Puisque nous avons quatre enseignes, nous pouvons créer une énumération. Ca ne servira pas directement à implémenter notre exemple final mais l'exemple s'y prête bien.</p>
+<pre data-lang="scala" style="background-color:#2b303b;color:#c0c5ce;" class="language-scala "><code class="language-scala" data-lang="scala"><span style="color:#b48ead;">object</span><span style="color:#ebcb8b;"> Enseignes </span><span style="color:#eff1f5;">{
+</span><span style="color:#eff1f5;">  </span><span style="color:#b48ead;">val </span><span style="color:#bf616a;">TREFLE </span><span>= </span><span style="color:#eff1f5;">Enseigne(</span><span>&quot;</span><span style="color:#a3be8c;">♣</span><span>&quot;</span><span style="color:#eff1f5;">, </span><span>&quot;</span><span style="color:#a3be8c;">trèfle</span><span>&quot;</span><span style="color:#eff1f5;">)
+</span><span style="color:#eff1f5;">  </span><span style="color:#b48ead;">val </span><span style="color:#bf616a;">CARREAU </span><span>= </span><span style="color:#eff1f5;">Enseigne(</span><span>&quot;</span><span style="color:#a3be8c;">♦</span><span>&quot;</span><span style="color:#eff1f5;">, </span><span>&quot;</span><span style="color:#a3be8c;">carreau</span><span>&quot;</span><span style="color:#eff1f5;">)
+</span><span style="color:#eff1f5;">  </span><span style="color:#b48ead;">val </span><span style="color:#bf616a;">COEUR </span><span>= </span><span style="color:#eff1f5;">Enseigne(</span><span>&quot;</span><span style="color:#a3be8c;">♥</span><span>&quot;</span><span style="color:#eff1f5;">, </span><span>&quot;</span><span style="color:#a3be8c;">coeur</span><span>&quot;</span><span style="color:#eff1f5;">)
+</span><span style="color:#eff1f5;">  </span><span style="color:#b48ead;">val </span><span style="color:#bf616a;">PIQUE </span><span>= </span><span style="color:#eff1f5;">Enseigne(</span><span>&quot;</span><span style="color:#a3be8c;">♠</span><span>&quot;</span><span style="color:#eff1f5;">, </span><span>&quot;</span><span style="color:#a3be8c;">pique</span><span>&quot;</span><span style="color:#eff1f5;">)
+</span><span style="color:#eff1f5;">  </span><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">values</span><span style="color:#eff1f5;">() </span><span>= </span><span style="color:#eff1f5;">List(CARREAU, COEUR, PIQUE, TREFLE)
+</span><span style="color:#eff1f5;">}
+</span><span>Enseignes.TREFLE != Enseignes.CARREAU </span><span style="color:#65737e;">// true
+</span><span>Enseignes.values </span><span style="color:#65737e;">// List[Enseigne] = List(Enseigne(♦,carreau), Enseigne(♥,coeur), Enseigne(♠,pique), Enseigne(♣,trèfle))
+</span></code></pre>
+<br/>
+## Dernière étape : pattern matchons !
+<h3 id="premier-exemple">Premier exemple</h3>
+<p>Un premier exemple de pattern matching, utilisé dans une fonction qui retourne la couleur de l'enseigne :</p>
+<pre data-lang="scala" style="background-color:#2b303b;color:#c0c5ce;" class="language-scala "><code class="language-scala" data-lang="scala"><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">indiquerJusteLaCouleur</span><span>(</span><span style="color:#bf616a;">cardSuite</span><span>: </span><span style="color:#ebcb8b;">Enseigne</span><span>): </span><span style="color:#ebcb8b;">String </span><span>= cardSuite </span><span style="color:#b48ead;">match </span><span>{
+</span><span>  </span><span style="color:#b48ead;">case </span><span>Enseignes.TREFLE | Enseignes.PIQUE </span><span style="color:#b48ead;">=&gt; </span><span>&quot;</span><span style="color:#a3be8c;">noir</span><span>&quot;
+</span><span>  </span><span style="color:#b48ead;">case </span><span>Enseignes.CARREAU | Enseignes.COEUR </span><span style="color:#b48ead;">=&gt; </span><span>&quot;</span><span style="color:#a3be8c;">rouge</span><span>&quot;
+</span><span>  </span><span style="color:#b48ead;">case </span><span style="color:#bf616a;">_ </span><span style="color:#b48ead;">=&gt; </span><span>&quot;</span><span style="color:#a3be8c;">aucune</span><span>&quot;
+</span><span>}
+</span><span>
+</span><span>indiquerJusteLaCouleur(Enseignes.PIQUE) </span><span style="color:#65737e;">// noir
+</span></code></pre>
+<p>Ce premier exemple met en avant :</p>
+<ul>
+<li>la notation <code>|</code> (<em>disjunction</em>) permettant de regrouper plusieurs cas ;</li>
+<li>la notation <code>_</code> (<em>wildcard</em>) pour gérer les autres cas.</li>
+</ul>
+<h3 id="deuxieme-exemple">Deuxième exemple</h3>
+<p>Voici un deuxième exemple montrant comment récupérer sélectivement certains champs (ici, le libellé de l'enseigne) en "dé-structurant" notre instance de <code>case class</code>, via la méthode <code>unapply</code>.</p>
+<pre data-lang="scala" style="background-color:#2b303b;color:#c0c5ce;" class="language-scala "><code class="language-scala" data-lang="scala"><span style="color:#b48ead;">def </span><span style="color:#8fa1b3;">décrireLaCouleur</span><span>(</span><span style="color:#bf616a;">enseigne</span><span>: </span><span style="color:#ebcb8b;">Enseigne</span><span>): </span><span style="color:#ebcb8b;">String </span><span>= enseigne </span><span style="color:#b48ead;">match </span><span>{
+</span><span>  </span><span style="color:#b48ead;">case </span><span>Enseigne(</span><span style="color:#bf616a;">_</span><span>, </span><span style="color:#bf616a;">libellé</span><span>) </span><span style="color:#b48ead;">=&gt; </span><span style="color:#96b5b4;">s</span><span>&quot;</span><span style="color:#bf616a;">$libellé</span><span style="color:#a3be8c;"> is ${</span><span>indiquerJusteLaCouleur(enseigne)</span><span style="color:#a3be8c;">}</span><span>&quot;
+</span><span>}
+</span><span>
+</span><span>décrireLaCouleur(Enseignes.PIQUE) </span><span style="color:#65737e;">// pique est noir
+</span></code></pre>
+<p>Et voilà ! 🤓</p>
+<p>PS : merci à Jérôme Prudent pour ses tuyaux en Scala et ses avis éclairés.
+Jérôme est contributeur au <a href="http://www.arolla.fr/blog">blog d'Arolla</a> (<a href="http://www.arolla.fr/blog/author/jerome-prudent/">lien direct vers ses articles</a>).</p>
+
+        </section>
+    </article>
+</main>
+
+
+
+        
+            
+        
+
+        
+    </div>
+</body>
+
+</html>
