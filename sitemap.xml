@@ -115,6 +115,9 @@
         <loc>https://nicokosi.github.io/fr/tags/clojure/</loc>
     </url>
     <url>
+        <loc>https://nicokosi.github.io/fr/tags/conference/</loc>
+    </url>
+    <url>
         <loc>https://nicokosi.github.io/fr/tags/console/</loc>
     </url>
     <url>
@@ -122,6 +125,9 @@
     </url>
     <url>
         <loc>https://nicokosi.github.io/fr/tags/dataviz/</loc>
+    </url>
+    <url>
+        <loc>https://nicokosi.github.io/fr/tags/devoxx/</loc>
     </url>
     <url>
         <loc>https://nicokosi.github.io/fr/tags/github/</loc>
@@ -179,6 +185,9 @@
     </url>
     <url>
         <loc>https://nicokosi.github.io/fr/tags/terminal/</loc>
+    </url>
+    <url>
+        <loc>https://nicokosi.github.io/fr/tags/tools/</loc>
     </url>
     <url>
         <loc>https://nicokosi.github.io/fr/tags/tui/</loc>
